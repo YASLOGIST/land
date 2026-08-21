@@ -1,22 +1,16 @@
 'use client'
 
 /**
- * LandLogisticsSection — YASLOGIST Land Operations Scrollytelling
+ * LandLogisticsSection — YASLOGIST 6G Logistics Digital Twin
  *
- * Directive 1: Absolute Zero-Occlusion Left-Pinned Stage Cards
- * - Strict, fixed vertical timeline stack pinned to the absolute left margin (left-4 sm:left-6 lg:left-8 top-1/2 -translate-y-1/2).
- * - Maximum width strictly constrained (w-[310px] sm:w-[345px] lg:w-[370px]) so the center and right regions
- *   (where AMRs, forklifts, and heavy trucks operate in all 3 stages) remain 100% visible and unobstructed.
- *
- * Directive 2: Double-Mount True Cinematic Theme Cross-Fade
- * - Both /videos/FINAL.mp4 (Light) and /videos/FINALnight.mp4 (Dark) mounted simultaneously in the DOM.
- * - Dark video opacity tied to theme with `transition-opacity duration-1000 ease-in-out` for a butter-smooth,
- *   continuous, and jump-free theme transition.
- * - Frame-accurate time synchronization in lockstep across both video elements.
- *
- * Directive 1 (Part B): Natural Corner Occlusion
- * - Expanded 'SIM ENGINE' HUD widget positioned in the bottom-right corner to naturally and imperceptibly
- *   cover the video generation artifact without any artificial post-processing blur on the video itself.
+ * Directive 1: Ultra-Glassmorphism & Cinematic Theme Sync
+ * - Hyper-premium optical glassmorphism (backdrop-blur-3xl bg-white/[0.06] in Light, bg-black/30 in Dark)
+ *   with specular top reflection lines and sub-pixel highlight borders.
+ * - Dynamic telemetry metrics projecting outside the card bounds, synchronized with active AMR/Truck action.
+ * - Double-Mount video architecture with organic 1000ms cubic-bezier opacity cross-fade for realistic
+ *   ambient lighting simulation between day and night.
+ * - Fixed left-pinned spatial anchoring with zero occlusion of AMRs, forklifts, and trucks across LTR & RTL.
+ * - Naturally occluding bottom-right SIM ENGINE HUD widget with 100% native pixel video clarity.
  */
 
 import { useEffect, useMemo, useRef, useState, useCallback } from 'react'
@@ -35,6 +29,7 @@ import {
   ChevronDown,
   Radio,
   Terminal,
+  Sparkles,
 } from 'lucide-react'
 import { useLanguage } from '@/hooks/use-language'
 import type {
@@ -57,7 +52,10 @@ const DEFAULT_SCROLL_LENGTH = 5
 
 const t = (en: string, ar: string): BilingualText => ({ en, ar })
 
-const PHASES: PhaseProps[] = [
+const PHASES: (PhaseProps & {
+  floatingProjection: BilingualText
+  projectedStatus: string
+})[] = [
   {
     index: 0,
     range: [0, 0.35] as const,
@@ -71,6 +69,8 @@ const PHASES: PhaseProps[] = [
       'Directing Autonomous Mobile Robots (AMRs) for high-precision sorting, batching, and preparation within distribution centers.',
       'توجيه الروبوتات المستقلة (AMRs) لتصنيف وتجميع وتجهيز الشحنات بدقة فائقة داخل مراكز التوزيع اللوجستية.',
     ),
+    floatingProjection: t('6G AMR Swarm Mesh // Active Node', 'شبكة أسراب الروبوتات 6G // عقدة نشطة'),
+    projectedStatus: '12ms LATENCY // 99.9% SYNC',
     metrics: [
       { id: 'amr-sync', icon: Cpu, label: t('AMR Sync', 'مزامنة الروبوتات'), value: '12ms LATENCY' },
       { id: 'iot', icon: Activity, label: t('IoT Sensors', 'مستشعرات IoT'), value: 'CALIBRATED' },
@@ -90,6 +90,8 @@ const PHASES: PhaseProps[] = [
       'Synchronizing equipment movement and safe forklift retraction with container telemetry for secure sealing and Zero-Loss compliance.',
       'مزامنة حركة المعدات وتراجع الرافعة الآمن مع مستشعرات الحاويات لضمان الإغلاق المحكم والامتثال الأمني (Zero-Loss).',
     ),
+    floatingProjection: t('Robotic Retraction & Seal // Zero-Loss', 'تراجع آلي وقفل أمني // خالي من الفقدان'),
+    projectedStatus: 'TELEMETRY LOCKED // SECURED',
     metrics: [
       { id: 'load-cycle', icon: Forklift, label: t('Load Cycle', 'دورة التحميل'), value: '02:14 MIN' },
       { id: 'telemetry', icon: ShieldCheck, label: t('Telemetry', 'رابط القياس'), value: 'SECURED' },
@@ -109,6 +111,8 @@ const PHASES: PhaseProps[] = [
       'Routing advanced truck fleets via AI-driven dynamic paths with continuous trip status and real-time waypoint telemetry.',
       'توجيه أسطول الشاحنات المتقدمة عبر مسارات ديناميكية مدعومة بالذكاء الاصطناعي ومراقبة الحالة اللحظية للرحلة.',
     ),
+    floatingProjection: t('Electric Highway Platoon // Highway V2X', 'شاحنات كهربائية مستقلة // V2X متصل'),
+    projectedStatus: 'WAYPOINT SYNCED // LIVE',
     metrics: [
       { id: 'grid', icon: Cpu, label: t('Grid Power', 'طاقة الشبكة'), value: '94% EFFICIENT' },
       { id: 'gps', icon: Globe, label: t('GPS Route', 'مسار GPS'), value: 'DYNAMIC' },
@@ -118,25 +122,25 @@ const PHASES: PhaseProps[] = [
 ]
 
 const DISCLAIMER: BilingualText = t(
-  'High-Fidelity Telemetry Simulation — Digital twin model illustrating YASLOGIST autonomous mechanics.',
-  'نموذج محاكاة للقياس عن بُعد عالي الدقة — يوضح الآلية التشغيلية لمنظومة ياسلوجيست المستقلة.',
+  '6G High-Fidelity Telemetry Simulation — Digital twin model illustrating YASLOGIST autonomous mechanics.',
+  'نموذج محاكاة للقياس عن بُعد 6G عالي الدقة — يوضح الآلية التشغيلية لمنظومة ياسلوجيست المستقلة.',
 )
 
 /* ========================================================================== */
-/*  Zero-Color Optical Glass Styling Tokens                                   */
+/*  Zero-Color Ultra Optical Glass Styling Tokens                             */
 /* ========================================================================== */
 
 const S = {
   card: {
-    dark: 'border border-white/15 bg-slate-950/80 backdrop-blur-2xl shadow-[0_20px_50px_rgba(0,0,0,0.7),inset_0_1px_1px_rgba(255,255,255,0.18)]',
-    light: 'border border-slate-300/90 bg-white/90 backdrop-blur-2xl shadow-[0_20px_50px_rgba(15,23,42,0.12),inset_0_1px_1px_rgba(255,255,255,0.95)]',
+    dark: 'border border-white/20 bg-black/40 backdrop-blur-3xl shadow-[0_24px_60px_rgba(0,0,0,0.8),inset_0_1px_1.5px_rgba(255,255,255,0.25)]',
+    light: 'border border-slate-300/90 bg-white/90 backdrop-blur-3xl shadow-[0_24px_60px_rgba(15,23,42,0.15),inset_0_1px_1.5px_rgba(255,255,255,0.95)]',
   },
   metric: {
-    dark: 'border border-white/10 bg-white/[0.03] backdrop-blur-xl hover:border-cyan-400/40 transition-colors',
-    light: 'border border-slate-200 bg-white/80 backdrop-blur-xl shadow-xs hover:border-cyan-500/50 transition-colors',
+    dark: 'border border-white/10 bg-white/[0.04] backdrop-blur-2xl hover:border-cyan-400/50 transition-colors',
+    light: 'border border-slate-200 bg-white/80 backdrop-blur-2xl shadow-xs hover:border-cyan-500/50 transition-colors',
   },
   icon: {
-    dark: 'bg-white/[0.05] text-cyan-300 border border-white/15 shadow-[0_0_15px_rgba(6,182,212,0.25)]',
+    dark: 'bg-cyan-500/10 text-cyan-300 border border-cyan-400/30 shadow-[0_0_20px_rgba(6,182,212,0.3)]',
     light: 'bg-cyan-50 text-cyan-900 border border-cyan-300 shadow-xs',
   },
   railActive: 'bg-cyan-400 shadow-[0_0_15px_rgba(6,182,212,1)] scale-y-110',
@@ -188,7 +192,7 @@ export default function LandLogisticsSection({
       ui: {
         scrollHint: language === 'ar' ? 'مرّر للاستكشاف' : 'Scroll to explore',
         phaseCounter: language === 'ar' ? 'المرحلة' : 'Phase',
-        simulationBadge: language === 'ar' ? 'محرك المحاكاة' : 'SIM ENGINE',
+        simulationBadge: language === 'ar' ? 'محرك المحاكاة 6G' : '6G SIM ENGINE',
         themeToggle: language === 'ar' ? 'تبديل المظهر' : 'Toggle theme',
         languageToggle: language === 'ar' ? 'English' : 'العربية',
       },
@@ -332,7 +336,7 @@ export default function LandLogisticsSection({
   const simPhaseDetails = [
     {
       badge: t('PHASE 01: SMART WAREHOUSING', 'المرحلة 01: المستودعات الذكية'),
-      sub: t('AMR Fleet Mesh & Dynamic Staging', 'أسراب الروبوتات والتجهيز الذكي'),
+      sub: t('6G AMR Fleet Mesh & Staging', 'أسراب الروبوتات والتجهيز الذكي 6G'),
       status: t('ACTIVE // 12ms', 'نشط // 12ms'),
     },
     {
@@ -361,7 +365,7 @@ export default function LandLogisticsSection({
       {/* ─── Sticky Viewport Container ─── */}
       <div className="sticky top-0 h-screen w-full overflow-hidden">
 
-        {/* ─── DIRECTIVE 2: DOUBLE-MOUNT CINEMATIC THEME CROSS-FADE ─── */}
+        {/* ─── DOUBLE-MOUNT CINEMATIC THEME CROSS-FADE ─── */}
         {/* BASE LAYER: Daytime Video (/videos/FINAL.mp4) */}
         <video
           ref={lightVideoRef}
@@ -390,8 +394,7 @@ export default function LandLogisticsSection({
           aria-hidden="true"
         />
 
-        {/* ─── DIRECTIVE 1: ABSOLUTE ZERO-OCCLUSION LEFT-PINNED STAGE CARDS ─── */}
-        {/* Strictly pinned to the left edge so center/right (AMRs, Forklifts, Trucks) are 100% visible */}
+        {/* ─── ZERO-OCCLUSION LEFT-PINNED STAGE CARDS & PROJECTING TELEMETRY ─── */}
         <div
           className={`absolute top-1/2 -translate-y-1/2 left-4 sm:left-6 lg:left-8 z-20 w-[310px] sm:w-[345px] lg:w-[370px] pointer-events-auto ${
             isRTL ? 'text-right' : 'text-left'
@@ -517,6 +520,29 @@ export default function LandLogisticsSection({
               </div>
             </motion.article>
           </AnimatePresence>
+
+          {/* Floating Projected Telemetry Badge (Projecting from Card Bounds) */}
+          <motion.div
+            key={`proj-${activePhase}`}
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3 }}
+            className={`mt-2.5 p-2 rounded-2xl border backdrop-blur-2xl flex items-center justify-between gap-2 ${
+              mode === 'dark'
+                ? 'bg-cyan-500/10 border-cyan-500/30 text-cyan-300 shadow-[0_0_15px_rgba(6,182,212,0.2)]'
+                : 'bg-cyan-50 border-cyan-300 text-cyan-950 shadow-xs'
+            }`}
+          >
+            <div className="flex items-center gap-1.5">
+              <Sparkles className="w-3 h-3 text-cyan-400 animate-pulse" />
+              <span className="font-mono text-[9px] font-bold">
+                {PHASES[activePhase].floatingProjection[language]}
+              </span>
+            </div>
+            <span className="font-mono text-[8.5px] font-extrabold px-1.5 py-0.2 rounded bg-cyan-400 text-slate-950">
+              {PHASES[activePhase].projectedStatus}
+            </span>
+          </motion.div>
         </div>
 
         {/* ─── Phase Progress Rail ─── */}
@@ -559,7 +585,7 @@ export default function LandLogisticsSection({
           )}
         </AnimatePresence>
 
-        {/* ─── DIRECTIVE 1 (Part B): Naturally Occluding Bottom-Right SIM ENGINE HUD Widget ─── */}
+        {/* ─── Naturally Occluding Bottom-Right SIM ENGINE HUD Widget ─── */}
         <motion.aside
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}

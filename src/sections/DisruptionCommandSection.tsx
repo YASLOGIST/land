@@ -1,15 +1,15 @@
 'use client'
 
 /**
- * DisruptionCommandSection — YASLOGIST AI Crisis Disruption Engine
+ * DisruptionCommandSection — YASLOGIST 6G AI Crisis Disruption Engine
  *
- * Directive 3 & 4: Professional Cartographic GIS Incident Crisis Canvas & Optical Neon Luminescence
- * - Detailed cartographic SVG continent map (North/South America, Europe, Africa, Middle East, Asia, Australia).
+ * Directive 2 & 4: Cartographic GIS Crisis Vector Canvas & Multi-Stage Optical Neon Luminescence
+ * - Geographically accurate SVG continent map (North/South America, Europe, Africa, Middle East, Asia, Australia).
  * - Multi-stage genuine optical neon glow SVG filters (<feGaussianBlur> + <feMerge>).
- * - Luminous Color Gradients:
- *   * Red Disrupted Corridors: Glowing neon rose/red with alert pulse drop-shadows and chokepoint hold telemetry.
+ * - Luminous Cyber Gradients:
+ *   * Red Disrupted Corridors: Deep neon rose/red with alert pulse drop-shadows and chokepoint hold telemetry.
  *   * Green AI Blockchain Bypasses: Cyber emerald glowing bezier curves with animated high-speed particle dashes.
- * - Synchronized optical diamond glassmorphism with deep backdrop-blur-2xl styling.
+ * - Synchronized optical diamond glassmorphism with deep backdrop-blur-3xl styling and dynamic contextual tinting.
  */
 
 import { useState, useMemo, useCallback } from 'react'
@@ -312,7 +312,7 @@ export default function DisruptionCommandSection() {
     const hoursSaved = activeStrategy.delayMitigationHours
     const efficiencyGain = Number((22.4 + activeStrategy.confidenceScore * 0.05).toFixed(1))
 
-    const rawSeed = `AUTH-REROUTE-${activeScenario.code}-${activeStrategy.id}-2026-ZERO-TRUST`
+    const rawSeed = `AUTH-REROUTE-${activeScenario.code}-${activeStrategy.id}-2026-6G`
     let hash = 0
     for (let i = 0; i < rawSeed.length; i++) {
       hash = (hash << 5) - hash + rawSeed.charCodeAt(i)
@@ -338,7 +338,7 @@ export default function DisruptionCommandSection() {
   }, [simulation.authChecksumToken])
 
   const ui = {
-    kicker: t('AUTONOMOUS DISRUPTION COMMAND CENTER', 'مركز القيادة والتحكم الذاتي لمعالجة الاختناقات'),
+    kicker: t('6G AUTONOMOUS DISRUPTION COMMAND CENTER', 'مركز القيادة والتحكم الذاتي لمعالجة الاختناقات 6G'),
     title: t('AI-Powered Global Incident Resolution', 'معالجة فورية لأزمات سلاسل التوريد بالذكاء الاصطناعي'),
     subtitle: t(
       'Live trade bottleneck detection with predictive autonomous rerouting, instant carrier dispatch, and zero-loss SLA assurance.',
@@ -429,7 +429,7 @@ export default function DisruptionCommandSection() {
                     setSelectedScenarioId(scenario.id)
                     setSelectedStrategyId('speed')
                   }}
-                  className={`p-5 rounded-3xl text-start transition-all duration-300 border backdrop-blur-2xl flex flex-col justify-between ${
+                  className={`p-5 rounded-3xl text-start transition-all duration-300 border backdrop-blur-3xl flex flex-col justify-between ${
                     isSelected
                       ? mode === 'dark'
                         ? 'bg-rose-500/10 border-rose-400 text-white shadow-[0_0_25px_rgba(244,63,94,0.3)]'
@@ -476,10 +476,8 @@ export default function DisruptionCommandSection() {
 
           {/* Right Column: Cartographic GIS Crisis Map & AI Resolution Console (7 Columns) */}
           <div
-            className={`lg:col-span-7 rounded-3xl p-6 sm:p-8 backdrop-blur-2xl border transition-all duration-300 flex flex-col justify-between ${
-              mode === 'dark'
-                ? 'bg-slate-950/80 border-white/10 shadow-[0_16px_40px_rgba(0,0,0,0.6)]'
-                : 'bg-white/95 border-slate-300 shadow-xl'
+            className={`lg:col-span-7 rounded-3xl p-6 sm:p-8 backdrop-blur-3xl border border-rose-500/30 shadow-[0_16px_50px_rgba(244,63,94,0.15)] transition-all duration-300 flex flex-col justify-between ${
+              mode === 'dark' ? 'bg-slate-950/85' : 'bg-white/95'
             }`}
           >
             {/* Top Incident Status Header */}
@@ -491,7 +489,7 @@ export default function DisruptionCommandSection() {
                   </div>
                   <div>
                     <span className="font-mono font-bold text-[9.5px] text-emerald-400 block leading-tight">
-                      GIS_INCIDENT_INTERVENTION
+                      6G_INCIDENT_INTERVENTION
                     </span>
                     <span className={`text-sm font-extrabold ${mode === 'dark' ? 'text-white' : 'text-slate-950'}`}>
                       {activeScenario.location[language]}
@@ -511,7 +509,7 @@ export default function DisruptionCommandSection() {
                 <svg className="absolute inset-0 w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
                   <defs>
                     {/* Genuine Multi-Stage Optical Neon Filter for Rose/Red */}
-                    <filter id="crisis-neon-red" x="-50%" y="-50%" width="200%" height="200%">
+                    <filter id="crisis-6g-red" x="-50%" y="-50%" width="200%" height="200%">
                       <feGaussianBlur in="SourceGraphic" stdDeviation="1.5" result="blur1" />
                       <feGaussianBlur in="SourceGraphic" stdDeviation="3.5" result="blur2" />
                       <feMerge>
@@ -522,7 +520,7 @@ export default function DisruptionCommandSection() {
                     </filter>
 
                     {/* Genuine Multi-Stage Optical Neon Filter for Cyber Emerald */}
-                    <filter id="crisis-neon-emerald" x="-50%" y="-50%" width="200%" height="200%">
+                    <filter id="crisis-6g-emerald" x="-50%" y="-50%" width="200%" height="200%">
                       <feGaussianBlur in="SourceGraphic" stdDeviation="1.5" result="blur1" />
                       <feGaussianBlur in="SourceGraphic" stdDeviation="3.5" result="blur2" />
                       <feMerge>
@@ -533,7 +531,7 @@ export default function DisruptionCommandSection() {
                     </filter>
 
                     {/* Luminous Bypass Gradient */}
-                    <linearGradient id="crisis-bypass-gradient-beam" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <linearGradient id="crisis-6g-bypass-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
                       <stop offset="0%" stopColor="#22d3ee" />
                       <stop offset="50%" stopColor="#10b981" />
                       <stop offset="100%" stopColor="#34d399" />
@@ -573,28 +571,28 @@ export default function DisruptionCommandSection() {
                     stroke="rgba(244,63,94,0.9)"
                     strokeWidth="3"
                     strokeDasharray="3 2.5"
-                    filter="url(#crisis-neon-red)"
+                    filter="url(#crisis-6g-red)"
                   />
 
                   {/* 4. Luminous Cyber Emerald AI Blockchain Bypass Trajectory */}
                   <motion.path
                     d={`M ${activeScenario.originPoint[0]} ${activeScenario.originPoint[1]} Q ${activeScenario.controlPoint[0]} ${activeScenario.controlPoint[1]} ${activeScenario.destinationPoint[0]} ${activeScenario.destinationPoint[1]}`}
                     fill="none"
-                    stroke="url(#crisis-bypass-gradient-beam)"
+                    stroke="url(#crisis-6g-bypass-gradient)"
                     strokeWidth="3.5"
                     strokeDasharray="5 2.5"
-                    filter="url(#crisis-neon-emerald)"
+                    filter="url(#crisis-6g-emerald)"
                     initial={{ strokeDashoffset: 0 }}
                     animate={{ strokeDashoffset: -26 }}
                     transition={{ duration: 1.8, repeat: Infinity, ease: 'linear' }}
                   />
 
                   {/* 5. Origin & Destination Nodes */}
-                  <circle cx={activeScenario.originPoint[0]} cy={activeScenario.originPoint[1]} r="3" fill="#22d3ee" filter="url(#crisis-neon-emerald)" />
-                  <circle cx={activeScenario.destinationPoint[0]} cy={activeScenario.destinationPoint[1]} r="3.5" fill="#10b981" filter="url(#crisis-neon-emerald)" />
+                  <circle cx={activeScenario.originPoint[0]} cy={activeScenario.originPoint[1]} r="3" fill="#22d3ee" filter="url(#crisis-6g-emerald)" />
+                  <circle cx={activeScenario.destinationPoint[0]} cy={activeScenario.destinationPoint[1]} r="3.5" fill="#10b981" filter="url(#crisis-6g-emerald)" />
 
                   {/* 6. Disrupted Chokepoint Emergency Node */}
-                  <circle cx={activeScenario.radarCoordinates[0]} cy={activeScenario.radarCoordinates[1]} r="6" fill="rgba(244,63,94,0.4)" filter="url(#crisis-neon-red)" />
+                  <circle cx={activeScenario.radarCoordinates[0]} cy={activeScenario.radarCoordinates[1]} r="6" fill="rgba(244,63,94,0.4)" filter="url(#crisis-6g-red)" />
                   <circle cx={activeScenario.radarCoordinates[0]} cy={activeScenario.radarCoordinates[1]} r="3" fill="#f43f5e" />
                 </svg>
 
@@ -627,7 +625,7 @@ export default function DisruptionCommandSection() {
                   }}
                   className="absolute -translate-x-1/2 translate-y-4 z-20 pointer-events-none"
                 >
-                  <span className="font-mono text-[8px] font-bold px-2 py-0.5 rounded bg-rose-950/95 text-rose-200 border border-rose-500/60 shadow-[0_0_12px_rgba(244,63,94,0.4)] whitespace-nowrap">
+                  <span className="font-mono text-[8.5px] font-bold px-2 py-0.5 rounded bg-rose-950/95 text-rose-200 border border-rose-500/60 shadow-[0_0_12px_rgba(244,63,94,0.4)] whitespace-nowrap">
                     ✕ {activeScenario.blockedPathLabel[language]}
                   </span>
                 </div>

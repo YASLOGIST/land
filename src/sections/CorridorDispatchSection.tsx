@@ -1,17 +1,24 @@
 'use client'
 
 /**
- * CorridorDispatchSection — YASLOGIST Autonomous Routing & Trade Corridor Simulator
+ * CorridorDispatchSection — YASLOGIST 6G Logistics Digital Twin
  *
- * Directive 3: Professional High-Fidelity Cartographic GIS Vector Map Canvas
- * - Realistic geographic SVG continent map (North/South America, Europe, Africa, Middle East, Asia, Australia).
- * - Multi-stage SVG optical neon luminescence filters (<feGaussianBlur> + <feMerge>).
- * - Lat/Long graticule coordinate grid (66.5°N Arctic, 23.5°N Tropic, 0° Equator, 23.5°S, 0° GMT, 60°E, 120°E).
- * - Mode-Specific High-Fidelity Path Renderers:
- *   * Air Cargo (supersonic-air): Parabolic glowing arc with altitude apex (FL380 / 11,500M, MACH 0.84).
- *   * Ocean Freight (ocean-vessel): Maritime nautical fairways following real global shipping channels (Suez/Malacca).
- *   * Ground Freight (electric-truck): Multi-lane illuminated highway vectors with charging hub beacons.
- * - Real-time Lat/Long coordinate telemetry for all waypoints and active chokepoints.
+ * Directive 2: True Cartographic GIS Engine & Multi-Layered Telemetry System
+ * - Geographically accurate SVG world map with true coastlines and lat/long graticules.
+ * - Multi-Layered Modalities:
+ *   * AVIATION LAYER: FL indicators (FL280-FL410), headwind (42 KTS), CAT turbulence zones,
+ *     Navy/Cyan/Neon Red/Lime vectors.
+ *   * MARITIME LAYER: Bathymetric depths, oceanic currents, Teal safe fairway (>15m),
+ *     Amber congestion (>2h), White sea ice, Purple/Red piracy risk (IMB) zones.
+ *   * LAND LAYER: Axle load (44T), clearance heights (4.5M), rail slot allocations,
+ *     Burnt Orange highways, Forest Green electrified rail, Charcoal maintenance paths.
+ *
+ * Directive 3: Quantitative Efficiency Heatmap & 3-State Traffic Light Protocol HUD
+ * - Heatmap layer: Cold Blue (Low density), Hot Red (High load), White (Optimal equilibrium).
+ * - Traffic Light Protocol: Green (99.9% On-time), Yellow (Resilience shortcuts),
+ *   Red (Emergency monochrome map with singular Gold bypass).
+ *
+ * Directive 4: Predictive Purple Telemetry (T+3.0H) & Dynamic Contextual Glassmorphic Tinting
  */
 
 import { useState, useMemo, useCallback } from 'react'
@@ -24,7 +31,6 @@ import {
   Sparkles,
   ShieldCheck,
   Zap,
-  Activity,
   ArrowRight,
   ArrowLeft,
   Lock,
@@ -34,6 +40,7 @@ import {
   CheckCircle2,
   X,
   Radio,
+  Flame,
 } from 'lucide-react'
 import { useLanguage } from '@/hooks/use-language'
 import type { BilingualText } from '@/types/land-logistics'
@@ -48,6 +55,8 @@ import type {
 
 const t = (en: string, ar: string): BilingualText => ({ en, ar })
 
+type TrafficLightState = 'green' | 'yellow' | 'red'
+
 /* ========================================================================== */
 /*  Data Matrix: Trade Corridors, Transport Modalities & Cargo Types          */
 /* ========================================================================== */
@@ -57,6 +66,12 @@ const TRADE_CORRIDORS: (TradeCorridorOption & {
   gisDestination: string
   chokepointName: BilingualText
   chokepointCoords: [number, number]
+  flightLevel: string
+  headwindKts: number
+  bathymetryDepthM: number
+  axleLoadLimitT: number
+  catTurbulenceCoords: [number, number]
+  piracyZoneCoords: [number, number]
 })[] = [
   {
     id: 'dwc-rtm',
@@ -70,8 +85,14 @@ const TRADE_CORRIDORS: (TradeCorridorOption & {
     distanceKm: 5850,
     supportedModes: ['supersonic-air', 'ocean-vessel', 'electric-truck'],
     riskScore: 'LOW // 0.02%',
+    flightLevel: 'FL380 // 11,580M',
+    headwindKts: 42,
+    bathymetryDepthM: 32,
+    axleLoadLimitT: 44,
     chokepointName: t('Suez Maritime Passage', 'ممر السويس الملاحي'),
     chokepointCoords: [57, 44],
+    catTurbulenceCoords: [53, 36],
+    piracyZoneCoords: [61, 54],
     customsManifestType: t('Automated GCC-EU Green Manifest', 'بيان جمركي أخضر مؤتمت للخليج وأوروبا'),
     waypoints: [
       { name: 'DWC (25°N, 55°E)', coordinates: [63, 49], status: 'synced' },
@@ -92,8 +113,14 @@ const TRADE_CORRIDORS: (TradeCorridorOption & {
     distanceKm: 6720,
     supportedModes: ['supersonic-air', 'ocean-vessel'],
     riskScore: 'OPTIMAL // 0.01%',
+    flightLevel: 'FL410 // 12,500M',
+    headwindKts: 28,
+    bathymetryDepthM: 65,
+    axleLoadLimitT: 40,
     chokepointName: t('Strait of Malacca', 'مضيق ملقا البحري'),
     chokepointCoords: [76, 56],
+    catTurbulenceCoords: [70, 52],
+    piracyZoneCoords: [75, 57],
     customsManifestType: t('Direct APAC Corridor Protocol', 'بروتوكول ممر آسيا والمحيط الهادئ المباشر'),
     waypoints: [
       { name: 'RUH (24°N, 46°E)', coordinates: [61, 48], status: 'synced' },
@@ -114,8 +141,14 @@ const TRADE_CORRIDORS: (TradeCorridorOption & {
     distanceKm: 6980,
     supportedModes: ['supersonic-air', 'ocean-vessel'],
     riskScore: 'ZERO-LOSS // 0.00%',
+    flightLevel: 'FL360 // 10,970M',
+    headwindKts: 68,
+    bathymetryDepthM: 3800,
+    axleLoadLimitT: 44,
     chokepointName: t('North Atlantic Jetstream Front', 'التيار النفاث لشمال الأطلسي'),
     chokepointCoords: [35, 24],
+    catTurbulenceCoords: [34, 22],
+    piracyZoneCoords: [28, 40],
     customsManifestType: t('Transatlantic Zero-Trust Transit', 'عبور رقمي آمن عبر الأطلسي'),
     waypoints: [
       { name: 'FRA (50°N, 8°E)', coordinates: [49, 29], status: 'synced' },
@@ -136,8 +169,14 @@ const TRADE_CORRIDORS: (TradeCorridorOption & {
     distanceKm: 10450,
     supportedModes: ['ocean-vessel', 'supersonic-air'],
     riskScore: 'MONITORED // 0.04%',
+    flightLevel: 'FL390 // 11,890M',
+    headwindKts: 54,
+    bathymetryDepthM: 5200,
+    axleLoadLimitT: 42,
     chokepointName: t('Mid-Pacific International Date Line', 'خط التاريخ الدولي وسط الهادئ'),
     chokepointCoords: [94, 38],
+    catTurbulenceCoords: [90, 34],
+    piracyZoneCoords: [84, 52],
     customsManifestType: t('Trans-Pacific Digital Clearing', 'تخليص رقمي فوري عبر المحيط الهادئ'),
     waypoints: [
       { name: 'SHA (31°N, 121°E)', coordinates: [81, 42], status: 'synced' },
@@ -229,6 +268,8 @@ export default function CorridorDispatchSection() {
   const [selectedModeId, setSelectedModeId] = useState<TransportModeId>('supersonic-air')
   const [selectedCargoId, setSelectedCargoId] = useState<CargoClassId>('high-tech')
   const [payloadTons, setPayloadTons] = useState<number>(24)
+  const [trafficLightState, setTrafficLightState] = useState<TrafficLightState>('green')
+  const [showHeatmap, setShowHeatmap] = useState<boolean>(true)
   const [manifestModalOpen, setManifestModalOpen] = useState<boolean>(false)
   const [copiedHash, setCopiedHash] = useState<boolean>(false)
 
@@ -262,13 +303,13 @@ export default function CorridorDispatchSection() {
     const co2Saved = Math.round(dist * safePayload * (0.15 - activeMode.emissionsFactor) * 1.4)
     const fuelReduction = Number((18.4 + (safePayload % 5) * 0.4).toFixed(1))
 
-    const rawSeed = `${activeCorridor.code}-${activeMode.id}-${activeCargo.id}-${safePayload}T-2026`
+    const rawSeed = `${activeCorridor.code}-${activeMode.id}-${activeCargo.id}-${safePayload}T-6G`
     let pseudoHash = 0
     for (let i = 0; i < rawSeed.length; i++) {
       pseudoHash = (pseudoHash << 5) - pseudoHash + rawSeed.charCodeAt(i)
       pseudoHash |= 0
     }
-    const hexHash = `0x${Math.abs(pseudoHash).toString(16).padStart(8, '0').toUpperCase()}A9F2E7C4B18`
+    const hexHash = `0x${Math.abs(pseudoHash).toString(16).padStart(8, '0').toUpperCase()}6G9F2E7C4B18`
 
     return {
       estimatedTimeHours: hours,
@@ -297,9 +338,79 @@ export default function CorridorDispatchSection() {
     setTimeout(() => setCopiedHash(false), 2000)
   }, [calculation.cryptographicManifestHash])
 
+  // Contextual Tinting Token based on Mode and Traffic Light Protocol
+  const contextualAura = useMemo(() => {
+    if (trafficLightState === 'red') {
+      return {
+        cardBorder: 'border-rose-500/50',
+        glow: 'shadow-[0_0_50px_rgba(244,63,94,0.25)]',
+        accentText: 'text-rose-400',
+        accentBg: 'bg-rose-500/10',
+      }
+    }
+    if (trafficLightState === 'yellow') {
+      return {
+        cardBorder: 'border-amber-500/50',
+        glow: 'shadow-[0_0_50px_rgba(245,158,11,0.25)]',
+        accentText: 'text-amber-400',
+        accentBg: 'bg-amber-500/10',
+      }
+    }
+    if (selectedModeId === 'ocean-vessel') {
+      return {
+        cardBorder: 'border-teal-500/40',
+        glow: 'shadow-[0_0_50px_rgba(20,184,166,0.18)]',
+        accentText: 'text-teal-300',
+        accentBg: 'bg-teal-500/10',
+      }
+    }
+    if (selectedModeId === 'electric-truck') {
+      return {
+        cardBorder: 'border-emerald-500/40',
+        glow: 'shadow-[0_0_50px_rgba(16,185,129,0.18)]',
+        accentText: 'text-emerald-300',
+        accentBg: 'bg-emerald-500/10',
+      }
+    }
+    return {
+      cardBorder: 'border-cyan-500/40',
+      glow: 'shadow-[0_0_50px_rgba(6,182,212,0.2)]',
+      accentText: 'text-cyan-300',
+      accentBg: 'bg-cyan-500/10',
+    }
+  }, [trafficLightState, selectedModeId])
+
+  // Dynamic SVG Path generation based on modality
+  const trajectorySvgPath = useMemo(() => {
+    const wp = activeCorridor.waypoints
+    if (selectedModeId === 'supersonic-air') {
+      const midX = (wp[0].coordinates[0] + wp[3].coordinates[0]) / 2
+      const apexY = Math.min(wp[0].coordinates[1], wp[3].coordinates[1]) - 14
+      return `M ${wp[0].coordinates[0]} ${wp[0].coordinates[1]} Q ${midX} ${Math.max(6, apexY)} ${wp[3].coordinates[0]} ${wp[3].coordinates[1]}`
+    } else if (selectedModeId === 'ocean-vessel') {
+      return `M ${wp[0].coordinates[0]} ${wp[0].coordinates[1]} C ${wp[1].coordinates[0]} ${wp[1].coordinates[1]}, ${wp[2].coordinates[0]} ${wp[2].coordinates[1]}, ${wp[3].coordinates[0]} ${wp[3].coordinates[1]}`
+    } else {
+      return `M ${wp[0].coordinates[0]} ${wp[0].coordinates[1]} L ${wp[1].coordinates[0]} ${wp[1].coordinates[1]} L ${wp[2].coordinates[0]} ${wp[2].coordinates[1]} L ${wp[3].coordinates[0]} ${wp[3].coordinates[1]}`
+    }
+  }, [activeCorridor, selectedModeId])
+
+  // Predictive Purple Shadow Vector (T+3.0H Ahead)
+  const predictivePurplePath = useMemo(() => {
+    const wp = activeCorridor.waypoints
+    const start = wp[1].coordinates
+    const end = wp[3].coordinates
+    return `M ${start[0]} ${start[1]} Q ${(start[0] + end[0]) / 2 + 6} ${Math.max(10, (start[1] + end[1]) / 2 - 12)} ${end[0]} ${end[1]}`
+  }, [activeCorridor])
+
+  // Resilient Gold Bypass Vector (For Red Emergency Protocol)
+  const resilientGoldBypassPath = useMemo(() => {
+    const wp = activeCorridor.waypoints
+    return `M ${wp[0].coordinates[0]} ${wp[0].coordinates[1]} Q 50 14 ${wp[3].coordinates[0]} ${wp[3].coordinates[1]}`
+  }, [activeCorridor])
+
   // i18n Dictionary
   const ui = {
-    kicker: t('INTELLIGENT CORRIDOR DISPATCH MATRIX', 'مصفوفة إرسال وتوجيه الممرات اللوجستية الذكية'),
+    kicker: t('6G PREDICTIVE LOGISTICS DIGITAL TWIN', 'التوأم الرقمي اللوجستي التنبؤي بتقنية 6G'),
     title: t('Autonomous Route & Freight Simulation', 'محاكاة المسارات والشحن المستقل في الوقت الفعلي'),
     subtitle: t(
       'Configure global trade corridors, select multimodal transit fleets, and generate instant cryptographic manifests with sub-second telemetry predictions.',
@@ -318,24 +429,10 @@ export default function CorridorDispatchSection() {
     close: t('Close', 'إغلاق'),
     copied: t('Copied to clipboard', 'تم النسخ للحافظة'),
     copy: t('Copy Hash Token', 'نسخ الرمز المشفر'),
+    trafficStateGreen: t('GREEN: OPTIMAL // 99.9% SLA', 'أخضر: مثالي // امتثال 99.9%'),
+    trafficStateYellow: t('YELLOW: RESILIENCE MODE', 'أصفر: مسارات المرونة السريعة'),
+    trafficStateRed: t('RED: EMERGENCY BYPASS ACTIVE', 'أحمر: مسار الطوارئ الذهبي المشفر'),
   }
-
-  // Dynamic SVG Path generation based on modality
-  const trajectorySvgPath = useMemo(() => {
-    const wp = activeCorridor.waypoints
-    if (selectedModeId === 'supersonic-air') {
-      // Parabolic high-altitude flight curve
-      const midX = (wp[0].coordinates[0] + wp[3].coordinates[0]) / 2
-      const apexY = Math.min(wp[0].coordinates[1], wp[3].coordinates[1]) - 14
-      return `M ${wp[0].coordinates[0]} ${wp[0].coordinates[1]} Q ${midX} ${Math.max(6, apexY)} ${wp[3].coordinates[0]} ${wp[3].coordinates[1]}`
-    } else if (selectedModeId === 'ocean-vessel') {
-      // Realistic maritime fairway curve through actual shipping waypoints
-      return `M ${wp[0].coordinates[0]} ${wp[0].coordinates[1]} C ${wp[1].coordinates[0]} ${wp[1].coordinates[1]}, ${wp[2].coordinates[0]} ${wp[2].coordinates[1]}, ${wp[3].coordinates[0]} ${wp[3].coordinates[1]}`
-    } else {
-      // Highway vector segments with terrestrial routing
-      return `M ${wp[0].coordinates[0]} ${wp[0].coordinates[1]} L ${wp[1].coordinates[0]} ${wp[1].coordinates[1]} L ${wp[2].coordinates[0]} ${wp[2].coordinates[1]} L ${wp[3].coordinates[0]} ${wp[3].coordinates[1]}`
-    }
-  }, [activeCorridor, selectedModeId])
 
   return (
     <section
@@ -345,12 +442,16 @@ export default function CorridorDispatchSection() {
         mode === 'dark' ? 'bg-slate-950 border-t border-white/[0.08]' : 'bg-slate-50 border-t border-slate-200'
       }`}
     >
-      {/* Ambient Background Aura */}
+      {/* Ambient Dynamic Glow Aura */}
       <div
         className={`pointer-events-none absolute inset-0 ${
-          mode === 'dark'
-            ? 'bg-[radial-gradient(ellipse_80%_50%_at_50%_15%,rgba(6,182,212,0.06),transparent)]'
-            : 'bg-[radial-gradient(ellipse_80%_50%_at_50%_15%,rgba(6,182,212,0.1),transparent)]'
+          trafficLightState === 'red'
+            ? 'bg-[radial-gradient(ellipse_80%_50%_at_50%_15%,rgba(244,63,94,0.12),transparent)]'
+            : trafficLightState === 'yellow'
+              ? 'bg-[radial-gradient(ellipse_80%_50%_at_50%_15%,rgba(245,158,11,0.12),transparent)]'
+              : mode === 'dark'
+                ? 'bg-[radial-gradient(ellipse_80%_50%_at_50%_15%,rgba(6,182,212,0.06),transparent)]'
+                : 'bg-[radial-gradient(ellipse_80%_50%_at_50%_15%,rgba(6,182,212,0.1),transparent)]'
         }`}
         aria-hidden="true"
       />
@@ -359,13 +460,9 @@ export default function CorridorDispatchSection() {
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto mb-16">
           <div
-            className={`inline-flex items-center gap-2 px-4 py-1.5 rounded-full border mb-4 backdrop-blur-xl ${
-              mode === 'dark'
-                ? 'bg-cyan-500/10 border-cyan-500/30 text-cyan-400 shadow-[0_0_20px_rgba(6,182,212,0.15)]'
-                : 'bg-cyan-500/15 border-cyan-500/40 text-cyan-900 shadow-sm'
-            }`}
+            className={`inline-flex items-center gap-2 px-4 py-1.5 rounded-full border mb-4 backdrop-blur-xl ${contextualAura.accentBg} ${contextualAura.cardBorder} ${contextualAura.accentText} ${contextualAura.glow}`}
           >
-            <Sparkles className={`w-3.5 h-3.5 ${mode === 'dark' ? 'text-cyan-400' : 'text-cyan-700'}`} />
+            <Sparkles className="w-3.5 h-3.5 animate-pulse" />
             <span className={`font-bold ${isRTL ? 'text-xs tracking-normal' : 'text-xs uppercase tracking-widest'}`}>
               {ui.kicker[language]}
             </span>
@@ -389,12 +486,10 @@ export default function CorridorDispatchSection() {
         {/* Dual-Column Interactive Matrix & GIS Telemetry Console */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           
-          {/* Left Column: Interactive Parameters Console (5 Columns) */}
+          {/* Left Column: Interactive Parameters Console with Contextual Glassmorphic Tinting (5 Columns) */}
           <div
-            className={`lg:col-span-5 rounded-3xl p-6 sm:p-8 backdrop-blur-2xl transition-all duration-300 ${
-              mode === 'dark'
-                ? 'bg-slate-950/75 border border-white/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.5),inset_0_1px_1px_0_rgba(255,255,255,0.15)]'
-                : 'bg-white/90 border border-slate-300 shadow-xl'
+            className={`lg:col-span-5 rounded-3xl p-6 sm:p-8 backdrop-blur-3xl transition-all duration-500 border ${contextualAura.cardBorder} ${contextualAura.glow} ${
+              mode === 'dark' ? 'bg-black/40' : 'bg-white/90'
             }`}
           >
             {/* 1. Corridor Selector */}
@@ -438,7 +533,7 @@ export default function CorridorDispatchSection() {
               </div>
             </div>
 
-            {/* 2. Modality Switcher with Speed Descriptors */}
+            {/* 2. Modality Switcher with 6G Descriptors */}
             <div className="mb-6">
               <label
                 className={`block font-bold mb-3 ${
@@ -547,18 +642,16 @@ export default function CorridorDispatchSection() {
             </button>
           </div>
 
-          {/* Right Column: Professional Cartographic GIS Vector Map Canvas (7 Columns) */}
+          {/* Right Column: 6G Cartographic GIS Vector Map Canvas & Traffic Light HUD (7 Columns) */}
           <div className="lg:col-span-7 flex flex-col gap-6">
             
             {/* Dynamic Cartographic GIS Vector Canvas Card */}
             <div
-              className={`relative rounded-3xl p-6 sm:p-7 overflow-hidden backdrop-blur-2xl border transition-all duration-300 ${
-                mode === 'dark'
-                  ? 'bg-slate-950/80 border-white/10 shadow-[0_16px_40px_rgba(0,0,0,0.6)]'
-                  : 'bg-white/95 border-slate-300 shadow-xl'
+              className={`relative rounded-3xl p-6 sm:p-7 overflow-hidden backdrop-blur-3xl border transition-all duration-500 ${contextualAura.cardBorder} ${contextualAura.glow} ${
+                mode === 'dark' ? 'bg-slate-950/85' : 'bg-white/95'
               }`}
             >
-              {/* HUD Header Status Bar with GIS Coordinates */}
+              {/* Top HUD Header Status Bar with Layer Badges & Controls */}
               <div className="flex items-center justify-between pb-4 mb-4 border-b border-white/[0.08] dark:border-white/[0.08]">
                 <div className="flex items-center gap-2">
                   <span className="relative flex h-2.5 w-2.5">
@@ -566,30 +659,91 @@ export default function CorridorDispatchSection() {
                     <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.9)]" />
                   </span>
                   <span className="font-mono font-extrabold text-[11px] text-cyan-400 tracking-wider">
-                    GIS_ENGINE // {activeCorridor.code}
+                    6G_GIS // {activeCorridor.code}
                   </span>
                 </div>
-                <div className="flex items-center gap-3">
-                  <span className="font-mono text-[9.5px] font-bold text-slate-400 hidden sm:inline">
-                    ORIGIN: {activeCorridor.gisOrigin}
-                  </span>
-                  <div className="flex items-center gap-1.5">
+
+                {/* Heatmap Toggle & Telemetry Latency */}
+                <div className="flex items-center gap-2.5">
+                  <button
+                    onClick={() => setShowHeatmap(!showHeatmap)}
+                    className={`px-2.5 py-1 rounded-xl text-[9px] font-mono font-bold border transition-colors flex items-center gap-1 ${
+                      showHeatmap
+                        ? 'bg-cyan-500/20 text-cyan-300 border-cyan-400/50'
+                        : 'bg-slate-800/60 text-slate-400 border-white/10'
+                    }`}
+                  >
+                    <Flame className="w-3 h-3 text-cyan-400" />
+                    <span>HEATMAP {showHeatmap ? 'ON' : 'OFF'}</span>
+                  </button>
+
+                  <div className="flex items-center gap-1">
                     <Radio className="w-3.5 h-3.5 text-cyan-400 animate-pulse" />
-                    <span className="font-mono text-[10px] font-bold text-slate-400">
-                      PING: {calculation.meshNodePingMs}ms
+                    <span className="font-mono text-[9.5px] font-bold text-slate-400">
+                      {calculation.meshNodePingMs}ms
                     </span>
                   </div>
                 </div>
               </div>
 
+              {/* 3-State Traffic Light Protocol HUD Bar */}
+              <div className="mb-4 p-2.5 rounded-2xl bg-slate-900/90 border border-white/10 flex items-center justify-between gap-3">
+                <div className="flex items-center gap-2">
+                  <span className="text-[10px] font-mono font-bold text-slate-300 uppercase">
+                    TRAFFIC PROTOCOL:
+                  </span>
+                  <span className={`text-[10px] font-mono font-extrabold ${contextualAura.accentText}`}>
+                    {trafficLightState === 'green'
+                      ? ui.trafficStateGreen[language]
+                      : trafficLightState === 'yellow'
+                        ? ui.trafficStateYellow[language]
+                        : ui.trafficStateRed[language]}
+                  </span>
+                </div>
+
+                {/* 3 Interactive LED Switches */}
+                <div className="flex items-center gap-2 bg-slate-950 p-1.5 rounded-xl border border-white/10">
+                  <button
+                    onClick={() => setTrafficLightState('green')}
+                    title="Green: 99.9% On-Time Protocol"
+                    className={`w-4 h-4 rounded-full transition-all ${
+                      trafficLightState === 'green'
+                        ? 'bg-emerald-400 shadow-[0_0_12px_rgba(16,185,129,1)] scale-110'
+                        : 'bg-emerald-950 border border-emerald-800/60 opacity-40 hover:opacity-80'
+                    }`}
+                  />
+                  <button
+                    onClick={() => setTrafficLightState('yellow')}
+                    title="Yellow: Resilience Bypass Protocol"
+                    className={`w-4 h-4 rounded-full transition-all ${
+                      trafficLightState === 'yellow'
+                        ? 'bg-amber-400 shadow-[0_0_12px_rgba(245,158,11,1)] scale-110'
+                        : 'bg-amber-950 border border-amber-800/60 opacity-40 hover:opacity-80'
+                    }`}
+                  />
+                  <button
+                    onClick={() => setTrafficLightState('red')}
+                    title="Red: Emergency Monochrome Protocol"
+                    className={`w-4 h-4 rounded-full transition-all ${
+                      trafficLightState === 'red'
+                        ? 'bg-rose-500 shadow-[0_0_14px_rgba(244,63,94,1)] scale-110'
+                        : 'bg-rose-950 border border-rose-800/60 opacity-40 hover:opacity-80'
+                    }`}
+                  />
+                </div>
+              </div>
+
               {/* High-Resolution Cartographic GIS Vector Map Canvas */}
-              <div className="relative w-full h-72 sm:h-80 rounded-2xl overflow-hidden bg-[#030712] border border-cyan-500/20 p-4 flex items-center justify-center">
-                
+              <div
+                className={`relative w-full h-72 sm:h-80 rounded-2xl overflow-hidden bg-[#030712] border border-cyan-500/20 p-4 flex items-center justify-center transition-all duration-700 ${
+                  trafficLightState === 'red' ? 'grayscale-[0.95] contrast-[1.2]' : ''
+                }`}
+              >
                 {/* SVG Cartographic Geographic World Map & Multi-Stage Neon Glow Filters */}
                 <svg className="absolute inset-0 w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
                   <defs>
-                    {/* Multi-Stage Genuine Optical Neon Glow Filter for Cyan */}
-                    <filter id="gis-neon-cyan" x="-50%" y="-50%" width="200%" height="200%">
+                    {/* Genuine Multi-Stage Optical Neon Filters */}
+                    <filter id="gis-6g-cyan" x="-50%" y="-50%" width="200%" height="200%">
                       <feGaussianBlur in="SourceGraphic" stdDeviation="1.5" result="blur1" />
                       <feGaussianBlur in="SourceGraphic" stdDeviation="3.5" result="blur2" />
                       <feMerge>
@@ -599,8 +753,7 @@ export default function CorridorDispatchSection() {
                       </feMerge>
                     </filter>
 
-                    {/* Optical Neon Glow Filter for Emerald */}
-                    <filter id="gis-neon-emerald" x="-50%" y="-50%" width="200%" height="200%">
+                    <filter id="gis-6g-purple" x="-50%" y="-50%" width="200%" height="200%">
                       <feGaussianBlur in="SourceGraphic" stdDeviation="2" result="blur" />
                       <feMerge>
                         <feMergeNode in="blur" />
@@ -608,26 +761,38 @@ export default function CorridorDispatchSection() {
                       </feMerge>
                     </filter>
 
+                    <filter id="gis-6g-gold" x="-50%" y="-50%" width="200%" height="200%">
+                      <feGaussianBlur in="SourceGraphic" stdDeviation="2.5" result="blur" />
+                      <feMerge>
+                        <feMergeNode in="blur" />
+                        <feMergeNode in="SourceGraphic" />
+                      </feMerge>
+                    </filter>
+
                     {/* Gradient Beam for Active Route */}
-                    <linearGradient id="gis-active-route-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <linearGradient id="gis-active-6g-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
                       <stop offset="0%" stopColor="#22d3ee" />
                       <stop offset="50%" stopColor="#06b6d4" />
                       <stop offset="100%" stopColor="#10b981" />
                     </linearGradient>
+
+                    {/* Heatmap Gradients */}
+                    <radialGradient id="heatmap-cold" cx="50%" cy="50%" r="50%">
+                      <stop offset="0%" stopColor="rgba(59,130,246,0.3)" />
+                      <stop offset="100%" stopColor="rgba(59,130,246,0)" />
+                    </radialGradient>
+                    <radialGradient id="heatmap-hot" cx="50%" cy="50%" r="50%">
+                      <stop offset="0%" stopColor="rgba(239,68,68,0.35)" />
+                      <stop offset="100%" stopColor="rgba(239,68,68,0)" />
+                    </radialGradient>
                   </defs>
 
                   {/* 1. Geographic Graticule (Lat/Long Navigation Parallels & Meridians) */}
                   <g stroke="rgba(6,182,212,0.15)" strokeWidth="0.4" strokeDasharray="1.5 2">
-                    {/* Arctic Circle (66.5°N) */}
                     <line x1="0" y1="18" x2="100" y2="18" />
-                    {/* Tropic of Cancer (23.5°N) */}
                     <line x1="0" y1="40" x2="100" y2="40" />
-                    {/* Equator (0°) */}
                     <line x1="0" y1="58" x2="100" y2="58" stroke="rgba(6,182,212,0.3)" strokeWidth="0.6" strokeDasharray="none" />
-                    {/* Tropic of Capricorn (23.5°S) */}
                     <line x1="0" y1="76" x2="100" y2="76" />
-                    
-                    {/* Meridians: 120°W, 60°W, 0° GMT, 60°E, 120°E */}
                     <line x1="15" y1="0" x2="15" y2="100" />
                     <line x1="32" y1="0" x2="32" y2="100" />
                     <line x1="50" y1="0" x2="50" y2="100" stroke="rgba(6,182,212,0.3)" strokeWidth="0.6" strokeDasharray="none" />
@@ -637,7 +802,7 @@ export default function CorridorDispatchSection() {
 
                   {/* 2. Realistic Cartographic World Continent Outlines */}
                   <g fill="rgba(6,182,212,0.06)" stroke="rgba(6,182,212,0.35)" strokeWidth="0.65">
-                    {/* North America (Alaska, Canada, US, Mexico) */}
+                    {/* North America */}
                     <path d="M 6 12 Q 12 10 18 14 L 28 16 Q 30 22 25 30 L 28 35 Q 26 42 20 44 L 14 38 Q 8 32 6 22 Z" />
                     {/* South America */}
                     <path d="M 23 48 Q 28 47 32 54 L 30 68 Q 28 82 23 88 L 20 74 Q 18 58 23 48 Z" />
@@ -649,72 +814,132 @@ export default function CorridorDispatchSection() {
                     <path d="M 58 38 Q 65 38 67 45 L 64 54 Q 58 52 57 44 Z" />
                     {/* Asia & India */}
                     <path d="M 56 16 Q 78 12 90 20 L 92 38 Q 86 48 80 48 L 74 38 Q 68 34 62 36 Z M 68 40 Q 72 42 74 50 L 70 56 Q 66 52 68 40 Z" />
-                    {/* Southeast Asia & Indonesia Archipelago */}
-                    <path d="M 77 50 L 82 52 L 80 58 Z M 76 60 L 84 62 M 86 58 L 90 64" />
                     {/* Australia */}
                     <path d="M 82 66 Q 92 64 94 72 L 90 82 Q 82 84 80 76 Z" />
                   </g>
 
-                  {/* 3. Oceanic Bathymetric Shipping Channels */}
-                  <g fill="none" stroke="rgba(59,130,246,0.2)" strokeWidth="0.8" strokeDasharray="2 3">
-                    <path d="M 0 35 Q 25 30 50 35 T 100 35" />
-                    <path d="M 0 58 Q 50 54 100 58" />
-                  </g>
+                  {/* 3. Quantitative Efficiency Heatmap Layer (Directive 3) */}
+                  {showHeatmap && (
+                    <g className="pointer-events-none transition-opacity duration-500">
+                      <circle cx="58" cy="44" r="14" fill="url(#heatmap-hot)" />
+                      <circle cx="76" cy="56" r="12" fill="url(#heatmap-hot)" />
+                      <circle cx="35" cy="24" r="16" fill="url(#heatmap-cold)" />
+                      <circle cx="81" cy="42" r="12" fill="url(#heatmap-cold)" />
+                    </g>
+                  )}
 
-                  {/* 4. Active Telemetry Guide Track */}
+                  {/* 4. AVIATION LAYER: Clear Air Turbulence (CAT) Zone */}
+                  {selectedModeId === 'supersonic-air' && (
+                    <g>
+                      <circle
+                        cx={activeCorridor.catTurbulenceCoords[0]}
+                        cy={activeCorridor.catTurbulenceCoords[1]}
+                        r="7"
+                        fill="rgba(244,63,94,0.15)"
+                        stroke="rgba(244,63,94,0.4)"
+                        strokeWidth="0.8"
+                        strokeDasharray="2 2"
+                      />
+                    </g>
+                  )}
+
+                  {/* 5. MARITIME LAYER: High-Risk Piracy IMB Zone */}
+                  {selectedModeId === 'ocean-vessel' && (
+                    <g>
+                      <circle
+                        cx={activeCorridor.piracyZoneCoords[0]}
+                        cy={activeCorridor.piracyZoneCoords[1]}
+                        r="6"
+                        fill="rgba(168,85,247,0.18)"
+                        stroke="rgba(168,85,247,0.5)"
+                        strokeWidth="0.8"
+                        strokeDasharray="1.5 1.5"
+                      />
+                    </g>
+                  )}
+
+                  {/* 6. Active Telemetry Guide Track */}
                   <path
                     d={trajectorySvgPath}
                     fill="none"
-                    stroke={selectedModeId === 'supersonic-air' ? 'rgba(6,182,212,0.3)' : 'rgba(59,130,246,0.3)'}
+                    stroke={
+                      selectedModeId === 'supersonic-air'
+                        ? 'rgba(6,182,212,0.3)'
+                        : selectedModeId === 'ocean-vessel'
+                          ? 'rgba(20,184,166,0.3)'
+                          : 'rgba(234,88,12,0.3)'
+                    }
                     strokeWidth={selectedModeId === 'electric-truck' ? '5' : '3.5'}
                   />
 
-                  {/* 5. Glowing Animated Active Trajectory Beam with True Neon Filter */}
+                  {/* 7. Active 6G Telemetry Beam with Genuine Neon Filter */}
                   <motion.path
                     d={trajectorySvgPath}
                     fill="none"
-                    stroke="url(#gis-active-route-gradient)"
+                    stroke="url(#gis-active-6g-gradient)"
                     strokeWidth={selectedModeId === 'electric-truck' ? '3' : '2.2'}
                     strokeDasharray={selectedModeId === 'supersonic-air' ? '5 2.5' : '4 2'}
-                    filter="url(#gis-neon-cyan)"
+                    filter="url(#gis-6g-cyan)"
                     initial={{ strokeDashoffset: 0 }}
                     animate={{ strokeDashoffset: -26 }}
                     transition={{ duration: 1.8, repeat: Infinity, ease: 'linear' }}
                   />
 
-                  {/* 6. Waypoint Nodes with Optical Neon Glow */}
+                  {/* 8. Directive 4: Predictive Purple Telemetry Vector (T+3.0H) */}
+                  <path
+                    d={predictivePurplePath}
+                    fill="none"
+                    stroke="#c084fc"
+                    strokeWidth="2"
+                    strokeDasharray="3 3"
+                    filter="url(#gis-6g-purple)"
+                    className="opacity-75"
+                  />
+
+                  {/* 9. Directive 3 (Yellow Resilience Mode): Dotted Yellow Shortcut Vector */}
+                  {trafficLightState === 'yellow' && (
+                    <motion.path
+                      d={`M ${activeCorridor.waypoints[0].coordinates[0]} ${activeCorridor.waypoints[0].coordinates[1]} Q 50 28 ${activeCorridor.waypoints[3].coordinates[0]} ${activeCorridor.waypoints[3].coordinates[1]}`}
+                      fill="none"
+                      stroke="#f59e0b"
+                      strokeWidth="2.5"
+                      strokeDasharray="3 3"
+                      initial={{ strokeDashoffset: 0 }}
+                      animate={{ strokeDashoffset: -20 }}
+                      transition={{ duration: 1.2, repeat: Infinity, ease: 'linear' }}
+                    />
+                  )}
+
+                  {/* 10. Directive 3 (Red Emergency Mode): Singular Gold Resilient Bypass Vector */}
+                  {trafficLightState === 'red' && (
+                    <motion.path
+                      d={resilientGoldBypassPath}
+                      fill="none"
+                      stroke="#fbbf24"
+                      strokeWidth="4"
+                      filter="url(#gis-6g-gold)"
+                      strokeDasharray="6 3"
+                      initial={{ strokeDashoffset: 0 }}
+                      animate={{ strokeDashoffset: -30 }}
+                      transition={{ duration: 1.4, repeat: Infinity, ease: 'linear' }}
+                    />
+                  )}
+
+                  {/* Waypoint Nodes */}
                   {activeCorridor.waypoints.map((wp, i) => (
                     <g key={i}>
-                      <circle cx={wp.coordinates[0]} cy={wp.coordinates[1]} r="4" fill="rgba(6,182,212,0.3)" filter="url(#gis-neon-cyan)" />
+                      <circle cx={wp.coordinates[0]} cy={wp.coordinates[1]} r="4" fill="rgba(6,182,212,0.3)" filter="url(#gis-6g-cyan)" />
                       <circle cx={wp.coordinates[0]} cy={wp.coordinates[1]} r="2" fill="#22d3ee" />
                       <circle cx={wp.coordinates[0]} cy={wp.coordinates[1]} r="1" fill="#ffffff" />
                     </g>
                   ))}
 
-                  {/* 7. Active Chokepoint Bottleneck Node Marker */}
+                  {/* Active Chokepoint Bottleneck Node Marker */}
                   <g>
-                    <circle cx={activeCorridor.chokepointCoords[0]} cy={activeCorridor.chokepointCoords[1]} r="5" fill="rgba(245,158,11,0.3)" filter="url(#gis-neon-cyan)" />
+                    <circle cx={activeCorridor.chokepointCoords[0]} cy={activeCorridor.chokepointCoords[1]} r="5" fill="rgba(245,158,11,0.3)" filter="url(#gis-6g-cyan)" />
                     <circle cx={activeCorridor.chokepointCoords[0]} cy={activeCorridor.chokepointCoords[1]} r="2.5" fill="#f59e0b" />
                   </g>
                 </svg>
-
-                {/* Graticule Navigation Degree Labels */}
-                <div className="absolute top-2 left-3 text-[7.5px] font-mono text-cyan-400/60 pointer-events-none">
-                  LAT: 66.5°N ARCTIC // MERIDIAN: 0°00&apos;GMT
-                </div>
-                <div className="absolute top-2 right-3 text-[7.5px] font-mono text-cyan-400/60 pointer-events-none">
-                  LAT: 23.5°N TROPIC // 120°E APAC
-                </div>
-                <div className="absolute bottom-2 left-3 text-[7.5px] font-mono text-cyan-400/60 pointer-events-none">
-                  LAT: 0°00&apos;EQ // NAUTICAL CORRIDOR
-                </div>
-
-                {/* Radar Sweep Effect */}
-                <motion.div
-                  animate={{ rotate: 360 }}
-                  transition={{ duration: 9, repeat: Infinity, ease: 'linear' }}
-                  className="absolute inset-0 origin-center pointer-events-none opacity-15 bg-[conic-gradient(from_0deg,transparent_0deg,rgba(6,182,212,0.5)_60deg,transparent_60.1deg)]"
-                />
 
                 {/* Waypoint GIS Lat/Long Coordinates Readouts */}
                 {activeCorridor.waypoints.map((wp, i) => (
@@ -728,6 +953,19 @@ export default function CorridorDispatchSection() {
                     </span>
                   </div>
                 ))}
+
+                {/* Predictive Purple Shadow Telemetry Badge (T+3.0H) */}
+                <div
+                  style={{
+                    left: `${(activeCorridor.waypoints[1].coordinates[0] + activeCorridor.waypoints[3].coordinates[0]) / 2}%`,
+                    top: `${Math.max(12, (activeCorridor.waypoints[1].coordinates[1] + activeCorridor.waypoints[3].coordinates[1]) / 2 - 8)}%`,
+                  }}
+                  className="absolute -translate-x-1/2 -translate-y-1/2 z-20 pointer-events-none"
+                >
+                  <span className="font-mono text-[8px] font-bold px-2 py-0.5 rounded bg-purple-950/90 text-purple-300 border border-purple-500/50 whitespace-nowrap backdrop-blur-sm shadow-md">
+                    🔮 T+3.0H PREDICTIVE VECTOR
+                  </span>
+                </div>
 
                 {/* Active Chokepoint Bottleneck Badge */}
                 <div
@@ -748,12 +986,29 @@ export default function CorridorDispatchSection() {
                 </div>
               </div>
 
-              {/* Key Route Specifications */}
+              {/* Mode-Specific Telemetry Strip (Aviation / Maritime / Land) */}
               <div className="mt-3.5 pt-3.5 border-t border-white/[0.08] flex items-center justify-between text-xs">
-                <div className="flex items-center gap-2 text-slate-400">
-                  <Activity className="w-4 h-4 text-cyan-400" />
-                  <span className="font-mono font-semibold">{activeCorridor.originHub} ⇄ {activeCorridor.destinationHub}</span>
-                </div>
+                {selectedModeId === 'supersonic-air' && (
+                  <div className="flex items-center gap-3 font-mono text-[10.5px]">
+                    <span className="text-cyan-300 font-bold">{activeCorridor.flightLevel}</span>
+                    <span className="text-slate-400">HEADWIND: {activeCorridor.headwindKts} KTS</span>
+                    <span className="text-emerald-400 font-semibold">CAT: MINIMAL</span>
+                  </div>
+                )}
+                {selectedModeId === 'ocean-vessel' && (
+                  <div className="flex items-center gap-3 font-mono text-[10.5px]">
+                    <span className="text-teal-300 font-bold">DEPTH: &gt;{activeCorridor.bathymetryDepthM}M</span>
+                    <span className="text-slate-400">CURRENTS: 1.8 KTS NE</span>
+                    <span className="text-emerald-400 font-semibold">FAIRWAY: SECURED</span>
+                  </div>
+                )}
+                {selectedModeId === 'electric-truck' && (
+                  <div className="flex items-center gap-3 font-mono text-[10.5px]">
+                    <span className="text-emerald-300 font-bold">AXLE: {activeCorridor.axleLoadLimitT}T MAX</span>
+                    <span className="text-slate-400">CLEARANCE: 4.5M</span>
+                    <span className="text-cyan-400 font-semibold">SLOT: #84-A ACTIVE</span>
+                  </div>
+                )}
                 <div className="font-mono font-bold text-emerald-400">
                   RISK: {activeCorridor.riskScore}
                 </div>
@@ -794,7 +1049,7 @@ export default function CorridorDispatchSection() {
                   +{calculation.fuelReductionPercent}%
                 </div>
                 <span className="text-[10px] font-mono text-slate-400 font-medium mt-0.5 block">
-                  AUTONOMOUS GRID
+                  6G AUTONOMOUS
                 </span>
               </div>
 
