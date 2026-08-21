@@ -43,6 +43,10 @@ export interface PhaseProps {
 export interface CapabilitySpec {
   label: BilingualText
   value: string
+  numValue?: number
+  decimals?: number
+  prefix?: string
+  suffix?: string
 }
 
 /** Content model for the 6 redesigned capability cards. */

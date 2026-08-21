@@ -131,12 +131,17 @@ export default function HeroSection() {
           <motion.div variants={itemVariants}>
             <a
               href="#land-logistics"
-              className={`group inline-flex items-center gap-3 px-8 py-4 rounded-2xl text-base sm:text-lg font-semibold transition-all duration-300 backdrop-blur-xl ${
+              className={`group relative overflow-hidden inline-flex items-center gap-3 px-8 py-4 rounded-2xl text-base sm:text-lg font-semibold transition-all duration-300 backdrop-blur-2xl ${
                 mode === 'light'
-                  ? 'bg-white/90 border border-slate-300/80 text-cyan-900 hover:border-cyan-500 hover:bg-cyan-50 shadow-md hover:shadow-xl'
-                  : 'bg-white/[0.04] border border-white/15 text-white hover:bg-white/[0.08] hover:border-cyan-400/50 shadow-[0_8px_32px_0_rgba(0,0,0,0.37)] hover:shadow-[0_0_30px_rgba(6,182,212,0.3)]'
+                  ? 'bg-white/80 border border-slate-300/80 text-cyan-900 hover:border-cyan-500 hover:bg-cyan-50 shadow-md hover:shadow-xl'
+                  : 'bg-white/[0.03] border border-white/15 text-white hover:bg-white/[0.06] hover:border-cyan-400/50 shadow-[0_8px_32px_0_rgba(0,0,0,0.37),inset_0_1px_1px_0_rgba(255,255,255,0.15)] hover:shadow-[0_0_30px_rgba(6,182,212,0.3)]'
               }`}
             >
+              {/* Specular Top Reflection Line */}
+              <div
+                className="absolute inset-x-0 top-0 h-[1.5px] bg-gradient-to-r from-transparent via-white/40 dark:via-cyan-400/40 to-transparent pointer-events-none"
+                aria-hidden="true"
+              />
               <span>{content.cta[language]}</span>
               <ArrowIcon
                 className={`w-5 h-5 text-cyan-400 transition-transform duration-300 ${

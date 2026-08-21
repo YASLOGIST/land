@@ -1,9 +1,17 @@
 'use client'
 
+/**
+ * StatsSection — Real-Time System Telemetry & Operational Metrics
+ *
+ * Directive 2: Zero-Color Optical Glassmorphism
+ * Directive 3: Physics-based smooth rolling Dynamic Counters (<DynamicCounter />)
+ */
+
 import { motion } from 'framer-motion'
 import { useTheme } from 'next-themes'
 import { Activity, ShieldCheck, Zap, Globe } from 'lucide-react'
 import { useLanguage } from '@/hooks/use-language'
+import DynamicCounter from '@/components/DynamicCounter'
 
 export default function StatsSection() {
   const { resolvedTheme } = useTheme()
@@ -23,7 +31,9 @@ export default function StatsSection() {
 
   const stats = [
     {
-      value: '99.9%',
+      numValue: 99.9,
+      decimals: 1,
+      suffix: '%',
       unit: 'ACCURACY',
       icon: ShieldCheck,
       status: t('SORT PRECISION', 'دقة التصنيف والفرز'),
@@ -31,7 +41,9 @@ export default function StatsSection() {
       description: t('Zero sorting discrepancies across high-density facilities', 'انعدام أخطاء الفرز في المستودعات عالية الكثافة'),
     },
     {
-      value: '12ms',
+      numValue: 12,
+      decimals: 0,
+      suffix: 'ms',
       unit: 'LATENCY',
       icon: Zap,
       status: t('MESH SYNCHRONIZED', 'مزامنة فورية للشبكة'),
@@ -39,7 +51,9 @@ export default function StatsSection() {
       description: t('Ultra-low latency hardware communications protocol', 'بروتوكول اتصالات فائق السرعة منخفض الاستجابة'),
     },
     {
-      value: '40+',
+      numValue: 40,
+      decimals: 0,
+      suffix: '+',
       unit: 'HUBS',
       icon: Globe,
       status: t('GLOBAL COMMAND', 'قيادة لوجستية عالمية'),
@@ -47,7 +61,10 @@ export default function StatsSection() {
       description: t('Unified multimodal air, ocean, and overland hubs', 'مراكز موحدة متعددة الوسائط جوياً وبحرياً وبرياً'),
     },
     {
-      value: '< 1.2min',
+      numValue: 1.2,
+      decimals: 1,
+      prefix: '< ',
+      suffix: 'min',
       unit: 'VARIANCE',
       icon: Activity,
       status: t('DYNAMIC ETA', 'تنبؤ لحظي بالوصول'),
@@ -62,7 +79,7 @@ export default function StatsSection() {
       className={`relative py-28 overflow-hidden transition-colors duration-500 ${
         mode === 'dark'
           ? 'bg-slate-950 border-t border-white/[0.08]'
-          : 'bg-white border-t border-slate-200'
+          : 'bg-slate-50 border-t border-slate-200'
       }`}
       dir={direction}
     >
@@ -100,7 +117,7 @@ export default function StatsSection() {
           </p>
         </motion.div>
 
-        {/* 4 Upgraded Numerical Stat Cards */}
+        {/* 4 Numerical Stat Optical Glass Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {stats.map((stat, index) => {
             const Icon = stat.icon
@@ -113,10 +130,16 @@ export default function StatsSection() {
                 transition={{ duration: 0.5, delay: index * 0.1 }}
                 className={`group relative flex flex-col justify-between rounded-3xl p-7 transition-all duration-300 backdrop-blur-2xl ${
                   mode === 'dark'
-                    ? 'bg-white/[0.025] hover:bg-white/[0.045] border border-white/10 hover:border-cyan-400/40 shadow-[0_8px_32px_0_rgba(0,0,0,0.37)] hover:shadow-[0_0_30px_rgba(6,182,212,0.2)]'
-                    : 'bg-slate-50/80 hover:bg-white border border-slate-200/90 hover:border-cyan-400/60 shadow-md hover:shadow-xl'
+                    ? 'bg-white/[0.025] hover:bg-white/[0.045] border border-white/10 hover:border-cyan-400/40 shadow-[0_8px_32px_0_rgba(0,0,0,0.37),inset_0_1px_1px_0_rgba(255,255,255,0.1)] hover:shadow-[0_0_30px_rgba(6,182,212,0.2)]'
+                    : 'bg-white/80 hover:bg-white border border-slate-200/90 hover:border-cyan-400/60 shadow-md hover:shadow-xl'
                 }`}
               >
+                {/* Specular Top Reflection Line */}
+                <div
+                  className="absolute inset-x-0 top-0 h-[1.5px] bg-gradient-to-r from-transparent via-white/40 dark:via-cyan-400/40 to-transparent pointer-events-none"
+                  aria-hidden="true"
+                />
+
                 {/* Top Status Header */}
                 <div>
                   <div className="flex items-center justify-between gap-2 mb-6">
@@ -129,12 +152,17 @@ export default function StatsSection() {
                     <Icon className="w-4 h-4 text-slate-400 group-hover:text-cyan-400 transition-colors" />
                   </div>
 
-                  {/* Upgraded Glowing Metric Value */}
+                  {/* Physics-Based Rolling Metric Counter */}
                   <div
                     dir="ltr"
                     className="text-4xl sm:text-5xl font-extrabold font-mono tracking-tight bg-gradient-to-r from-cyan-400 via-cyan-200 to-blue-400 bg-clip-text text-transparent drop-shadow-[0_0_18px_rgba(6,182,212,0.35)] mb-3"
                   >
-                    {stat.value}
+                    <DynamicCounter
+                      value={stat.numValue}
+                      decimals={stat.decimals}
+                      prefix={stat.prefix}
+                      suffix={stat.suffix}
+                    />
                   </div>
 
                   {/* Metric Label */}

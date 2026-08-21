@@ -3,20 +3,15 @@
 /**
  * LandLogisticsSection — YASLOGIST Land Operations Scrollytelling
  *
- * Full-screen sticky background video with high-performance bidirectional requestAnimationFrame
- * scroll synchronization for both downward and upward scrolling.
+ * Directive 1: Dynamic Single-Asset Environment
+ * - Utilizes a single high-efficiency video asset with simulated Night Mode
+ * - Hardware-accelerated CSS overlays (mix-blend-multiply, deep blue gradient, brightness/contrast filters)
+ * - 60FPS fluid bidirectional requestAnimationFrame video scrubbing.
  *
- * Cinematic Theme Transformations:
- * - LIGHT MODE: Dedicated DAYTIME video (FINAL-light.mp4) with crisp, natural daytime sunlight.
- * - DARK MODE: Dedicated NIGHTTIME video (FINAL-dark.mp4) with nocturnal ambient shadows and vehicle lights.
- * - ZERO loading flash and perfect frame synchronization when toggling theme.
- *
- * High-End AI Simulation Telemetry Panel:
- * - Upgraded, larger, highly detailed telemetry HUD positioned in the bottom-right corner.
- * - Completely covers/replaces any watermark with an intentional, premium glassmorphism telemetry panel.
- *
- * Dedicated Responsive Arabic RTL Composition:
- * - Intelligently anchored to preserve complete visibility of the warehouse AMRs, forklift, and highway truck.
+ * Directive 2 & 4: Zero-Color Optical Glassmorphism & RTL Spatial Optimization
+ * - Physical diamond glass styling (backdrop-filter blur 24px, sub-pixel specular borders)
+ * - Cards intelligently anchored to the left in both LTR and RTL so the warehouse AMRs,
+ *   forklift, and highway truck on the right remain 100% visible and unobstructed.
  */
 
 import { useEffect, useMemo, useRef, useState, useCallback } from 'react'
@@ -123,27 +118,27 @@ const DISCLAIMER: BilingualText = t(
 )
 
 /* ========================================================================== */
-/*  Card Styling Tokens (Strictly Preserving Scrollytelling Visual Design)    */
+/*  Zero-Color Optical Glass Styling Tokens                                   */
 /* ========================================================================== */
 
 const S = {
   card: {
-    dark: 'border border-cyan-500/35 bg-slate-950/85 backdrop-blur-2xl shadow-[0_16px_40px_rgba(0,0,0,0.6),inset_0_1px_1px_rgba(255,255,255,0.12)]',
-    light: 'border border-slate-300/90 bg-white/90 backdrop-blur-2xl shadow-[0_16px_40px_rgba(15,23,42,0.12),inset_0_1px_1px_rgba(255,255,255,0.9)]',
+    dark: 'border border-white/15 bg-white/[0.03] backdrop-blur-2xl shadow-[0_16px_40px_rgba(0,0,0,0.6),inset_0_1px_1px_rgba(255,255,255,0.15)]',
+    light: 'border border-slate-300/80 bg-white/80 backdrop-blur-2xl shadow-[0_16px_40px_rgba(15,23,42,0.08),inset_0_1px_1px_rgba(255,255,255,0.9)]',
   },
   metric: {
-    dark: 'border border-cyan-800/40 bg-slate-900/80 backdrop-blur-md hover:border-cyan-500/50 transition-colors',
-    light: 'border border-slate-200 bg-white/95 backdrop-blur-md shadow-xs hover:border-cyan-400/60 transition-colors',
+    dark: 'border border-white/10 bg-white/[0.02] backdrop-blur-xl hover:border-cyan-400/40 transition-colors',
+    light: 'border border-slate-200/80 bg-white/70 backdrop-blur-xl shadow-xs hover:border-cyan-500/40 transition-colors',
   },
   icon: {
-    dark: 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 shadow-[0_0_15px_rgba(6,182,212,0.3)]',
-    light: 'bg-cyan-100/90 text-cyan-800 border border-cyan-200 shadow-xs',
+    dark: 'bg-white/[0.04] text-cyan-300 border border-white/15 shadow-[0_0_15px_rgba(6,182,212,0.2)]',
+    light: 'bg-cyan-50 text-cyan-800 border border-cyan-200/80 shadow-xs',
   },
   railActive: 'bg-cyan-400 shadow-[0_0_15px_rgba(6,182,212,1)] scale-y-110',
   railInactive: { dark: 'bg-slate-700/60', light: 'bg-slate-300' },
   text: {
     title: { dark: 'text-white', light: 'text-slate-900' },
-    subtitle: { dark: 'text-slate-200', light: 'text-slate-700' },
+    subtitle: { dark: 'text-slate-300', light: 'text-slate-700' },
     muted: { dark: 'text-slate-400', light: 'text-slate-500' },
     metric: { dark: 'text-cyan-300', light: 'text-cyan-800' },
   },
@@ -163,8 +158,7 @@ export default function LandLogisticsSection({
   const { resolvedTheme } = useTheme()
 
   const sectionRef = useRef<HTMLElement | null>(null)
-  const lightVideoRef = useRef<HTMLVideoElement | null>(null)
-  const darkVideoRef = useRef<HTMLVideoElement | null>(null)
+  const videoRef = useRef<HTMLVideoElement | null>(null)
 
   const targetProgressRef = useRef<number>(0)
   const currentProgressRef = useRef<number>(0)
@@ -200,28 +194,24 @@ export default function LandLogisticsSection({
     setActivePhase((prev) => (prev === next ? prev : next))
   }, [])
 
-  /* ── High-Performance Bidirectional Video Scrubber (Smooth Up & Down Sync) ── */
+  /* ── High-Performance Single-Asset Video Scrubber (60FPS Fluid Sync) ── */
   useEffect(() => {
     const section = sectionRef.current
     if (!section) return
 
-    const lightVideo = lightVideoRef.current
-    const darkVideo = darkVideoRef.current
-
-    if (lightVideo) lightVideo.pause()
-    if (darkVideo) darkVideo.pause()
+    const video = videoRef.current
+    if (video) video.pause()
 
     gsap.registerPlugin(ScrollTrigger)
 
     let isRunning = true
 
-    const syncVideoTime = (video: HTMLVideoElement | null, targetTime: number) => {
-      if (!video) return
-      if (video.duration && !isNaN(video.duration) && video.duration > 0) {
-        const clampedTime = Math.max(0, Math.min(targetTime, video.duration - 0.02))
-        // Smooth direct currentTime assignment for frame-accurate bidirectional seek
-        if (Math.abs(video.currentTime - clampedTime) > 0.005) {
-          video.currentTime = clampedTime
+    const syncVideoTime = (videoEl: HTMLVideoElement | null, targetTime: number) => {
+      if (!videoEl) return
+      if (videoEl.duration && !isNaN(videoEl.duration) && videoEl.duration > 0) {
+        const clampedTime = Math.max(0, Math.min(targetTime, videoEl.duration - 0.02))
+        if (Math.abs(videoEl.currentTime - clampedTime) > 0.005) {
+          videoEl.currentTime = clampedTime
         }
       }
     }
@@ -233,7 +223,6 @@ export default function LandLogisticsSection({
       const curP = currentProgressRef.current
       const diff = targetP - curP
 
-      // Responsive lerp dampening for seamless forward and reverse scrub
       if (Math.abs(diff) > 0.0001) {
         currentProgressRef.current += diff * 0.32
       } else {
@@ -241,18 +230,12 @@ export default function LandLogisticsSection({
       }
 
       const p = currentProgressRef.current
-
-      // Compute current time based on available duration
-      const activeVideoEl = mode === 'light' ? lightVideoRef.current : darkVideoRef.current
-      const dur = activeVideoEl?.duration && !isNaN(activeVideoEl.duration) ? activeVideoEl.duration : 5.0
+      const videoEl = videoRef.current
+      const dur = videoEl?.duration && !isNaN(videoEl.duration) ? videoEl.duration : 5.0
 
       const targetTime = p * dur
+      syncVideoTime(videoEl, targetTime)
 
-      // Synchronize both Day and Night videos in real time
-      syncVideoTime(lightVideoRef.current, targetTime)
-      syncVideoTime(darkVideoRef.current, targetTime)
-
-      // Update simulation timecode indicator
       const totalSeconds = p * 60 + (activePhase * 30)
       const minutes = Math.floor(totalSeconds / 60)
       const seconds = Math.floor(totalSeconds % 60)
@@ -291,19 +274,11 @@ export default function LandLogisticsSection({
       ScrollTrigger.refresh()
     }
 
-    if (lightVideo) {
-      if (lightVideo.readyState >= 2) onVideoReady()
+    if (video) {
+      if (video.readyState >= 2) onVideoReady()
       else {
-        lightVideo.addEventListener('loadedmetadata', onVideoReady, { once: true })
-        lightVideo.addEventListener('canplay', onVideoReady, { once: true })
-      }
-    }
-
-    if (darkVideo) {
-      if (darkVideo.readyState >= 2) onVideoReady()
-      else {
-        darkVideo.addEventListener('loadedmetadata', onVideoReady, { once: true })
-        darkVideo.addEventListener('canplay', onVideoReady, { once: true })
+        video.addEventListener('loadedmetadata', onVideoReady, { once: true })
+        video.addEventListener('canplay', onVideoReady, { once: true })
       }
     }
 
@@ -316,13 +291,9 @@ export default function LandLogisticsSection({
         cancelAnimationFrame(animFrameIdRef.current)
       }
       window.removeEventListener('resize', handleResize)
-      if (lightVideo) {
-        lightVideo.removeEventListener('loadedmetadata', onVideoReady)
-        lightVideo.removeEventListener('canplay', onVideoReady)
-      }
-      if (darkVideo) {
-        darkVideo.removeEventListener('loadedmetadata', onVideoReady)
-        darkVideo.removeEventListener('canplay', onVideoReady)
+      if (video) {
+        video.removeEventListener('loadedmetadata', onVideoReady)
+        video.removeEventListener('canplay', onVideoReady)
       }
       trigger.kill()
     }
@@ -364,75 +335,66 @@ export default function LandLogisticsSection({
       {/* ─── Sticky Viewport Container ─── */}
       <div className="sticky top-0 h-screen w-full overflow-hidden">
 
-        {/* ─── DAYTIME VIDEO: Light Mode Source ─── */}
+        {/* ─── DIRECTIVE 1: Single-Asset High-Efficiency Video Stream ─── */}
         <video
-          ref={lightVideoRef}
+          ref={videoRef}
           src="/videos/FINAL-light.mp4"
           muted
           playsInline
           preload="auto"
           disablePictureInPicture
-          className={`pointer-events-none absolute inset-0 h-full w-full object-cover scale-[1.08] origin-center transition-opacity duration-700 ${
-            mode === 'light' ? 'opacity-100 z-0' : 'opacity-0 z-0'
-          }`}
+          className="pointer-events-none absolute inset-0 h-full w-full object-cover scale-[1.08] origin-center transition-all duration-700 z-0"
           style={{
-            willChange: 'transform, opacity',
-            // Natural cinematic daytime sunlight, crisp shadows, pristine clarity
-            filter: 'contrast(1.05) saturate(1.1) brightness(1.02)',
+            willChange: 'transform, filter',
+            filter:
+              mode === 'dark'
+                ? 'brightness(0.55) contrast(1.22) saturate(0.85) hue-rotate(195deg)'
+                : 'contrast(1.05) saturate(1.1) brightness(1.02)',
           }}
           aria-hidden="true"
         />
 
-        {/* ─── NIGHTTIME VIDEO: Dark Mode Source ─── */}
-        <video
-          ref={darkVideoRef}
-          src="/videos/FINAL-dark.mp4"
-          muted
-          playsInline
-          preload="auto"
-          disablePictureInPicture
-          className={`pointer-events-none absolute inset-0 h-full w-full object-cover scale-[1.08] origin-center transition-opacity duration-700 ${
-            mode === 'dark' ? 'opacity-100 z-0' : 'opacity-0 z-0'
-          }`}
-          style={{
-            willChange: 'transform, opacity',
-            // Deep nocturnal atmosphere, uncrushed shadows, glowing road lights
-            filter: 'contrast(1.18) saturate(1.15) brightness(0.92)',
-          }}
-          aria-hidden="true"
-        />
-
-        {/* ─── Light Mode: Natural Ambient Daylight Glow (Minimal & Clean) ─── */}
-        {mode === 'light' && (
-          <>
-            {/* Subtle soft sunlight accent */}
-            <div
-              className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_100%_60%_at_80%_0%,rgba(254,240,138,0.12),transparent_70%)]"
-              aria-hidden="true"
-            />
-            {/* Gentle ground depth */}
-            <div
-              className="pointer-events-none absolute inset-x-0 bottom-0 h-36 bg-gradient-to-t from-slate-950/15 to-transparent"
-              aria-hidden="true"
-            />
-          </>
-        )}
-
-        {/* ─── Dark Mode: Ambient Nighttime Telemetry Glow ─── */}
+        {/* ─── Simulated Night Mode: Hardware-Accelerated Deep Blue Overlay Layers ─── */}
         {mode === 'dark' && (
           <>
+            {/* Deep Midnight Blue Multiplier Overlay */}
             <div
-              className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_90%_60%_at_50%_0%,rgba(6,182,212,0.1),transparent_70%)]"
+              className="pointer-events-none absolute inset-0 bg-[#020617] mix-blend-multiply opacity-80 transition-opacity duration-700 z-0"
               aria-hidden="true"
             />
+            {/* Nocturnal Cyber Atmospheric Gradient */}
             <div
-              className="pointer-events-none absolute inset-0 bg-gradient-to-b from-slate-950/40 via-transparent to-slate-950/50"
+              className="pointer-events-none absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent mix-blend-overlay z-0"
+              aria-hidden="true"
+            />
+            {/* Ambient Cyan Vehicle/Road Highlights */}
+            <div
+              className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_75%_55%_at_70%_60%,rgba(6,182,212,0.22),transparent_70%)] z-0"
+              aria-hidden="true"
+            />
+            {/* Top Atmospheric Shadow */}
+            <div
+              className="pointer-events-none absolute inset-0 bg-gradient-to-b from-slate-950/70 via-transparent to-slate-950/80 z-0"
               aria-hidden="true"
             />
           </>
         )}
 
-        {/* ─── Targeted Protective Corner Vignette (Ensures Zero Watermark Presence) ─── */}
+        {/* ─── Light Mode: Clean Sunlight Ambient Glow ─── */}
+        {mode === 'light' && (
+          <>
+            <div
+              className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_100%_60%_at_80%_0%,rgba(254,240,138,0.1),transparent_70%)] z-0"
+              aria-hidden="true"
+            />
+            <div
+              className="pointer-events-none absolute inset-x-0 bottom-0 h-36 bg-gradient-to-t from-slate-950/15 to-transparent z-0"
+              aria-hidden="true"
+            />
+          </>
+        )}
+
+        {/* ─── Protective Corner Vignette ─── */}
         <div
           className={`pointer-events-none absolute bottom-0 right-0 w-80 h-56 z-10 ${
             mode === 'dark'
@@ -442,8 +404,8 @@ export default function LandLogisticsSection({
           aria-hidden="true"
         />
 
-        {/* ─── Presentation Scrollytelling Card (Dedicated RTL & LTR Composition) ─── */}
-        {/* Intentionally anchored to the LEFT half so the warehouse AMRs, forklift, and truck on the RIGHT remain fully visible */}
+        {/* ─── DIRECTIVE 4: RTL & Spatial Layout Optimization ─── */}
+        {/* Fixed on the LEFT side of the screen in BOTH LTR and RTL so the AMRs/Trucks on the RIGHT are 100% visible */}
         <div className="relative z-10 flex h-full items-center px-4 sm:px-8 lg:px-16 max-w-7xl mx-auto pointer-events-none">
           <div
             className={`w-full max-w-xl lg:max-w-2xl pointer-events-auto ml-0 mr-auto ${
@@ -457,8 +419,14 @@ export default function LandLogisticsSection({
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={{ opacity: 0, y: -20, scale: 0.98 }}
                 transition={{ duration: 0.45, ease: EASE_CURVE }}
-                className={`rounded-3xl p-6 sm:p-9 ${S.card[mode]}`}
+                className={`relative rounded-3xl p-6 sm:p-9 ${S.card[mode]}`}
               >
+                {/* Specular Top Reflection Line */}
+                <div
+                  className="absolute inset-x-0 top-0 h-[1.5px] bg-gradient-to-r from-transparent via-white/40 to-transparent pointer-events-none"
+                  aria-hidden="true"
+                />
+
                 {/* Header Kicker */}
                 <div
                   className={`mb-4 flex items-center gap-3.5 ${
@@ -583,8 +551,7 @@ export default function LandLogisticsSection({
           )}
         </AnimatePresence>
 
-        {/* ─── Upgraded & Repositioned AI Simulation Telemetry Panel (Sections 8 & 9) ─── */}
-        {/* Positioned precisely in the bottom-right corner replacing any watermark with an intentional telemetry HUD */}
+        {/* ─── AI Simulation Telemetry Panel (Bottom Right) ─── */}
         <motion.aside
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -671,7 +638,7 @@ export default function LandLogisticsSection({
               </div>
             </div>
 
-            {/* Clear Operational Clarification / Disclaimer Notice */}
+            {/* Operational Clarification Notice */}
             <div
               className={`pt-2.5 border-t ${
                 mode === 'dark' ? 'border-white/[0.06]' : 'border-slate-200'
