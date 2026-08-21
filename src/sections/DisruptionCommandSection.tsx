@@ -3,11 +3,12 @@
 /**
  * DisruptionCommandSection — YASLOGIST 6G AI Crisis Disruption Engine
  *
- * Directive 2 & 4: Cartographic GIS Crisis Vector Canvas & Multi-Stage Optical Neon Luminescence
- * - Geographically accurate SVG continent map (North/South America, Europe, Africa, Middle East, Asia, Australia).
+ * True Cartographic GIS Engine (Real World Natural Earth Geometry & WGS-84 Telemetry)
+ * - Authentic 110m TopoJSON world continent coastlines and national boundaries.
+ * - Exact Equirectangular WGS-84 coordinate mapping on 1000x500 cartographic canvas.
  * - Multi-stage genuine optical neon glow SVG filters (<feGaussianBlur> + <feMerge>).
- * - Luminous Cyber Gradients:
- *   * Red Disrupted Corridors: Deep neon rose/red with alert pulse drop-shadows and chokepoint hold telemetry.
+ * - Luminous Visual Channels:
+ *   * Red Disrupted Corridors: Deep glowing neon rose/red with alert pulse drop-shadows and chokepoint hold telemetry.
  *   * Green AI Blockchain Bypasses: Cyber emerald glowing bezier curves with animated high-speed particle dashes.
  * - Synchronized optical diamond glassmorphism with deep backdrop-blur-3xl styling and dynamic contextual tinting.
  */
@@ -36,6 +37,8 @@ import type {
   StrategyModeId,
   DisruptionSimulationResult,
 } from '@/types/disruption'
+import { WORLD_LAND_SVG_PATH, WORLD_BORDERS_SVG_PATH } from '@/data/world-land-110m'
+import { projectGeo } from '@/utils/gis-projection'
 
 const t = (en: string, ar: string): BilingualText => ({ en, ar })
 
@@ -43,14 +46,18 @@ const t = (en: string, ar: string): BilingualText => ({ en, ar })
 /*  Disruption Scenarios & AI Contingency Strategies Data Matrix              */
 /* ========================================================================== */
 
-const DISRUPTION_SCENARIOS: (DisruptionScenarioOption & {
+interface RealDisruptionScenario extends DisruptionScenarioOption {
   gisCoordinates: string
   blockedPathLabel: BilingualText
   bypassPathLabel: BilingualText
-  originPoint: [number, number]
-  destinationPoint: [number, number]
-  controlPoint: [number, number]
-})[] = [
+  originGps: [number, number]
+  destinationGps: [number, number]
+  chokepointGps: [number, number]
+  realBlockedSvgPath: string
+  realBypassSvgPath: string
+}
+
+const DISRUPTION_SCENARIOS: RealDisruptionScenario[] = [
   {
     id: 'suez-congestion',
     code: 'INCIDENT-SUEZ-09',
@@ -65,12 +72,16 @@ const DISRUPTION_SCENARIOS: (DisruptionScenarioOption & {
     ),
     baseDelayHours: 84,
     potentialLossRisk: '$520,000 / FLEET',
-    radarCoordinates: [57, 44],
-    originPoint: [63, 49],
-    destinationPoint: [47, 28],
-    controlPoint: [50, 16],
+    originGps: [55.3, 25.2],
+    destinationGps: [4.48, 51.92],
+    chokepointGps: [32.55, 29.93],
+    radarCoordinates: [59.04, 33.38],
     blockedPathLabel: t('MARITIME STALL // +84H DELAY', 'توقف ملاحي // تأخير +84 ساعة'),
     bypassPathLabel: t('LANDBRIDGE RAIL BYPASS // -76H', 'تحويل بري أخضر // توفير 76 ساعة'),
+    // Real maritime channel stall at Suez
+    realBlockedSvgPath: 'M 653.6 180.0 L 620.8 215.0 L 590.4 166.9',
+    // Overland rail bypass curve through Anatolia to Rotterdam
+    realBypassSvgPath: 'M 653.6 180.0 Q 560.0 90.0 512.4 105.8',
     strategies: [
       {
         id: 'speed',
@@ -121,12 +132,14 @@ const DISRUPTION_SCENARIOS: (DisruptionScenarioOption & {
     ),
     baseDelayHours: 36,
     potentialLossRisk: '$280,000 / CARGO',
-    radarCoordinates: [35, 24],
-    originPoint: [49, 29],
-    destinationPoint: [20, 35],
-    controlPoint: [34, 10],
+    originGps: [8.57, 50.03],
+    destinationGps: [-87.90, 41.98],
+    chokepointGps: [-35.0, 56.0],
+    radarCoordinates: [40.28, 18.89],
     blockedPathLabel: t('AIRSPACE GROUND STOP // +36H', 'إغلاق جوي // تأخير +36 ساعة'),
     bypassPathLabel: t('FL450 POLAR JETSTREAM VECTOR // -32H', 'مسار قطبي فائق الارتفاع // توفير 32 ساعة'),
+    realBlockedSvgPath: 'M 523.8 111.0 L 402.8 94.4',
+    realBypassSvgPath: 'M 523.8 111.0 Q 380.0 40.0 255.8 133.4',
     strategies: [
       {
         id: 'speed',
@@ -177,12 +190,14 @@ const DISRUPTION_SCENARIOS: (DisruptionScenarioOption & {
     ),
     baseDelayHours: 48,
     potentialLossRisk: '$195,000 / CORRIDOR',
-    radarCoordinates: [50, 32],
-    originPoint: [61, 48],
-    destinationPoint: [78, 59],
-    controlPoint: [70, 38],
+    originGps: [46.67, 24.71],
+    destinationGps: [103.82, 1.35],
+    chokepointGps: [70.0, 20.0],
+    radarCoordinates: [69.44, 38.89],
     blockedPathLabel: t('MANUAL CUSTOMS QUEUE // +48H', 'تفتيش يدوي معطل // تأخير +48 ساعة'),
     bypassPathLabel: t('ZERO-TRUST GREEN LANE // -46H', 'المسار الأخضر المشفر // توفير 46 ساعة'),
+    realBlockedSvgPath: 'M 629.6 181.4 L 694.4 194.4',
+    realBypassSvgPath: 'M 629.6 181.4 Q 710.0 160.0 788.4 246.3',
     strategies: [
       {
         id: 'speed',
@@ -233,12 +248,14 @@ const DISRUPTION_SCENARIOS: (DisruptionScenarioOption & {
     ),
     baseDelayHours: 24,
     potentialLossRisk: '$850,000 / CONSIGNMENT',
-    radarCoordinates: [60, 48],
-    originPoint: [62, 52],
-    destinationPoint: [66, 44],
-    controlPoint: [68, 36],
+    originGps: [48.0, 24.0],
+    destinationGps: [56.0, 25.0],
+    chokepointGps: [52.0, 26.0],
+    radarCoordinates: [64.44, 35.56],
     blockedPathLabel: t('DAYTIME HEAT SURGE // +24H', 'خطر حراري نهاري // تأخير +24 ساعة'),
     bypassPathLabel: t('AUXILIARY CRYO NIGHT DISPATCH // -22H', 'نقل ليلي بتبريد ذكي // توفير 22 ساعة'),
+    realBlockedSvgPath: 'M 633.3 183.3 L 644.4 177.8',
+    realBypassSvgPath: 'M 633.3 183.3 Q 645.0 150.0 655.6 180.6',
     strategies: [
       {
         id: 'zero-loss-cryo',
@@ -312,7 +329,7 @@ export default function DisruptionCommandSection() {
     const hoursSaved = activeStrategy.delayMitigationHours
     const efficiencyGain = Number((22.4 + activeStrategy.confidenceScore * 0.05).toFixed(1))
 
-    const rawSeed = `AUTH-REROUTE-${activeScenario.code}-${activeStrategy.id}-2026-6G`
+    const rawSeed = `AUTH-REROUTE-${activeScenario.code}-${activeStrategy.id}-2026-6G-GIS`
     let hash = 0
     for (let i = 0; i < rawSeed.length; i++) {
       hash = (hash << 5) - hash + rawSeed.charCodeAt(i)
@@ -336,6 +353,10 @@ export default function DisruptionCommandSection() {
     setCopiedToken(true)
     setTimeout(() => setCopiedToken(false), 2000)
   }, [simulation.authChecksumToken])
+
+  const originPixels = useMemo(() => projectGeo(activeScenario.originGps), [activeScenario])
+  const destinationPixels = useMemo(() => projectGeo(activeScenario.destinationGps), [activeScenario])
+  const chokepointPixels = useMemo(() => projectGeo(activeScenario.chokepointGps), [activeScenario])
 
   const ui = {
     kicker: t('6G AUTONOMOUS DISRUPTION COMMAND CENTER', 'مركز القيادة والتحكم الذاتي لمعالجة الاختناقات 6G'),
@@ -502,16 +523,16 @@ export default function DisruptionCommandSection() {
                 </div>
               </div>
 
-              {/* High-Resolution Cartographic GIS Crisis Vector Map Canvas */}
+              {/* High-Resolution Cartographic GIS Crisis Vector Map Canvas (1000x500 WGS-84) */}
               <div className="relative w-full h-64 sm:h-72 rounded-2xl overflow-hidden bg-[#030712] border border-rose-500/25 p-4 mb-5 flex items-center justify-center">
                 
-                {/* SVG Cartographic Geographic World Map with Multi-Stage Optical Neon Filters */}
-                <svg className="absolute inset-0 w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
+                {/* SVG Real World Cartographic Map with Natural Earth TopoJSON & Multi-Stage Optical Neon */}
+                <svg className="absolute inset-0 w-full h-full" viewBox="0 0 1000 500" preserveAspectRatio="none">
                   <defs>
                     {/* Genuine Multi-Stage Optical Neon Filter for Rose/Red */}
-                    <filter id="crisis-6g-red" x="-50%" y="-50%" width="200%" height="200%">
-                      <feGaussianBlur in="SourceGraphic" stdDeviation="1.5" result="blur1" />
-                      <feGaussianBlur in="SourceGraphic" stdDeviation="3.5" result="blur2" />
+                    <filter id="crisis-real-red" x="-50%" y="-50%" width="200%" height="200%">
+                      <feGaussianBlur in="SourceGraphic" stdDeviation="3" result="blur1" />
+                      <feGaussianBlur in="SourceGraphic" stdDeviation="8" result="blur2" />
                       <feMerge>
                         <feMergeNode in="blur2" />
                         <feMergeNode in="blur1" />
@@ -520,9 +541,9 @@ export default function DisruptionCommandSection() {
                     </filter>
 
                     {/* Genuine Multi-Stage Optical Neon Filter for Cyber Emerald */}
-                    <filter id="crisis-6g-emerald" x="-50%" y="-50%" width="200%" height="200%">
-                      <feGaussianBlur in="SourceGraphic" stdDeviation="1.5" result="blur1" />
-                      <feGaussianBlur in="SourceGraphic" stdDeviation="3.5" result="blur2" />
+                    <filter id="crisis-real-emerald" x="-50%" y="-50%" width="200%" height="200%">
+                      <feGaussianBlur in="SourceGraphic" stdDeviation="3" result="blur1" />
+                      <feGaussianBlur in="SourceGraphic" stdDeviation="8" result="blur2" />
                       <feMerge>
                         <feMergeNode in="blur2" />
                         <feMergeNode in="blur1" />
@@ -531,7 +552,7 @@ export default function DisruptionCommandSection() {
                     </filter>
 
                     {/* Luminous Bypass Gradient */}
-                    <linearGradient id="crisis-6g-bypass-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <linearGradient id="crisis-real-bypass-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
                       <stop offset="0%" stopColor="#22d3ee" />
                       <stop offset="50%" stopColor="#10b981" />
                       <stop offset="100%" stopColor="#34d399" />
@@ -539,61 +560,62 @@ export default function DisruptionCommandSection() {
                   </defs>
 
                   {/* 1. Cartographic Lat/Long Graticule Grid */}
-                  <g stroke="rgba(244,63,94,0.12)" strokeWidth="0.4" strokeDasharray="1.5 2">
-                    <line x1="0" y1="20" x2="100" y2="20" />
-                    <line x1="0" y1="50" x2="100" y2="50" stroke="rgba(244,63,94,0.25)" strokeWidth="0.6" strokeDasharray="none" />
-                    <line x1="0" y1="80" x2="100" y2="80" />
-                    <line x1="25" y1="0" x2="25" y2="100" />
-                    <line x1="50" y1="0" x2="50" y2="100" stroke="rgba(244,63,94,0.25)" strokeWidth="0.6" strokeDasharray="none" />
-                    <line x1="75" y1="0" x2="75" y2="100" />
+                  <g stroke="rgba(244,63,94,0.12)" strokeWidth="0.8" strokeDasharray="4 6">
+                    <line x1="0" y1="65.3" x2="1000" y2="65.3" />
+                    <line x1="0" y1="184.7" x2="1000" y2="184.7" />
+                    <line x1="0" y1="250.0" x2="1000" y2="250.0" stroke="rgba(244,63,94,0.25)" strokeWidth="1.2" strokeDasharray="none" />
+                    <line x1="0" y1="315.3" x2="1000" y2="315.3" />
+                    <line x1="166.7" y1="0" x2="166.7" y2="500" />
+                    <line x1="333.3" y1="0" x2="333.3" y2="500" />
+                    <line x1="500.0" y1="0" x2="500.0" y2="500" stroke="rgba(244,63,94,0.25)" strokeWidth="1.2" strokeDasharray="none" />
+                    <line x1="666.7" y1="0" x2="666.7" y2="500" />
+                    <line x1="833.3" y1="0" x2="833.3" y2="500" />
                   </g>
 
-                  {/* 2. Realistic Cartographic World Continent Outlines */}
-                  <g fill="rgba(244,63,94,0.04)" stroke="rgba(244,63,94,0.3)" strokeWidth="0.65">
-                    {/* North America */}
-                    <path d="M 6 12 Q 12 10 18 14 L 28 16 Q 30 22 25 30 L 28 35 Q 26 42 20 44 L 14 38 Q 8 32 6 22 Z" />
-                    {/* South America */}
-                    <path d="M 23 48 Q 28 47 32 54 L 30 68 Q 28 82 23 88 L 20 74 Q 18 58 23 48 Z" />
-                    {/* Europe & Scandinavia */}
-                    <path d="M 45 16 Q 50 14 54 18 L 52 25 Q 56 28 54 34 L 46 36 Q 42 32 45 22 Z" />
-                    {/* Africa & Madagascar */}
-                    <path d="M 46 38 Q 60 38 62 48 L 58 64 Q 54 82 48 80 L 42 60 Q 40 45 46 38 Z" />
-                    {/* Middle East & Arabian Peninsula */}
-                    <path d="M 58 38 Q 65 38 67 45 L 64 54 Q 58 52 57 44 Z" />
-                    {/* Asia */}
-                    <path d="M 56 16 Q 78 12 90 20 L 92 38 Q 86 48 80 48 L 74 38 Q 68 34 62 36 Z M 68 40 Q 72 42 74 50 L 70 56 Q 66 52 68 40 Z" />
-                  </g>
+                  {/* 2. Real Cartographic World Continents & Coastlines (Natural Earth Dataset) */}
+                  <path
+                    d={WORLD_LAND_SVG_PATH}
+                    fill="rgba(244,63,94,0.04)"
+                    stroke="rgba(244,63,94,0.4)"
+                    strokeWidth="1.2"
+                  />
+                  <path
+                    d={WORLD_BORDERS_SVG_PATH}
+                    fill="none"
+                    stroke="rgba(244,63,94,0.18)"
+                    strokeWidth="0.75"
+                  />
 
                   {/* 3. Luminous Red Disrupted Track (Terminating at blocked chokepoint) */}
                   <path
-                    d={`M ${activeScenario.originPoint[0]} ${activeScenario.originPoint[1]} L ${activeScenario.radarCoordinates[0]} ${activeScenario.radarCoordinates[1]}`}
+                    d={activeScenario.realBlockedSvgPath}
                     fill="none"
-                    stroke="rgba(244,63,94,0.9)"
-                    strokeWidth="3"
-                    strokeDasharray="3 2.5"
-                    filter="url(#crisis-6g-red)"
+                    stroke="rgba(244,63,94,0.95)"
+                    strokeWidth="6"
+                    strokeDasharray="8 6"
+                    filter="url(#crisis-real-red)"
                   />
 
                   {/* 4. Luminous Cyber Emerald AI Blockchain Bypass Trajectory */}
                   <motion.path
-                    d={`M ${activeScenario.originPoint[0]} ${activeScenario.originPoint[1]} Q ${activeScenario.controlPoint[0]} ${activeScenario.controlPoint[1]} ${activeScenario.destinationPoint[0]} ${activeScenario.destinationPoint[1]}`}
+                    d={activeScenario.realBypassSvgPath}
                     fill="none"
-                    stroke="url(#crisis-6g-bypass-gradient)"
-                    strokeWidth="3.5"
-                    strokeDasharray="5 2.5"
-                    filter="url(#crisis-6g-emerald)"
+                    stroke="url(#crisis-real-bypass-gradient)"
+                    strokeWidth="7"
+                    strokeDasharray="12 6"
+                    filter="url(#crisis-real-emerald)"
                     initial={{ strokeDashoffset: 0 }}
-                    animate={{ strokeDashoffset: -26 }}
+                    animate={{ strokeDashoffset: -60 }}
                     transition={{ duration: 1.8, repeat: Infinity, ease: 'linear' }}
                   />
 
                   {/* 5. Origin & Destination Nodes */}
-                  <circle cx={activeScenario.originPoint[0]} cy={activeScenario.originPoint[1]} r="3" fill="#22d3ee" filter="url(#crisis-6g-emerald)" />
-                  <circle cx={activeScenario.destinationPoint[0]} cy={activeScenario.destinationPoint[1]} r="3.5" fill="#10b981" filter="url(#crisis-6g-emerald)" />
+                  <circle cx={originPixels[0]} cy={originPixels[1]} r="7" fill="#22d3ee" filter="url(#crisis-real-emerald)" />
+                  <circle cx={destinationPixels[0]} cy={destinationPixels[1]} r="8" fill="#10b981" filter="url(#crisis-real-emerald)" />
 
                   {/* 6. Disrupted Chokepoint Emergency Node */}
-                  <circle cx={activeScenario.radarCoordinates[0]} cy={activeScenario.radarCoordinates[1]} r="6" fill="rgba(244,63,94,0.4)" filter="url(#crisis-6g-red)" />
-                  <circle cx={activeScenario.radarCoordinates[0]} cy={activeScenario.radarCoordinates[1]} r="3" fill="#f43f5e" />
+                  <circle cx={chokepointPixels[0]} cy={chokepointPixels[1]} r="14" fill="rgba(244,63,94,0.4)" filter="url(#crisis-real-red)" />
+                  <circle cx={chokepointPixels[0]} cy={chokepointPixels[1]} r="7" fill="#f43f5e" />
                 </svg>
 
                 {/* Top Corner GIS Coordinates Readout */}
@@ -604,8 +626,8 @@ export default function DisruptionCommandSection() {
                 {/* Pulsing Disruption Epicenter Marker (Luminous Neon Red) */}
                 <div
                   style={{
-                    left: `${activeScenario.radarCoordinates[0]}%`,
-                    top: `${activeScenario.radarCoordinates[1]}%`,
+                    left: `${(chokepointPixels[0] / 10).toFixed(1)}%`,
+                    top: `${(chokepointPixels[1] / 5).toFixed(1)}%`,
                   }}
                   className="absolute -translate-x-1/2 -translate-y-1/2 z-20 pointer-events-none"
                 >
@@ -620,8 +642,8 @@ export default function DisruptionCommandSection() {
                 {/* Disrupted Path Label */}
                 <div
                   style={{
-                    left: `${activeScenario.radarCoordinates[0]}%`,
-                    top: `${activeScenario.radarCoordinates[1]}%`,
+                    left: `${(chokepointPixels[0] / 10).toFixed(1)}%`,
+                    top: `${(chokepointPixels[1] / 5).toFixed(1)}%`,
                   }}
                   className="absolute -translate-x-1/2 translate-y-4 z-20 pointer-events-none"
                 >

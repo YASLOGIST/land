@@ -23,6 +23,7 @@ export default defineConfig({
           'react-vendor': ['react', 'react-dom', 'react-router'],
           'motion-gsap': ['framer-motion', 'gsap'],
           'lucide-icons': ['lucide-react'],
+          'gis-cartography': ['./src/data/world-land-110m'],
         },
       },
     },
