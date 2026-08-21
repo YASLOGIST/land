@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en" dir="ltr" class="dark" style="color-scheme: dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>YASLOGIST — Next-Gen Supply Chain Intelligence Platform</title>
+    
+    <!-- Google Fonts: Plus Jakarta Sans (EN), Alexandria (AR), JetBrains Mono (Numbers/Telemetry) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Alexandria:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      /* Critical CSS & Base Typography */
+      html, body, #root {
+        margin: 0;
+        padding: 0;
+        min-height: 100vh;
+        background-color: #020617;
+      }
+      
+      /* English/LTR Default Font */
+      html[dir="ltr"] body, html[dir="ltr"] {
+        font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      }
+
+      /* Arabic/RTL Universal Font Enforcement */
+      html[dir="rtl"] body,
+      html[dir="rtl"],
+      [dir="rtl"] {
+        font-family: 'Alexandria', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+      }
+
+      /* Reset letter-spacing in Arabic to maintain cursive ligature rendering */
+      [dir="rtl"] * {
+        letter-spacing: normal !important;
+      }
+
+      html.dark {
+        background: #020617;
+        color-scheme: dark;
+      }
+      html.light {
+        background: #f8fafc;
+        color-scheme: light;
+      }
+    </style>
+  </head>
+  <body class="overflow-x-hidden antialiased selection:bg-cyan-500 selection:text-slate-950">
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
