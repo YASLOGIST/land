@@ -3,15 +3,13 @@
 /**
  * LandLogisticsSection — YASLOGIST Land Operations Scrollytelling
  *
- * Directive 1: Dynamic Single-Asset Environment
- * - Utilizes a single high-efficiency video asset with simulated Night Mode
- * - Hardware-accelerated CSS overlays (mix-blend-multiply, deep blue gradient, brightness/contrast filters)
- * - 60FPS fluid bidirectional requestAnimationFrame video scrubbing.
- *
- * Directive 2 & 4: Zero-Color Optical Glassmorphism & RTL Spatial Optimization
- * - Physical diamond glass styling (backdrop-filter blur 24px, sub-pixel specular borders)
- * - Cards intelligently anchored to the left in both LTR and RTL so the warehouse AMRs,
- *   forklift, and highway truck on the right remain 100% visible and unobstructed.
+ * Synchronized Dual-Track Video Architecture:
+ * - Light Mode: /videos/FINAL.mp4 (High-fidelity cinematic daytime)
+ * - Dark Mode: /videos/FINALnight.mp4 (Authentic nocturnal logistics environment)
+ * - Frame-accurate dual-track time synchronization via requestAnimationFrame + ScrollTrigger.
+ * - GPU-accelerated cross-fading (opacity transition with will-change: opacity, transform).
+ * - Zero synthetic overlays — pristine authentic lighting across both themes.
+ * - Left-anchored spatial layout for 100% unobstructed visibility of AMRs, forklifts, and trucks in LTR & RTL.
  */
 
 import { useEffect, useMemo, useRef, useState, useCallback } from 'react'
@@ -158,7 +156,8 @@ export default function LandLogisticsSection({
   const { resolvedTheme } = useTheme()
 
   const sectionRef = useRef<HTMLElement | null>(null)
-  const videoRef = useRef<HTMLVideoElement | null>(null)
+  const lightVideoRef = useRef<HTMLVideoElement | null>(null)
+  const darkVideoRef = useRef<HTMLVideoElement | null>(null)
 
   const targetProgressRef = useRef<number>(0)
   const currentProgressRef = useRef<number>(0)
@@ -194,13 +193,16 @@ export default function LandLogisticsSection({
     setActivePhase((prev) => (prev === next ? prev : next))
   }, [])
 
-  /* ── High-Performance Single-Asset Video Scrubber (60FPS Fluid Sync) ── */
+  /* ── Synchronized Dual-Track Video Scrubber (Light & Dark Lockstep) ── */
   useEffect(() => {
     const section = sectionRef.current
     if (!section) return
 
-    const video = videoRef.current
-    if (video) video.pause()
+    const lightVideo = lightVideoRef.current
+    const darkVideo = darkVideoRef.current
+
+    if (lightVideo) lightVideo.pause()
+    if (darkVideo) darkVideo.pause()
 
     gsap.registerPlugin(ScrollTrigger)
 
@@ -230,11 +232,16 @@ export default function LandLogisticsSection({
       }
 
       const p = currentProgressRef.current
-      const videoEl = videoRef.current
-      const dur = videoEl?.duration && !isNaN(videoEl.duration) ? videoEl.duration : 5.0
+      const activeVideo = mode === 'dark' ? darkVideoRef.current : lightVideoRef.current
+      const dur = activeVideo?.duration && !isNaN(activeVideo.duration) && activeVideo.duration > 0
+        ? activeVideo.duration
+        : 5.0
 
       const targetTime = p * dur
-      syncVideoTime(videoEl, targetTime)
+
+      // Synchronize both Light and Dark tracks simultaneously in exact lockstep
+      syncVideoTime(lightVideoRef.current, targetTime)
+      syncVideoTime(darkVideoRef.current, targetTime)
 
       const totalSeconds = p * 60 + (activePhase * 30)
       const minutes = Math.floor(totalSeconds / 60)
@@ -274,11 +281,19 @@ export default function LandLogisticsSection({
       ScrollTrigger.refresh()
     }
 
-    if (video) {
-      if (video.readyState >= 2) onVideoReady()
+    if (lightVideo) {
+      if (lightVideo.readyState >= 2) onVideoReady()
       else {
-        video.addEventListener('loadedmetadata', onVideoReady, { once: true })
-        video.addEventListener('canplay', onVideoReady, { once: true })
+        lightVideo.addEventListener('loadedmetadata', onVideoReady, { once: true })
+        lightVideo.addEventListener('canplay', onVideoReady, { once: true })
+      }
+    }
+
+    if (darkVideo) {
+      if (darkVideo.readyState >= 2) onVideoReady()
+      else {
+        darkVideo.addEventListener('loadedmetadata', onVideoReady, { once: true })
+        darkVideo.addEventListener('canplay', onVideoReady, { once: true })
       }
     }
 
@@ -291,9 +306,13 @@ export default function LandLogisticsSection({
         cancelAnimationFrame(animFrameIdRef.current)
       }
       window.removeEventListener('resize', handleResize)
-      if (video) {
-        video.removeEventListener('loadedmetadata', onVideoReady)
-        video.removeEventListener('canplay', onVideoReady)
+      if (lightVideo) {
+        lightVideo.removeEventListener('loadedmetadata', onVideoReady)
+        lightVideo.removeEventListener('canplay', onVideoReady)
+      }
+      if (darkVideo) {
+        darkVideo.removeEventListener('loadedmetadata', onVideoReady)
+        darkVideo.removeEventListener('canplay', onVideoReady)
       }
       trigger.kill()
     }
@@ -335,76 +354,51 @@ export default function LandLogisticsSection({
       {/* ─── Sticky Viewport Container ─── */}
       <div className="sticky top-0 h-screen w-full overflow-hidden">
 
-        {/* ─── DIRECTIVE 1: Single-Asset High-Efficiency Video Stream ─── */}
+        {/* ─── DAYTIME VIDEO: Light Mode Source (/videos/FINAL.mp4) ─── */}
         <video
-          ref={videoRef}
-          src="/videos/FINAL-light.mp4"
+          ref={lightVideoRef}
+          src="/videos/FINAL.mp4"
           muted
           playsInline
           preload="auto"
           disablePictureInPicture
-          className="pointer-events-none absolute inset-0 h-full w-full object-cover scale-[1.08] origin-center transition-all duration-700 z-0"
+          className={`pointer-events-none absolute inset-0 h-full w-full object-cover scale-[1.08] origin-center transition-opacity duration-700 ease-in-out z-0 ${
+            mode === 'light' ? 'opacity-100' : 'opacity-0'
+          }`}
           style={{
-            willChange: 'transform, filter',
-            filter:
-              mode === 'dark'
-                ? 'brightness(0.55) contrast(1.22) saturate(0.85) hue-rotate(195deg)'
-                : 'contrast(1.05) saturate(1.1) brightness(1.02)',
+            willChange: 'opacity, transform',
           }}
           aria-hidden="true"
         />
 
-        {/* ─── Simulated Night Mode: Hardware-Accelerated Deep Blue Overlay Layers ─── */}
-        {mode === 'dark' && (
-          <>
-            {/* Deep Midnight Blue Multiplier Overlay */}
-            <div
-              className="pointer-events-none absolute inset-0 bg-[#020617] mix-blend-multiply opacity-80 transition-opacity duration-700 z-0"
-              aria-hidden="true"
-            />
-            {/* Nocturnal Cyber Atmospheric Gradient */}
-            <div
-              className="pointer-events-none absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent mix-blend-overlay z-0"
-              aria-hidden="true"
-            />
-            {/* Ambient Cyan Vehicle/Road Highlights */}
-            <div
-              className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_75%_55%_at_70%_60%,rgba(6,182,212,0.22),transparent_70%)] z-0"
-              aria-hidden="true"
-            />
-            {/* Top Atmospheric Shadow */}
-            <div
-              className="pointer-events-none absolute inset-0 bg-gradient-to-b from-slate-950/70 via-transparent to-slate-950/80 z-0"
-              aria-hidden="true"
-            />
-          </>
-        )}
+        {/* ─── NIGHTTIME VIDEO: Dark Mode Source (/videos/FINALnight.mp4) ─── */}
+        <video
+          ref={darkVideoRef}
+          src="/videos/FINALnight.mp4"
+          muted
+          playsInline
+          preload="auto"
+          disablePictureInPicture
+          className={`pointer-events-none absolute inset-0 h-full w-full object-cover scale-[1.08] origin-center transition-opacity duration-700 ease-in-out z-0 ${
+            mode === 'dark' ? 'opacity-100' : 'opacity-0'
+          }`}
+          style={{
+            willChange: 'opacity, transform',
+          }}
+          aria-hidden="true"
+        />
 
-        {/* ─── Light Mode: Clean Sunlight Ambient Glow ─── */}
-        {mode === 'light' && (
-          <>
-            <div
-              className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_100%_60%_at_80%_0%,rgba(254,240,138,0.1),transparent_70%)] z-0"
-              aria-hidden="true"
-            />
-            <div
-              className="pointer-events-none absolute inset-x-0 bottom-0 h-36 bg-gradient-to-t from-slate-950/15 to-transparent z-0"
-              aria-hidden="true"
-            />
-          </>
-        )}
-
-        {/* ─── Protective Corner Vignette ─── */}
+        {/* ─── Protective Corner Vignette (Guarantees Zero Watermark Exposure & Text Contrast) ─── */}
         <div
           className={`pointer-events-none absolute bottom-0 right-0 w-80 h-56 z-10 ${
             mode === 'dark'
-              ? 'bg-gradient-to-tl from-slate-950/95 via-slate-950/50 to-transparent'
-              : 'bg-gradient-to-tl from-slate-900/30 via-slate-900/10 to-transparent'
+              ? 'bg-gradient-to-tl from-slate-950/95 via-slate-950/40 to-transparent'
+              : 'bg-gradient-to-tl from-slate-900/25 via-slate-900/05 to-transparent'
           }`}
           aria-hidden="true"
         />
 
-        {/* ─── DIRECTIVE 4: RTL & Spatial Layout Optimization ─── */}
+        {/* ─── RTL & Spatial Layout Optimization ─── */}
         {/* Fixed on the LEFT side of the screen in BOTH LTR and RTL so the AMRs/Trucks on the RIGHT are 100% visible */}
         <div className="relative z-10 flex h-full items-center px-4 sm:px-8 lg:px-16 max-w-7xl mx-auto pointer-events-none">
           <div
