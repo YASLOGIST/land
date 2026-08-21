@@ -21,6 +21,7 @@ export default function Footer() {
     platformLinks: [
       { label: t('Autonomous Land Operations', 'العمليات البرية المستقلة'), href: '#land-logistics' },
       { label: t('Platform Capabilities', 'قدرات المنصة والذكاء الاصطناعي'), href: '#capabilities' },
+      { label: t('Corridor Dispatch Matrix', 'مصفوفة إرسال وتوجيه الممرات'), href: '#dispatch-optimizer' },
       { label: t('System Telemetry & Stats', 'القياس عن بعد والأداء'), href: '#telemetry' },
       { label: t('Multimodal Field Hubs', 'المراكز الميدانية متعددة الوسائط'), href: '#infrastructure' },
     ],

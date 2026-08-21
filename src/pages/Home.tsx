@@ -3,6 +3,7 @@ import HeroSection from '@/sections/HeroSection'
 import LandLogisticsSection from '@/sections/LandLogisticsSection'
 import CapabilitiesSection from '@/sections/CapabilitiesSection'
 import StatsSection from '@/sections/StatsSection'
+import CorridorDispatchSection from '@/sections/CorridorDispatchSection'
 import ShowcaseSection from '@/sections/ShowcaseSection'
 import Footer from '@/components/Footer'
 
@@ -14,6 +15,7 @@ export default function Home() {
       <LandLogisticsSection />
       <CapabilitiesSection />
       <StatsSection />
+      <CorridorDispatchSection />
       <ShowcaseSection />
       <Footer />
     </div>
