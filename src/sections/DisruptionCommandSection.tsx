@@ -1,5 +1,18 @@
 'use client'
 
+/**
+ * DisruptionCommandSection — YASLOGIST AI Crisis Disruption Engine
+ *
+ * Directive 2: GIS Vector Incident Crisis Map Architecture
+ * - Scenario-specific GIS maps for all 4 global supply chain disruptions.
+ * - Articulates Red Disrupted Corridor vs. Green Optimized AI Blockchain Bypass.
+ * - Live GIS coordinates, telemetry markers, and incident alert pulses tailored to each scenario.
+ *
+ * Directive 3: Dual-Theme Contrast & Glassmorphism Perfection
+ * - Dark: Deep obsidian/sapphire glass with sub-pixel amber/emerald/cyan borders.
+ * - Light: Ultra-clean frosted crystal glass with high-contrast slate-900 typography and zero glare.
+ */
+
 import { useState, useMemo, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useTheme } from 'next-themes'
@@ -31,12 +44,20 @@ const t = (en: string, ar: string): BilingualText => ({ en, ar })
 /*  Disruption Scenarios & AI Contingency Strategies Data Matrix              */
 /* ========================================================================== */
 
-const DISRUPTION_SCENARIOS: DisruptionScenarioOption[] = [
+const DISRUPTION_SCENARIOS: (DisruptionScenarioOption & {
+  gisCoordinates: string
+  blockedPathLabel: BilingualText
+  bypassPathLabel: BilingualText
+  originPoint: [number, number]
+  destinationPoint: [number, number]
+  controlPoint: [number, number]
+})[] = [
   {
     id: 'suez-congestion',
     code: 'INCIDENT-SUEZ-09',
     title: t('Suez Canal Bottleneck & Port Stoppage', 'اختناق قناة السويس وتكدس الموانئ'),
     location: t('Red Sea & Eastern Mediterranean Gateway', 'البحر الأحمر وبوابة شرق المتوسط'),
+    gisCoordinates: '29°55\'N 32°33\'E // RED SEA SECTOR 4',
     affectedCorridor: 'CORR-DXB-RTM // MARITIME',
     severity: 'CRITICAL',
     impactDescription: t(
@@ -45,7 +66,12 @@ const DISRUPTION_SCENARIOS: DisruptionScenarioOption[] = [
     ),
     baseDelayHours: 84,
     potentialLossRisk: '$520,000 / FLEET',
-    radarCoordinates: [54, 48],
+    radarCoordinates: [52, 50],
+    originPoint: [16, 76],
+    destinationPoint: [88, 32],
+    controlPoint: [50, 14],
+    blockedPathLabel: t('MARITIME STALL // +84H DELAY', 'توقف ملاحي // تأخير +84 ساعة'),
+    bypassPathLabel: t('LANDBRIDGE RAIL BYPASS // -76H', 'تحويل بري أخضر // توفير 76 ساعة'),
     strategies: [
       {
         id: 'speed',
@@ -87,6 +113,7 @@ const DISRUPTION_SCENARIOS: DisruptionScenarioOption[] = [
     code: 'INCIDENT-POLAR-03',
     title: t('North Atlantic Winter Storm Jetstream', 'عاصفة شتوية وتغير التيارات النفاثة بالأطلسي'),
     location: t('North Atlantic Flight Corridors', 'الممرات الجوية لشمال المحيط الأطلسي'),
+    gisCoordinates: '58°20\'N 35°10\'W // JETSTREAM POLAR FRONT',
     affectedCorridor: 'CORR-FRA-ORD // AIR FREIGHT',
     severity: 'HIGH',
     impactDescription: t(
@@ -95,7 +122,12 @@ const DISRUPTION_SCENARIOS: DisruptionScenarioOption[] = [
     ),
     baseDelayHours: 36,
     potentialLossRisk: '$280,000 / CARGO',
-    radarCoordinates: [35, 28],
+    radarCoordinates: [50, 42],
+    originPoint: [18, 64],
+    destinationPoint: [88, 48],
+    controlPoint: [50, 8],
+    blockedPathLabel: t('AIRSPACE GROUND STOP // +36H', 'إغلاق جوي // تأخير +36 ساعة'),
+    bypassPathLabel: t('FL450 POLAR JETSTREAM VECTOR // -32H', 'مسار قطبي فائق الارتفاع // توفير 32 ساعة'),
     strategies: [
       {
         id: 'speed',
@@ -137,6 +169,7 @@ const DISRUPTION_SCENARIOS: DisruptionScenarioOption[] = [
     code: 'INCIDENT-BORDER-08',
     title: t('International Border Clearance Peak Surge', 'ذروة تدفق وازدحام المنافذ الجمركية الدولية'),
     location: t('European Union & APAC Border Terminals', 'المنافذ الحدودية للاتحاد الأوروبي وآسيا'),
+    gisCoordinates: '48°12\'N 16°22\'E // BORDER GATEWAY 08',
     affectedCorridor: 'CORR-RUH-SIN // MULTIMODAL',
     severity: 'HIGH',
     impactDescription: t(
@@ -145,7 +178,12 @@ const DISRUPTION_SCENARIOS: DisruptionScenarioOption[] = [
     ),
     baseDelayHours: 48,
     potentialLossRisk: '$195,000 / CORRIDOR',
-    radarCoordinates: [72, 60],
+    radarCoordinates: [54, 52],
+    originPoint: [16, 72],
+    destinationPoint: [88, 38],
+    controlPoint: [50, 16],
+    blockedPathLabel: t('MANUAL CUSTOMS QUEUE // +48H', 'تفتيش يدوي معطل // تأخير +48 ساعة'),
+    bypassPathLabel: t('ZERO-TRUST GREEN LANE // -46H', 'المسار الأخضر المشفر // توفير 46 ساعة'),
     strategies: [
       {
         id: 'speed',
@@ -187,6 +225,7 @@ const DISRUPTION_SCENARIOS: DisruptionScenarioOption[] = [
     code: 'INCIDENT-THERMAL-12',
     title: t('Ambient Heatwave & Cold-Chain Alert', 'موجة حرارة شديدة وإنذار سلسلة التبريد'),
     location: t('Gulf & Desert Overland Highway Segments', 'طرق النقل البري السريعة الصحراوية'),
+    gisCoordinates: '26°30\'N 50°10\'E // HIGHWAY DESERT CORRIDOR',
     affectedCorridor: 'CORR-SHA-LAX // INLAND FLEET',
     severity: 'CRITICAL',
     impactDescription: t(
@@ -195,7 +234,12 @@ const DISRUPTION_SCENARIOS: DisruptionScenarioOption[] = [
     ),
     baseDelayHours: 24,
     potentialLossRisk: '$850,000 / CONSIGNMENT',
-    radarCoordinates: [65, 38],
+    radarCoordinates: [52, 54],
+    originPoint: [16, 70],
+    destinationPoint: [88, 42],
+    controlPoint: [50, 18],
+    blockedPathLabel: t('DAYTIME HEAT SURGE // +24H', 'خطر حراري نهاري // تأخير +24 ساعة'),
+    bypassPathLabel: t('AUXILIARY CRYO NIGHT DISPATCH // -22H', 'نقل ليلي بتبريد ذكي // توفير 22 ساعة'),
     strategies: [
       {
         id: 'zero-loss-cryo',
@@ -304,13 +348,10 @@ export default function DisruptionCommandSection() {
     activeAlertsTitle: t('Live Global Supply Chain Disruptions', 'الإنذارات اللوجستية العالمية النشطة'),
     mitigationTitle: t('Select AI Autonomous Contingency Protocol', 'اختر بروتوكول التدخل الذكي المناسب'),
     authorizeBtn: t('Authorize Autonomous AI Reroute', 'اعتماد وتفعيل خطة المسار الذكية'),
-    beforeLabel: t('Standard Delay Without AI', 'التأخير المتوقع بدون تدخل'),
-    afterLabel: t('Net Delay With AI Reroute', 'مدة التأخير بعد المعالجة'),
     savedLabel: t('Transit Time Recovered', 'الوقت المسترد والموفر'),
+    afterLabel: t('Net Delay With AI Reroute', 'مدة التأخير بعد المعالجة'),
     lossRiskLabel: t('Asset Risk Mitigation', 'حماية وسلامة الأصول'),
-    lossPrevented: t('Zero-Loss Guaranteed', 'حماية بنسبة 100% خالية من الفقدان'),
     modalTitle: t('Autonomous Reroute Authorization Token', 'رمز اعتماد وتفويض المسار الذاتي المشفر'),
-    modalDesc: t('Cryptographically signed dispatch mandate broadcasted to regional AMR hubs and highway carriers.', 'تفويض رقمي مشفر تم بثه إلى شبكة الروبوتات والأسطول اللوجستي الإقليمي.'),
     copy: t('Copy Authorization Token', 'نسخ رمز التفويض'),
     copied: t('Token Copied', 'تم نسخ الرمز'),
     close: t('Close', 'إغلاق'),
@@ -341,7 +382,7 @@ export default function DisruptionCommandSection() {
             className={`inline-flex items-center gap-2 px-4 py-1.5 rounded-full border mb-4 backdrop-blur-xl ${
               mode === 'dark'
                 ? 'bg-amber-500/10 border-amber-500/30 text-amber-400 shadow-[0_0_20px_rgba(245,158,11,0.15)]'
-                : 'bg-amber-500/15 border-amber-500/40 text-amber-800 shadow-sm'
+                : 'bg-amber-500/15 border-amber-500/40 text-amber-900 shadow-sm'
             }`}
           >
             <AlertTriangle className={`w-3.5 h-3.5 ${mode === 'dark' ? 'text-amber-400' : 'text-amber-700'}`} />
@@ -351,7 +392,7 @@ export default function DisruptionCommandSection() {
           </div>
           <h2
             className={`text-3xl sm:text-5xl font-extrabold tracking-tight mb-5 leading-tight ${
-              mode === 'dark' ? 'text-white' : 'text-slate-900'
+              mode === 'dark' ? 'text-white' : 'text-slate-950'
             }`}
           >
             {ui.title[language]}
@@ -371,7 +412,7 @@ export default function DisruptionCommandSection() {
           {/* Left Column: Active Disruptions & Scenario Selector (5 Columns) */}
           <div className="lg:col-span-5 flex flex-col gap-4">
             <div className="flex items-center justify-between px-1">
-              <span className={`font-bold text-xs ${mode === 'dark' ? 'text-slate-300' : 'text-slate-700'}`}>
+              <span className={`font-bold text-xs ${mode === 'dark' ? 'text-slate-300' : 'text-slate-800'}`}>
                 {ui.activeAlertsTitle[language]}
               </span>
               <span className="font-mono text-[10px] font-extrabold text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded-md border border-amber-500/30">
@@ -392,11 +433,11 @@ export default function DisruptionCommandSection() {
                   className={`p-5 rounded-3xl text-start transition-all duration-300 border backdrop-blur-xl flex flex-col justify-between ${
                     isSelected
                       ? mode === 'dark'
-                        ? 'bg-amber-500/10 border-amber-400/80 text-white shadow-[0_0_25px_rgba(245,158,11,0.25)]'
-                        : 'bg-amber-50/90 border-amber-500 text-slate-950 shadow-md'
+                        ? 'bg-amber-500/10 border-amber-400 text-white shadow-[0_0_25px_rgba(245,158,11,0.25)]'
+                        : 'bg-amber-50 border-amber-500 text-slate-950 shadow-md'
                       : mode === 'dark'
                         ? 'bg-white/[0.02] border-white/10 text-slate-400 hover:border-white/20 hover:text-slate-200'
-                        : 'bg-white/80 border-slate-200 text-slate-600 hover:border-slate-300 shadow-xs'
+                        : 'bg-white/90 border-slate-300 text-slate-700 hover:border-slate-400 shadow-xs'
                   }`}
                 >
                   <div className="flex items-center justify-between w-full mb-2">
@@ -434,50 +475,57 @@ export default function DisruptionCommandSection() {
             })}
           </div>
 
-          {/* Right Column: AI Resolution Console & Comparative Telemetry (7 Columns) */}
+          {/* Right Column: GIS Crisis Map & AI Resolution Console (7 Columns) */}
           <div
             className={`lg:col-span-7 rounded-3xl p-6 sm:p-8 backdrop-blur-2xl border transition-all duration-300 flex flex-col justify-between ${
               mode === 'dark'
-                ? 'bg-slate-950/85 border-white/10 shadow-[0_16px_40px_rgba(0,0,0,0.6)]'
-                : 'bg-white border-slate-200 shadow-xl'
+                ? 'bg-slate-950/80 border-white/10 shadow-[0_16px_40px_rgba(0,0,0,0.6)]'
+                : 'bg-white/95 border-slate-300 shadow-xl'
             }`}
           >
             {/* Top Incident Status Header */}
             <div>
-              <div className="flex items-center justify-between pb-4 mb-6 border-b border-white/[0.08]">
+              <div className="flex items-center justify-between pb-3.5 mb-4 border-b border-white/[0.08] dark:border-white/[0.08]">
                 <div className="flex items-center gap-2.5">
                   <div className="w-8 h-8 rounded-xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400">
                     <Zap className="w-4 h-4" />
                   </div>
                   <div>
-                    <span className="font-mono font-bold text-[10px] text-emerald-400 block leading-tight">
-                      AI_AUTONOMOUS_INTERVENTION
+                    <span className="font-mono font-bold text-[9.5px] text-emerald-400 block leading-tight">
+                      GIS_INCIDENT_INTERVENTION
                     </span>
-                    <span className={`text-sm font-extrabold ${mode === 'dark' ? 'text-white' : 'text-slate-900'}`}>
+                    <span className={`text-sm font-extrabold ${mode === 'dark' ? 'text-white' : 'text-slate-950'}`}>
                       {activeScenario.location[language]}
                     </span>
                   </div>
                 </div>
-                <div className="flex items-center gap-1.5 font-mono text-[10px] font-bold text-slate-400">
+                <div className="flex items-center gap-2 font-mono text-[9.5px] font-bold text-slate-400">
                   <Terminal className="w-3.5 h-3.5 text-cyan-400" />
                   <span>CONFIDENCE: {activeStrategy.confidenceScore}%</span>
                 </div>
               </div>
 
-              {/* Vector Incident Radar Canvas */}
-              <div className="relative w-full h-44 sm:h-48 rounded-2xl overflow-hidden bg-slate-900/70 border border-white/5 p-4 mb-6 flex items-center justify-center">
+              {/* GIS Incident Crisis Vector Map Canvas */}
+              <div className="relative w-full h-52 sm:h-56 rounded-2xl overflow-hidden bg-slate-900/80 border border-white/5 p-4 mb-5 flex items-center justify-center">
+                
+                {/* GIS Lat/Long Coordinates Grid Lines */}
                 <div
-                  className="absolute inset-0 opacity-15 pointer-events-none"
+                  className="absolute inset-0 opacity-20 pointer-events-none"
                   style={{
                     backgroundImage:
-                      'linear-gradient(rgba(6,182,212,0.4) 1px, transparent 1px), linear-gradient(90deg, rgba(6,182,212,0.4) 1px, transparent 1px)',
-                    backgroundSize: '28px 28px',
+                      'linear-gradient(rgba(6,182,212,0.3) 1px, transparent 1px), linear-gradient(90deg, rgba(6,182,212,0.3) 1px, transparent 1px)',
+                    backgroundSize: '32px 32px',
                   }}
                 />
 
+                {/* Top Corner GIS Coordinates Readout */}
+                <div className="absolute top-2 left-3 text-[8.5px] font-mono text-cyan-400/60 pointer-events-none">
+                  {activeScenario.gisCoordinates}
+                </div>
+
                 {/* Radar Concentric Circles */}
-                <div className="absolute inset-4 rounded-full border border-cyan-500/20 pointer-events-none" />
-                <div className="absolute inset-12 rounded-full border border-cyan-500/15 pointer-events-none" />
+                <div className="absolute inset-4 rounded-full border border-cyan-500/15 pointer-events-none" />
+                <div className="absolute inset-14 rounded-full border border-cyan-500/10 pointer-events-none" />
 
                 {/* Pulsing Disruption Epicenter Marker */}
                 <div
@@ -487,64 +535,81 @@ export default function DisruptionCommandSection() {
                   }}
                   className="absolute -translate-x-1/2 -translate-y-1/2 z-20"
                 >
-                  <span className="relative flex h-5 w-5">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-80" />
-                    <span className="relative inline-flex rounded-full h-5 w-5 bg-rose-500/80 items-center justify-center text-[9px] font-bold text-white shadow-[0_0_12px_rgba(244,63,94,1)]">
+                  <span className="relative flex h-6 w-6">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-500 opacity-75" />
+                    <span className="relative inline-flex rounded-full h-6 w-6 bg-rose-600/90 items-center justify-center text-[10px] font-extrabold text-white shadow-[0_0_15px_rgba(244,63,94,1)]">
                       !
                     </span>
                   </span>
                 </div>
 
-                {/* Dynamic AI Reroute Trajectory Curve */}
+                {/* Vector Disruption vs. Green AI Bypass Trajectory */}
                 <svg className="w-full h-full relative z-10" viewBox="0 0 100 100" preserveAspectRatio="none">
-                  {/* Blocked Path in Red */}
-                  <path
-                    d={`M 15 80 L ${activeScenario.radarCoordinates[0]} ${activeScenario.radarCoordinates[1]}`}
-                    fill="none"
-                    stroke="rgba(244,63,94,0.4)"
-                    strokeWidth="2"
-                    strokeDasharray="2 2"
-                  />
-                  {/* AI Green Reroute Path */}
-                  <motion.path
-                    d={`M 15 80 Q 50 15 88 50`}
-                    fill="none"
-                    stroke="url(#reroute-gradient)"
-                    strokeWidth="3"
-                    strokeDasharray="4 2"
-                    initial={{ strokeDashoffset: 0 }}
-                    animate={{ strokeDashoffset: -24 }}
-                    transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
-                  />
                   <defs>
-                    <linearGradient id="reroute-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <linearGradient id="crisis-bypass-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
                       <stop offset="0%" stopColor="#22d3ee" />
                       <stop offset="50%" stopColor="#10b981" />
                       <stop offset="100%" stopColor="#3b82f6" />
                     </linearGradient>
                   </defs>
-                  <circle cx="15" cy="80" r="3" fill="#22d3ee" />
-                  <circle cx="88" cy="50" r="3" fill="#10b981" />
+
+                  {/* 1. Red Disrupted Track (Blocked into Chokepoint) */}
+                  <path
+                    d={`M ${activeScenario.originPoint[0]} ${activeScenario.originPoint[1]} L ${activeScenario.radarCoordinates[0]} ${activeScenario.radarCoordinates[1]}`}
+                    fill="none"
+                    stroke="rgba(244,63,94,0.6)"
+                    strokeWidth="2.5"
+                    strokeDasharray="3 3"
+                  />
+
+                  {/* 2. Green AI Optimized Blockchain Green-Lane Bypass */}
+                  <motion.path
+                    d={`M ${activeScenario.originPoint[0]} ${activeScenario.originPoint[1]} Q ${activeScenario.controlPoint[0]} ${activeScenario.controlPoint[1]} ${activeScenario.destinationPoint[0]} ${activeScenario.destinationPoint[1]}`}
+                    fill="none"
+                    stroke="url(#crisis-bypass-gradient)"
+                    strokeWidth="3.5"
+                    strokeDasharray="5 2.5"
+                    initial={{ strokeDashoffset: 0 }}
+                    animate={{ strokeDashoffset: -26 }}
+                    transition={{ duration: 1.8, repeat: Infinity, ease: 'linear' }}
+                  />
+
+                  {/* Origin & Destination Nodes */}
+                  <circle cx={activeScenario.originPoint[0]} cy={activeScenario.originPoint[1]} r="3" fill="#22d3ee" />
+                  <circle cx={activeScenario.destinationPoint[0]} cy={activeScenario.destinationPoint[1]} r="3.5" fill="#10b981" />
                 </svg>
 
-                {/* Active Protocol Badge */}
-                <div className={`absolute bottom-3 ${isRTL ? 'left-3' : 'right-3'} z-20`}>
-                  <span className="font-mono text-[9px] font-extrabold px-2.5 py-1 rounded-lg bg-slate-950/90 text-emerald-400 border border-emerald-500/30 backdrop-blur-md">
-                    {activeStrategy.rerouteProtocol[language]}
+                {/* Disrupted Path Label */}
+                <div
+                  style={{
+                    left: `${activeScenario.radarCoordinates[0]}%`,
+                    top: `${activeScenario.radarCoordinates[1]}%`,
+                  }}
+                  className="absolute -translate-x-1/2 translate-y-4 z-20 pointer-events-none"
+                >
+                  <span className="font-mono text-[8px] font-bold px-1.5 py-0.5 rounded bg-rose-950/90 text-rose-300 border border-rose-500/50 shadow-sm whitespace-nowrap">
+                    ✕ {activeScenario.blockedPathLabel[language]}
+                  </span>
+                </div>
+
+                {/* Active Protocol Badge (Bottom) */}
+                <div className={`absolute bottom-2.5 ${isRTL ? 'left-2.5' : 'right-2.5'} z-20`}>
+                  <span className="font-mono text-[9px] font-extrabold px-2.5 py-1 rounded-lg bg-slate-950/90 text-emerald-400 border border-emerald-500/40 backdrop-blur-md">
+                    ✓ {activeScenario.bypassPathLabel[language]}
                   </span>
                 </div>
               </div>
 
               {/* Contingency Strategy Selector */}
-              <div className="mb-6">
+              <div className="mb-5">
                 <label
-                  className={`block font-bold mb-3 ${
+                  className={`block font-bold mb-2.5 ${
                     isRTL ? 'text-xs tracking-normal' : 'text-xs uppercase tracking-wider'
-                  } ${mode === 'dark' ? 'text-slate-300' : 'text-slate-700'}`}
+                  } ${mode === 'dark' ? 'text-slate-300' : 'text-slate-800'}`}
                 >
                   {ui.mitigationTitle[language]}
                 </label>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                   {activeScenario.strategies.map((strategy) => {
                     const Icon = strategy.icon
                     const isSelected = strategy.id === selectedStrategyId
@@ -552,24 +617,24 @@ export default function DisruptionCommandSection() {
                       <button
                         key={strategy.id}
                         onClick={() => setSelectedStrategyId(strategy.id)}
-                        className={`p-3.5 rounded-2xl text-start border transition-all duration-200 flex flex-col justify-between ${
+                        className={`p-3 rounded-2xl text-start border transition-all duration-200 flex flex-col justify-between ${
                           isSelected
                             ? mode === 'dark'
                               ? 'bg-emerald-500/15 border-emerald-400 text-white shadow-[0_0_15px_rgba(16,185,129,0.25)]'
-                              : 'bg-emerald-50 border-emerald-500 text-slate-950 shadow-sm'
+                              : 'bg-emerald-50 border-emerald-600 text-slate-950 shadow-sm'
                             : mode === 'dark'
                               ? 'bg-white/[0.02] border-white/10 text-slate-400 hover:border-white/20'
-                              : 'bg-slate-50 border-slate-200 text-slate-600'
+                              : 'bg-slate-50 border-slate-200 text-slate-700'
                         }`}
                       >
-                        <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center justify-between mb-1.5">
                           <Icon className={`w-4 h-4 ${isSelected ? 'text-emerald-400' : 'text-slate-400'}`} />
                           <span className="font-mono text-[9px] font-bold text-emerald-400">
                             -{strategy.delayMitigationHours}h
                           </span>
                         </div>
-                        <div className="font-bold text-xs leading-snug mb-1">{strategy.name[language]}</div>
-                        <div className="text-[10px] text-slate-400 leading-tight">{strategy.tagline[language]}</div>
+                        <div className="font-bold text-xs leading-snug mb-0.5">{strategy.name[language]}</div>
+                        <div className="text-[9.5px] text-slate-400 leading-tight">{strategy.tagline[language]}</div>
                       </button>
                     )
                   })}
@@ -577,71 +642,71 @@ export default function DisruptionCommandSection() {
               </div>
 
               {/* Before vs. After Comparative Telemetry Matrix */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 mb-5">
                 {/* Metric 1: Hours Recovered */}
                 <div
-                  className={`p-3.5 rounded-2xl border backdrop-blur-xl ${
+                  className={`p-3 rounded-2xl border backdrop-blur-xl ${
                     mode === 'dark' ? 'bg-white/[0.025] border-white/10' : 'bg-white border-slate-200 shadow-sm'
                   }`}
                 >
-                  <span className="text-[10px] font-bold text-slate-400 block uppercase mb-1">
+                  <span className="text-[9.5px] font-bold text-slate-400 block uppercase mb-0.5">
                     {ui.savedLabel[language]}
                   </span>
                   <div className="font-mono text-xl sm:text-2xl font-extrabold text-emerald-400">
                     -{simulation.hoursSaved} hrs
                   </div>
-                  <span className="text-[10px] font-mono text-cyan-400 font-semibold mt-0.5 block">
+                  <span className="text-[9px] font-mono text-cyan-400 font-semibold mt-0.5 block">
                     AI OPTIMIZED
                   </span>
                 </div>
 
                 {/* Metric 2: Net Delay */}
                 <div
-                  className={`p-3.5 rounded-2xl border backdrop-blur-xl ${
+                  className={`p-3 rounded-2xl border backdrop-blur-xl ${
                     mode === 'dark' ? 'bg-white/[0.025] border-white/10' : 'bg-white border-slate-200 shadow-sm'
                   }`}
                 >
-                  <span className="text-[10px] font-bold text-slate-400 block uppercase mb-1">
+                  <span className="text-[9.5px] font-bold text-slate-400 block uppercase mb-0.5">
                     {ui.afterLabel[language]}
                   </span>
                   <div className="font-mono text-xl sm:text-2xl font-extrabold text-cyan-300">
                     {simulation.netDelayHours} hrs
                   </div>
-                  <span className="text-[10px] font-mono text-slate-400 line-through mt-0.5 block">
+                  <span className="text-[9px] font-mono text-slate-400 line-through mt-0.5 block">
                     was {activeScenario.baseDelayHours} hrs
                   </span>
                 </div>
 
                 {/* Metric 3: Carbon Offset */}
                 <div
-                  className={`p-3.5 rounded-2xl border backdrop-blur-xl ${
+                  className={`p-3 rounded-2xl border backdrop-blur-xl ${
                     mode === 'dark' ? 'bg-white/[0.025] border-white/10' : 'bg-white border-slate-200 shadow-sm'
                   }`}
                 >
-                  <span className="text-[10px] font-bold text-slate-400 block uppercase mb-1">
-                    ESG CARBON OFFSET
+                  <span className="text-[9.5px] font-bold text-slate-400 block uppercase mb-0.5">
+                    ESG OFFSET
                   </span>
                   <div className="font-mono text-xl sm:text-2xl font-extrabold text-blue-400">
                     -{activeStrategy.co2OffsetKg} kg
                   </div>
-                  <span className="text-[10px] font-mono text-emerald-400 font-semibold mt-0.5 block">
+                  <span className="text-[9px] font-mono text-emerald-400 font-semibold mt-0.5 block">
                     +{simulation.fuelEfficiencyGain}% GAIN
                   </span>
                 </div>
 
                 {/* Metric 4: Asset Loss Prevention */}
                 <div
-                  className={`p-3.5 rounded-2xl border backdrop-blur-xl ${
+                  className={`p-3 rounded-2xl border backdrop-blur-xl ${
                     mode === 'dark' ? 'bg-white/[0.025] border-white/10' : 'bg-white border-slate-200 shadow-sm'
                   }`}
                 >
-                  <span className="text-[10px] font-bold text-slate-400 block uppercase mb-1">
+                  <span className="text-[9.5px] font-bold text-slate-400 block uppercase mb-0.5">
                     {ui.lossRiskLabel[language]}
                   </span>
-                  <div className="font-mono text-sm sm:text-base font-extrabold text-emerald-400 mt-1">
+                  <div className="font-mono text-sm sm:text-base font-extrabold text-emerald-400 mt-0.5">
                     {simulation.lossPreventionRate}
                   </div>
-                  <span className="text-[9px] font-mono text-slate-400 block mt-1">
+                  <span className="text-[8.5px] font-mono text-slate-400 block mt-0.5">
                     SAVED: {activeScenario.potentialLossRisk}
                   </span>
                 </div>
@@ -651,7 +716,7 @@ export default function DisruptionCommandSection() {
             {/* Authorize AI Reroute Trigger */}
             <button
               onClick={() => setAuthModalOpen(true)}
-              className={`w-full group py-4 px-6 rounded-2xl font-bold text-sm tracking-wide transition-all duration-300 flex items-center justify-center gap-3 backdrop-blur-xl ${
+              className={`w-full group py-3.5 px-6 rounded-2xl font-bold text-sm tracking-wide transition-all duration-300 flex items-center justify-center gap-3 backdrop-blur-xl ${
                 mode === 'dark'
                   ? 'bg-gradient-to-r from-emerald-500 via-cyan-500 to-blue-600 text-slate-950 hover:from-emerald-400 hover:to-blue-500 shadow-[0_0_25px_rgba(16,185,129,0.35)]'
                   : 'bg-gradient-to-r from-emerald-600 via-cyan-600 to-blue-700 text-white hover:from-emerald-500 hover:to-blue-600 shadow-lg'
