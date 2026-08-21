@@ -3,14 +3,12 @@
 /**
  * DisruptionCommandSection — YASLOGIST AI Crisis Disruption Engine
  *
- * Directive 2: GIS Vector Incident Crisis Map Architecture
- * - Scenario-specific GIS maps for all 4 global supply chain disruptions.
- * - Articulates Red Disrupted Corridor vs. Green Optimized AI Blockchain Bypass.
- * - Live GIS coordinates, telemetry markers, and incident alert pulses tailored to each scenario.
- *
- * Directive 3: Dual-Theme Contrast & Glassmorphism Perfection
- * - Dark: Deep obsidian/sapphire glass with sub-pixel amber/emerald/cyan borders.
- * - Light: Ultra-clean frosted crystal glass with high-contrast slate-900 typography and zero glare.
+ * Zero-Defect Directive 4: Synchronized Optical Glassmorphism & Luminous Incident Visuals
+ * - Deep backdrop-blur-2xl and diamond optical glass across container and all inner scenario cards.
+ * - Luminous Color Gradients:
+ *   * Red Disrupted Corridors: Glowing neon rose/red with alert pulses and chokepoint hold telemetry.
+ *   * Green AI Blockchain Bypasses: Cyber emerald glowing bezier trajectories with animated pulse particles.
+ * - High-Definition GIS Crisis Vector Canvas with continent topology and incident coordinate readouts.
  */
 
 import { useState, useMemo, useCallback } from 'react'
@@ -66,10 +64,10 @@ const DISRUPTION_SCENARIOS: (DisruptionScenarioOption & {
     ),
     baseDelayHours: 84,
     potentialLossRisk: '$520,000 / FLEET',
-    radarCoordinates: [52, 50],
+    radarCoordinates: [50, 52],
     originPoint: [16, 76],
-    destinationPoint: [88, 32],
-    controlPoint: [50, 14],
+    destinationPoint: [88, 30],
+    controlPoint: [50, 12],
     blockedPathLabel: t('MARITIME STALL // +84H DELAY', 'توقف ملاحي // تأخير +84 ساعة'),
     bypassPathLabel: t('LANDBRIDGE RAIL BYPASS // -76H', 'تحويل بري أخضر // توفير 76 ساعة'),
     strategies: [
@@ -122,10 +120,10 @@ const DISRUPTION_SCENARIOS: (DisruptionScenarioOption & {
     ),
     baseDelayHours: 36,
     potentialLossRisk: '$280,000 / CARGO',
-    radarCoordinates: [50, 42],
+    radarCoordinates: [48, 44],
     originPoint: [18, 64],
     destinationPoint: [88, 48],
-    controlPoint: [50, 8],
+    controlPoint: [50, 6],
     blockedPathLabel: t('AIRSPACE GROUND STOP // +36H', 'إغلاق جوي // تأخير +36 ساعة'),
     bypassPathLabel: t('FL450 POLAR JETSTREAM VECTOR // -32H', 'مسار قطبي فائق الارتفاع // توفير 32 ساعة'),
     strategies: [
@@ -369,8 +367,8 @@ export default function DisruptionCommandSection() {
       <div
         className={`pointer-events-none absolute inset-0 ${
           mode === 'dark'
-            ? 'bg-[radial-gradient(ellipse_75%_45%_at_50%_15%,rgba(245,158,11,0.06),transparent)]'
-            : 'bg-[radial-gradient(ellipse_75%_45%_at_50%_15%,rgba(245,158,11,0.1),transparent)]'
+            ? 'bg-[radial-gradient(ellipse_75%_45%_at_50%_15%,rgba(244,63,94,0.06),transparent)]'
+            : 'bg-[radial-gradient(ellipse_75%_45%_at_50%_15%,rgba(244,63,94,0.09),transparent)]'
         }`}
         aria-hidden="true"
       />
@@ -381,11 +379,11 @@ export default function DisruptionCommandSection() {
           <div
             className={`inline-flex items-center gap-2 px-4 py-1.5 rounded-full border mb-4 backdrop-blur-xl ${
               mode === 'dark'
-                ? 'bg-amber-500/10 border-amber-500/30 text-amber-400 shadow-[0_0_20px_rgba(245,158,11,0.15)]'
-                : 'bg-amber-500/15 border-amber-500/40 text-amber-900 shadow-sm'
+                ? 'bg-rose-500/10 border-rose-500/30 text-rose-400 shadow-[0_0_20px_rgba(244,63,94,0.2)]'
+                : 'bg-rose-500/15 border-rose-500/40 text-rose-900 shadow-sm'
             }`}
           >
-            <AlertTriangle className={`w-3.5 h-3.5 ${mode === 'dark' ? 'text-amber-400' : 'text-amber-700'}`} />
+            <AlertTriangle className={`w-3.5 h-3.5 ${mode === 'dark' ? 'text-rose-400' : 'text-rose-700'}`} />
             <span className={`font-bold ${isRTL ? 'text-xs tracking-normal' : 'text-xs uppercase tracking-widest'}`}>
               {ui.kicker[language]}
             </span>
@@ -415,7 +413,7 @@ export default function DisruptionCommandSection() {
               <span className={`font-bold text-xs ${mode === 'dark' ? 'text-slate-300' : 'text-slate-800'}`}>
                 {ui.activeAlertsTitle[language]}
               </span>
-              <span className="font-mono text-[10px] font-extrabold text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded-md border border-amber-500/30">
+              <span className="font-mono text-[10px] font-extrabold text-rose-400 bg-rose-500/10 px-2 py-0.5 rounded-md border border-rose-500/30">
                 4 CRITICAL NODES
               </span>
             </div>
@@ -430,11 +428,11 @@ export default function DisruptionCommandSection() {
                     setSelectedScenarioId(scenario.id)
                     setSelectedStrategyId('speed')
                   }}
-                  className={`p-5 rounded-3xl text-start transition-all duration-300 border backdrop-blur-xl flex flex-col justify-between ${
+                  className={`p-5 rounded-3xl text-start transition-all duration-300 border backdrop-blur-2xl flex flex-col justify-between ${
                     isSelected
                       ? mode === 'dark'
-                        ? 'bg-amber-500/10 border-amber-400 text-white shadow-[0_0_25px_rgba(245,158,11,0.25)]'
-                        : 'bg-amber-50 border-amber-500 text-slate-950 shadow-md'
+                        ? 'bg-rose-500/10 border-rose-400 text-white shadow-[0_0_25px_rgba(244,63,94,0.3)]'
+                        : 'bg-rose-50 border-rose-500 text-slate-950 shadow-md'
                       : mode === 'dark'
                         ? 'bg-white/[0.02] border-white/10 text-slate-400 hover:border-white/20 hover:text-slate-200'
                         : 'bg-white/90 border-slate-300 text-slate-700 hover:border-slate-400 shadow-xs'
@@ -443,15 +441,15 @@ export default function DisruptionCommandSection() {
                   <div className="flex items-center justify-between w-full mb-2">
                     <div className="flex items-center gap-2">
                       <span className="relative flex h-2 w-2">
-                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75" />
-                        <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-500" />
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75" />
+                        <span className="relative inline-flex rounded-full h-2 w-2 bg-rose-500" />
                       </span>
-                      <span className="font-mono font-bold text-[10px] text-amber-400">{scenario.code}</span>
+                      <span className="font-mono font-bold text-[10px] text-rose-400">{scenario.code}</span>
                     </div>
                     <span
                       className={`font-mono text-[9px] font-extrabold px-2 py-0.5 rounded-md ${
                         scenario.severity === 'CRITICAL'
-                          ? 'bg-rose-500/20 text-rose-400 border border-rose-500/30'
+                          ? 'bg-rose-500/20 text-rose-400 border border-rose-500/40 shadow-[0_0_10px_rgba(244,63,94,0.3)]'
                           : 'bg-amber-500/20 text-amber-400 border border-amber-500/30'
                       }`}
                     >
@@ -487,7 +485,7 @@ export default function DisruptionCommandSection() {
             <div>
               <div className="flex items-center justify-between pb-3.5 mb-4 border-b border-white/[0.08] dark:border-white/[0.08]">
                 <div className="flex items-center gap-2.5">
-                  <div className="w-8 h-8 rounded-xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400">
+                  <div className="w-8 h-8 rounded-xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400 shadow-[0_0_12px_rgba(16,185,129,0.3)]">
                     <Zap className="w-4 h-4" />
                   </div>
                   <div>
@@ -505,21 +503,26 @@ export default function DisruptionCommandSection() {
                 </div>
               </div>
 
-              {/* GIS Incident Crisis Vector Map Canvas */}
-              <div className="relative w-full h-52 sm:h-56 rounded-2xl overflow-hidden bg-slate-900/80 border border-white/5 p-4 mb-5 flex items-center justify-center">
+              {/* GIS Incident Crisis Vector Map Canvas with World Outlines */}
+              <div className="relative w-full h-56 sm:h-64 rounded-2xl overflow-hidden bg-slate-950/90 border border-white/5 p-4 mb-5 flex items-center justify-center">
                 
-                {/* GIS Lat/Long Coordinates Grid Lines */}
-                <div
-                  className="absolute inset-0 opacity-20 pointer-events-none"
-                  style={{
-                    backgroundImage:
-                      'linear-gradient(rgba(6,182,212,0.3) 1px, transparent 1px), linear-gradient(90deg, rgba(6,182,212,0.3) 1px, transparent 1px)',
-                    backgroundSize: '32px 32px',
-                  }}
-                />
+                {/* SVG Geographic Continent Vectors & Lat/Long Coordinate Grid */}
+                <svg className="absolute inset-0 w-full h-full pointer-events-none opacity-20" viewBox="0 0 100 100" preserveAspectRatio="none">
+                  <line x1="0" y1="25" x2="100" y2="25" stroke="rgba(6,182,212,0.4)" strokeWidth="0.5" strokeDasharray="1 2" />
+                  <line x1="0" y1="50" x2="100" y2="50" stroke="rgba(6,182,212,0.6)" strokeWidth="0.75" />
+                  <line x1="0" y1="75" x2="100" y2="75" stroke="rgba(6,182,212,0.4)" strokeWidth="0.5" strokeDasharray="1 2" />
+                  
+                  <line x1="25" y1="0" x2="25" y2="100" stroke="rgba(6,182,212,0.4)" strokeWidth="0.5" strokeDasharray="1 2" />
+                  <line x1="50" y1="0" x2="50" y2="100" stroke="rgba(6,182,212,0.6)" strokeWidth="0.75" />
+                  <line x1="75" y1="0" x2="75" y2="100" stroke="rgba(6,182,212,0.4)" strokeWidth="0.5" strokeDasharray="1 2" />
+
+                  {/* Continent outlines */}
+                  <path d="M 22 28 Q 35 15 55 18 T 85 24 Q 92 38 88 50 T 65 60 Q 45 68 32 55 Z" fill="rgba(6,182,212,0.08)" stroke="rgba(6,182,212,0.25)" strokeWidth="0.8" />
+                  <path d="M 30 52 Q 44 48 48 62 T 40 85 Q 32 88 28 72 Z" fill="rgba(6,182,212,0.06)" stroke="rgba(6,182,212,0.2)" strokeWidth="0.8" />
+                </svg>
 
                 {/* Top Corner GIS Coordinates Readout */}
-                <div className="absolute top-2 left-3 text-[8.5px] font-mono text-cyan-400/60 pointer-events-none">
+                <div className="absolute top-2 left-3 text-[8px] font-mono text-rose-400/80 pointer-events-none">
                   {activeScenario.gisCoordinates}
                 </div>
 
@@ -527,7 +530,7 @@ export default function DisruptionCommandSection() {
                 <div className="absolute inset-4 rounded-full border border-cyan-500/15 pointer-events-none" />
                 <div className="absolute inset-14 rounded-full border border-cyan-500/10 pointer-events-none" />
 
-                {/* Pulsing Disruption Epicenter Marker */}
+                {/* Pulsing Disruption Epicenter Marker (Luminous Neon Red) */}
                 <div
                   style={{
                     left: `${activeScenario.radarCoordinates[0]}%`,
@@ -535,9 +538,9 @@ export default function DisruptionCommandSection() {
                   }}
                   className="absolute -translate-x-1/2 -translate-y-1/2 z-20"
                 >
-                  <span className="relative flex h-6 w-6">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-500 opacity-75" />
-                    <span className="relative inline-flex rounded-full h-6 w-6 bg-rose-600/90 items-center justify-center text-[10px] font-extrabold text-white shadow-[0_0_15px_rgba(244,63,94,1)]">
+                  <span className="relative flex h-7 w-7">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-500 opacity-80" />
+                    <span className="relative inline-flex rounded-full h-7 w-7 bg-rose-600 items-center justify-center text-[11px] font-extrabold text-white shadow-[0_0_20px_rgba(244,63,94,1)]">
                       !
                     </span>
                   </span>
@@ -546,29 +549,31 @@ export default function DisruptionCommandSection() {
                 {/* Vector Disruption vs. Green AI Bypass Trajectory */}
                 <svg className="w-full h-full relative z-10" viewBox="0 0 100 100" preserveAspectRatio="none">
                   <defs>
-                    <linearGradient id="crisis-bypass-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <linearGradient id="luminous-emerald-bypass-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
                       <stop offset="0%" stopColor="#22d3ee" />
                       <stop offset="50%" stopColor="#10b981" />
-                      <stop offset="100%" stopColor="#3b82f6" />
+                      <stop offset="100%" stopColor="#34d399" />
                     </linearGradient>
                   </defs>
 
-                  {/* 1. Red Disrupted Track (Blocked into Chokepoint) */}
+                  {/* 1. Luminous Red Disrupted Track (Blocked into Chokepoint) */}
                   <path
                     d={`M ${activeScenario.originPoint[0]} ${activeScenario.originPoint[1]} L ${activeScenario.radarCoordinates[0]} ${activeScenario.radarCoordinates[1]}`}
                     fill="none"
-                    stroke="rgba(244,63,94,0.6)"
-                    strokeWidth="2.5"
+                    stroke="rgba(244,63,94,0.85)"
+                    strokeWidth="3"
                     strokeDasharray="3 3"
+                    style={{ filter: 'drop-shadow(0 0 6px rgba(244,63,94,0.7))' }}
                   />
 
-                  {/* 2. Green AI Optimized Blockchain Green-Lane Bypass */}
+                  {/* 2. Luminous Green AI Optimized Blockchain Green-Lane Bypass */}
                   <motion.path
                     d={`M ${activeScenario.originPoint[0]} ${activeScenario.originPoint[1]} Q ${activeScenario.controlPoint[0]} ${activeScenario.controlPoint[1]} ${activeScenario.destinationPoint[0]} ${activeScenario.destinationPoint[1]}`}
                     fill="none"
-                    stroke="url(#crisis-bypass-gradient)"
-                    strokeWidth="3.5"
+                    stroke="url(#luminous-emerald-bypass-gradient)"
+                    strokeWidth="4"
                     strokeDasharray="5 2.5"
+                    style={{ filter: 'drop-shadow(0 0 10px rgba(16,185,129,0.9))' }}
                     initial={{ strokeDashoffset: 0 }}
                     animate={{ strokeDashoffset: -26 }}
                     transition={{ duration: 1.8, repeat: Infinity, ease: 'linear' }}
@@ -587,14 +592,14 @@ export default function DisruptionCommandSection() {
                   }}
                   className="absolute -translate-x-1/2 translate-y-4 z-20 pointer-events-none"
                 >
-                  <span className="font-mono text-[8px] font-bold px-1.5 py-0.5 rounded bg-rose-950/90 text-rose-300 border border-rose-500/50 shadow-sm whitespace-nowrap">
+                  <span className="font-mono text-[8.5px] font-bold px-2 py-0.5 rounded bg-rose-950/95 text-rose-200 border border-rose-500/60 shadow-[0_0_12px_rgba(244,63,94,0.4)] whitespace-nowrap">
                     ✕ {activeScenario.blockedPathLabel[language]}
                   </span>
                 </div>
 
                 {/* Active Protocol Badge (Bottom) */}
                 <div className={`absolute bottom-2.5 ${isRTL ? 'left-2.5' : 'right-2.5'} z-20`}>
-                  <span className="font-mono text-[9px] font-extrabold px-2.5 py-1 rounded-lg bg-slate-950/90 text-emerald-400 border border-emerald-500/40 backdrop-blur-md">
+                  <span className="font-mono text-[9px] font-extrabold px-3 py-1 rounded-xl bg-slate-950/95 text-emerald-300 border border-emerald-500/50 shadow-[0_0_12px_rgba(16,185,129,0.35)] backdrop-blur-md">
                     ✓ {activeScenario.bypassPathLabel[language]}
                   </span>
                 </div>
@@ -620,7 +625,7 @@ export default function DisruptionCommandSection() {
                         className={`p-3 rounded-2xl text-start border transition-all duration-200 flex flex-col justify-between ${
                           isSelected
                             ? mode === 'dark'
-                              ? 'bg-emerald-500/15 border-emerald-400 text-white shadow-[0_0_15px_rgba(16,185,129,0.25)]'
+                              ? 'bg-emerald-500/15 border-emerald-400 text-white shadow-[0_0_18px_rgba(16,185,129,0.35)]'
                               : 'bg-emerald-50 border-emerald-600 text-slate-950 shadow-sm'
                             : mode === 'dark'
                               ? 'bg-white/[0.02] border-white/10 text-slate-400 hover:border-white/20'
