@@ -3,15 +3,20 @@
 /**
  * LandLogisticsSection — YASLOGIST Land Operations Scrollytelling
  *
- * Zero-Defect Directive 1: Natural Occlusion HUD & Vertical Timeline Architecture
- * - Zero artificial post-processing blur filters on the video itself (100% native pixel fidelity).
- * - Expanded 'SIM ENGINE' HUD widget (w-[340px] sm:w-[400px] lg:w-[430px]) positioned flush in the
- *   bottom-right corner to naturally and imperceptibly occlude the corner generation artifact.
- * - Compact vertical timeline stack for the 3-Phase stage cards anchored strictly to the outer left bounds.
- * - Guaranteed 100% unobstructed visibility of background video action (AMRs, forklifts, trucks) in LTR & RTL.
+ * Directive 1: Absolute Zero-Occlusion Left-Pinned Stage Cards
+ * - Strict, fixed vertical timeline stack pinned to the absolute left margin (left-4 sm:left-6 lg:left-8 top-1/2 -translate-y-1/2).
+ * - Maximum width strictly constrained (w-[310px] sm:w-[345px] lg:w-[370px]) so the center and right regions
+ *   (where AMRs, forklifts, and heavy trucks operate in all 3 stages) remain 100% visible and unobstructed.
  *
- * Directive 2: Professional 1000ms Motion Cross-Fade Theme Transition
- * - Butter-smooth, realistic cubic-bezier cross-fade between /videos/FINAL.mp4 (Light) and /videos/FINALnight.mp4 (Dark).
+ * Directive 2: Double-Mount True Cinematic Theme Cross-Fade
+ * - Both /videos/FINAL.mp4 (Light) and /videos/FINALnight.mp4 (Dark) mounted simultaneously in the DOM.
+ * - Dark video opacity tied to theme with `transition-opacity duration-1000 ease-in-out` for a butter-smooth,
+ *   continuous, and jump-free theme transition.
+ * - Frame-accurate time synchronization in lockstep across both video elements.
+ *
+ * Directive 1 (Part B): Natural Corner Occlusion
+ * - Expanded 'SIM ENGINE' HUD widget positioned in the bottom-right corner to naturally and imperceptibly
+ *   cover the video generation artifact without any artificial post-processing blur on the video itself.
  */
 
 import { useEffect, useMemo, useRef, useState, useCallback } from 'react'
@@ -123,7 +128,7 @@ const DISCLAIMER: BilingualText = t(
 
 const S = {
   card: {
-    dark: 'border border-white/15 bg-slate-950/75 backdrop-blur-2xl shadow-[0_20px_50px_rgba(0,0,0,0.7),inset_0_1px_1px_rgba(255,255,255,0.18)]',
+    dark: 'border border-white/15 bg-slate-950/80 backdrop-blur-2xl shadow-[0_20px_50px_rgba(0,0,0,0.7),inset_0_1px_1px_rgba(255,255,255,0.18)]',
     light: 'border border-slate-300/90 bg-white/90 backdrop-blur-2xl shadow-[0_20px_50px_rgba(15,23,42,0.12),inset_0_1px_1px_rgba(255,255,255,0.95)]',
   },
   metric: {
@@ -356,7 +361,8 @@ export default function LandLogisticsSection({
       {/* ─── Sticky Viewport Container ─── */}
       <div className="sticky top-0 h-screen w-full overflow-hidden">
 
-        {/* ─── DAYTIME VIDEO: Light Mode Source (/videos/FINAL.mp4) — 1000ms butter-smooth transition ─── */}
+        {/* ─── DIRECTIVE 2: DOUBLE-MOUNT CINEMATIC THEME CROSS-FADE ─── */}
+        {/* BASE LAYER: Daytime Video (/videos/FINAL.mp4) */}
         <video
           ref={lightVideoRef}
           src="/videos/FINAL.mp4"
@@ -364,16 +370,12 @@ export default function LandLogisticsSection({
           playsInline
           preload="auto"
           disablePictureInPicture
-          className={`pointer-events-none absolute inset-0 h-full w-full object-cover scale-[1.08] origin-center transition-opacity duration-1000 ease-in-out z-0 ${
-            mode === 'light' ? 'opacity-100' : 'opacity-0'
-          }`}
-          style={{
-            willChange: 'opacity, transform',
-          }}
+          className="pointer-events-none absolute inset-0 h-full w-full object-cover scale-[1.05] origin-center z-0"
+          style={{ willChange: 'transform' }}
           aria-hidden="true"
         />
 
-        {/* ─── NIGHTTIME VIDEO: Dark Mode Source (/videos/FINALnight.mp4) — 1000ms butter-smooth transition ─── */}
+        {/* OVERLAY LAYER: Nocturnal Video (/videos/FINALnight.mp4) with 1000ms butter-smooth opacity cross-fade */}
         <video
           ref={darkVideoRef}
           src="/videos/FINALnight.mp4"
@@ -381,152 +383,148 @@ export default function LandLogisticsSection({
           playsInline
           preload="auto"
           disablePictureInPicture
-          className={`pointer-events-none absolute inset-0 h-full w-full object-cover scale-[1.08] origin-center transition-opacity duration-1000 ease-in-out z-0 ${
+          className={`pointer-events-none absolute inset-0 h-full w-full object-cover scale-[1.05] origin-center z-1 transition-opacity duration-1000 ease-in-out ${
             mode === 'dark' ? 'opacity-100' : 'opacity-0'
           }`}
-          style={{
-            willChange: 'opacity, transform',
-          }}
+          style={{ willChange: 'opacity, transform' }}
           aria-hidden="true"
         />
 
-        {/* ─── DIRECTIVE 1: Vertical Timeline Stack Locked to Outer Left Margin ─── */}
-        {/* Intentionally locked to the LEFT margin so the AMRs/Trucks on the RIGHT are 100% visible in both LTR & RTL */}
-        <div className="relative z-10 flex h-full items-center px-4 sm:px-6 lg:px-12 max-w-7xl mx-auto pointer-events-none">
-          <div
-            className={`w-full max-w-md lg:max-w-lg pointer-events-auto ml-0 mr-auto ${
-              isRTL ? 'text-right' : 'text-left'
-            }`}
-          >
-            {/* Phase Step Navigation Pills Header */}
-            <div className={`flex items-center gap-2 mb-3.5 ${isRTL ? 'flex-row-reverse justify-end' : 'flex-row'}`}>
-              {PHASES.map((p) => {
-                const isActive = p.index === activePhase
-                return (
-                  <div
-                    key={p.index}
-                    className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-mono font-bold transition-all duration-300 ${
-                      isActive
-                        ? mode === 'dark'
-                          ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-400/60 shadow-[0_0_12px_rgba(6,182,212,0.35)]'
-                          : 'bg-cyan-100 text-cyan-950 border border-cyan-400 shadow-sm'
-                        : mode === 'dark'
-                          ? 'bg-white/[0.04] text-slate-400 border border-white/10'
-                          : 'bg-white/70 text-slate-600 border border-slate-200'
-                    }`}
-                  >
-                    <span className={`w-1.5 h-1.5 rounded-full ${isActive ? 'bg-cyan-400 animate-pulse' : 'bg-slate-400'}`} />
-                    <span>0{p.index + 1}</span>
-                  </div>
-                )
-              })}
-            </div>
-
-            <AnimatePresence mode="wait">
-              <motion.article
-                key={`phase-${phase.index}`}
-                initial={{ opacity: 0, y: 24, scale: 0.98 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, y: -16, scale: 0.98 }}
-                transition={{ duration: 0.4, ease: EASE_CURVE }}
-                className={`relative rounded-3xl p-5 sm:p-7 ${S.card[mode]}`}
-              >
-                {/* Specular Top Reflection Line */}
+        {/* ─── DIRECTIVE 1: ABSOLUTE ZERO-OCCLUSION LEFT-PINNED STAGE CARDS ─── */}
+        {/* Strictly pinned to the left edge so center/right (AMRs, Forklifts, Trucks) are 100% visible */}
+        <div
+          className={`absolute top-1/2 -translate-y-1/2 left-4 sm:left-6 lg:left-8 z-20 w-[310px] sm:w-[345px] lg:w-[370px] pointer-events-auto ${
+            isRTL ? 'text-right' : 'text-left'
+          }`}
+        >
+          {/* Vertical Timeline Step Navigation Pills */}
+          <div className={`flex items-center gap-1.5 mb-3 ${isRTL ? 'flex-row-reverse justify-end' : 'flex-row'}`}>
+            {PHASES.map((p) => {
+              const isActive = p.index === activePhase
+              return (
                 <div
-                  className="absolute inset-x-0 top-0 h-[1.5px] bg-gradient-to-r from-transparent via-white/50 to-transparent pointer-events-none"
-                  aria-hidden="true"
-                />
-
-                {/* Header Kicker */}
-                <div
-                  className={`mb-3.5 flex items-center gap-3 ${
-                    isRTL ? 'flex-row-reverse justify-end' : 'flex-row'
+                  key={p.index}
+                  className={`flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[9.5px] font-mono font-bold transition-all duration-300 ${
+                    isActive
+                      ? mode === 'dark'
+                        ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-400/60 shadow-[0_0_10px_rgba(6,182,212,0.35)]'
+                        : 'bg-cyan-100 text-cyan-950 border border-cyan-400 shadow-xs'
+                      : mode === 'dark'
+                        ? 'bg-white/[0.04] text-slate-400 border border-white/10'
+                        : 'bg-white/70 text-slate-600 border border-slate-200'
                   }`}
                 >
-                  <span
-                    className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl ${S.icon[mode]}`}
-                  >
-                    <PhaseIcon className="h-5 w-5" strokeWidth={1.8} />
-                  </span>
-                  <div className={isRTL ? 'text-right' : 'text-left'}>
-                    <p
-                      className={`font-bold uppercase text-cyan-400 ${
-                        isAr ? 'text-xs tracking-normal' : 'text-[10.5px] tracking-[0.2em]'
-                      }`}
-                    >
-                      {phase.kicker[language]}
-                    </p>
-                    <p
-                      className={`font-semibold font-mono ${S.text.muted[mode]} ${
-                        isAr ? 'text-xs tracking-normal' : 'text-xs tracking-wider'
-                      }`}
-                    >
-                      {i18n.ui.phaseCounter} {phase.index + 1} / {i18n.phases.length}
-                    </p>
-                  </div>
+                  <span className={`w-1.5 h-1.5 rounded-full ${isActive ? 'bg-cyan-400 animate-pulse' : 'bg-slate-400'}`} />
+                  <span>0{p.index + 1}</span>
                 </div>
+              )
+            })}
+          </div>
 
-                {/* Title */}
-                <h2
-                  className={`text-xl sm:text-2xl lg:text-3xl font-extrabold leading-tight tracking-tight ${S.text.title[mode]}`}
+          <AnimatePresence mode="wait">
+            <motion.article
+              key={`phase-${phase.index}`}
+              initial={{ opacity: 0, x: -16, scale: 0.98 }}
+              animate={{ opacity: 1, x: 0, scale: 1 }}
+              exit={{ opacity: 0, x: -12, scale: 0.98 }}
+              transition={{ duration: 0.35, ease: EASE_CURVE }}
+              className={`relative rounded-3xl p-4 sm:p-5 ${S.card[mode]}`}
+            >
+              {/* Specular Top Reflection Line */}
+              <div
+                className="absolute inset-x-0 top-0 h-[1.5px] bg-gradient-to-r from-transparent via-white/50 to-transparent pointer-events-none"
+                aria-hidden="true"
+              />
+
+              {/* Header Kicker */}
+              <div
+                className={`mb-2.5 flex items-center gap-2.5 ${
+                  isRTL ? 'flex-row-reverse justify-end' : 'flex-row'
+                }`}
+              >
+                <span
+                  className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-xl ${S.icon[mode]}`}
                 >
-                  {phase.title[language]}
-                </h2>
+                  <PhaseIcon className="h-4 w-4" strokeWidth={1.8} />
+                </span>
+                <div className={isRTL ? 'text-right' : 'text-left'}>
+                  <p
+                    className={`font-bold uppercase text-cyan-400 ${
+                      isAr ? 'text-[10px] tracking-normal' : 'text-[9.5px] tracking-[0.18em]'
+                    }`}
+                  >
+                    {phase.kicker[language]}
+                  </p>
+                  <p
+                    className={`font-semibold font-mono ${S.text.muted[mode]} ${
+                      isAr ? 'text-[10px] tracking-normal' : 'text-[10px] tracking-wider'
+                    }`}
+                  >
+                    {i18n.ui.phaseCounter} {phase.index + 1} / {i18n.phases.length}
+                  </p>
+                </div>
+              </div>
 
-                {/* Subtitle */}
-                <p className={`mt-2.5 text-xs sm:text-sm leading-relaxed ${S.text.subtitle[mode]}`}>
-                  {phase.subtitle[language]}
-                </p>
+              {/* Title */}
+              <h2
+                className={`text-lg sm:text-xl font-extrabold leading-tight tracking-tight ${S.text.title[mode]}`}
+              >
+                {phase.title[language]}
+              </h2>
 
-                {/* Metrics Grid */}
-                <div className="mt-5 grid grid-cols-3 gap-2">
-                  {phase.metrics.map((metric, idx) => {
-                    const MetricIcon = metric.icon
-                    return (
-                      <motion.div
-                        key={metric.id}
-                        initial={{ opacity: 0, y: 8 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.25, delay: 0.03 * idx, ease: EASE_CURVE }}
-                        className={`rounded-2xl p-2.5 ${S.metric[mode]}`}
+              {/* Subtitle */}
+              <p className={`mt-2 text-xs leading-relaxed ${S.text.subtitle[mode]}`}>
+                {phase.subtitle[language]}
+              </p>
+
+              {/* Metrics Grid */}
+              <div className="mt-4 grid grid-cols-3 gap-1.5">
+                {phase.metrics.map((metric, idx) => {
+                  const MetricIcon = metric.icon
+                  return (
+                    <motion.div
+                      key={metric.id}
+                      initial={{ opacity: 0, y: 6 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.2, delay: 0.02 * idx, ease: EASE_CURVE }}
+                      className={`rounded-xl p-2 ${S.metric[mode]}`}
+                    >
+                      <div
+                        className={`flex items-center gap-1 ${
+                          isRTL ? 'flex-row-reverse justify-end' : 'flex-row'
+                        }`}
                       >
-                        <div
-                          className={`flex items-center gap-1.5 ${
-                            isRTL ? 'flex-row-reverse justify-end' : 'flex-row'
+                        <MetricIcon className="h-2.5 w-2.5 shrink-0 text-cyan-400" strokeWidth={2} />
+                        <span
+                          className={`font-semibold uppercase truncate ${S.text.muted[mode]} ${
+                            isAr ? 'text-[9px] tracking-normal' : 'text-[8.5px] tracking-wider'
                           }`}
                         >
-                          <MetricIcon className="h-3 w-3 shrink-0 text-cyan-400" strokeWidth={2} />
-                          <span
-                            className={`font-semibold uppercase truncate ${S.text.muted[mode]} ${
-                              isAr ? 'text-[10px] tracking-normal' : 'text-[9px] tracking-wider'
-                            }`}
-                          >
-                            {metric.label[language]}
-                          </span>
-                        </div>
-                        <p
-                          dir="ltr"
-                          className={`mt-1 font-mono text-[11px] sm:text-xs font-bold tracking-tight ${
-                            S.text.metric[mode]
-                          } ${isAr ? 'text-right' : 'text-left'}`}
-                        >
-                          {metric.value}
-                        </p>
-                      </motion.div>
-                    )
-                  })}
-                </div>
-              </motion.article>
-            </AnimatePresence>
-          </div>
+                          {metric.label[language]}
+                        </span>
+                      </div>
+                      <p
+                        dir="ltr"
+                        className={`mt-0.5 font-mono text-[10px] sm:text-[11px] font-bold tracking-tight ${
+                          S.text.metric[mode]
+                        } ${isAr ? 'text-right' : 'text-left'}`}
+                      >
+                        {metric.value}
+                      </p>
+                    </motion.div>
+                  )
+                })}
+              </div>
+            </motion.article>
+          </AnimatePresence>
         </div>
 
         {/* ─── Phase Progress Rail ─── */}
-        <div className="absolute top-1/2 right-4 sm:right-6 lg:right-8 z-20 flex -translate-y-1/2 flex-col items-center gap-2.5">
+        <div className="absolute top-1/2 right-4 sm:right-6 lg:right-8 z-20 flex -translate-y-1/2 flex-col items-center gap-2">
           {i18n.phases.map((p) => (
             <div
               key={p.index}
-              className={`h-9 w-1.5 rounded-full transition-all duration-400 ${
+              className={`h-8 w-1.5 rounded-full transition-all duration-400 ${
                 p.index === activePhase ? S.railActive : S.railInactive[mode]
               }`}
               role="presentation"
@@ -561,13 +559,12 @@ export default function LandLogisticsSection({
           )}
         </AnimatePresence>
 
-        {/* ─── DIRECTIVE 1: Naturally Occluding Bottom-Right SIM ENGINE HUD Widget ─── */}
-        {/* Expanded & positioned flush to completely obstruct the bottom-right video generation artifact naturally without blur */}
+        {/* ─── DIRECTIVE 1 (Part B): Naturally Occluding Bottom-Right SIM ENGINE HUD Widget ─── */}
         <motion.aside
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.2 }}
-          className="absolute bottom-4 right-4 sm:bottom-6 sm:right-6 lg:bottom-8 lg:right-8 z-20 w-[320px] sm:w-[380px] lg:w-[420px]"
+          className="absolute bottom-4 right-4 sm:bottom-6 sm:right-6 lg:bottom-8 lg:right-8 z-20 w-[310px] sm:w-[360px] lg:w-[400px]"
           aria-label="Simulation Telemetry Monitoring Panel"
         >
           <div
@@ -575,36 +572,36 @@ export default function LandLogisticsSection({
           >
             {/* Top Telemetry Status Header */}
             <div
-              className={`flex items-center justify-between pb-3 mb-3 border-b ${
+              className={`flex items-center justify-between pb-2.5 mb-2.5 border-b ${
                 mode === 'dark' ? 'border-white/[0.08]' : 'border-slate-200'
               }`}
             >
               <div className="flex items-center gap-2">
-                <span className="relative flex h-2.5 w-2.5">
+                <span className="relative flex h-2 w-2">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-                  <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.9)]" />
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.9)]" />
                 </span>
-                <span className="font-mono font-extrabold text-[10px] tracking-wider text-cyan-400">
+                <span className="font-mono font-extrabold text-[9.5px] tracking-wider text-cyan-400">
                   {i18n.ui.simulationBadge}: ONLINE
                 </span>
               </div>
 
               <div className="flex items-center gap-1.5">
                 <Terminal className="w-3.5 h-3.5 text-cyan-400" />
-                <span className="font-mono text-[10px] font-bold text-slate-400">
+                <span className="font-mono text-[9.5px] font-bold text-slate-400">
                   T+{telemetryTime}
                 </span>
               </div>
             </div>
 
-            {/* Dynamic Phase Status & Details */}
-            <div className={`mb-3 ${isAr ? 'text-right' : 'text-left'}`}>
-              <div className="flex items-center justify-between gap-2 mb-1">
-                <span className="font-bold font-mono text-[11px] text-cyan-300 truncate">
+            {/* Dynamic Phase Status */}
+            <div className={`mb-2.5 ${isAr ? 'text-right' : 'text-left'}`}>
+              <div className="flex items-center justify-between gap-1.5 mb-0.5">
+                <span className="font-bold font-mono text-[10.5px] text-cyan-300 truncate">
                   {currentSimDetail.badge[language]}
                 </span>
                 <span
-                  className={`px-2 py-0.5 rounded-md font-mono text-[9px] font-bold shrink-0 ${
+                  className={`px-1.5 py-0.2 rounded font-mono text-[8.5px] font-bold shrink-0 ${
                     mode === 'dark'
                       ? 'bg-cyan-500/15 text-cyan-300 border border-cyan-500/30'
                       : 'bg-cyan-100 text-cyan-900 border border-cyan-300'
@@ -614,7 +611,7 @@ export default function LandLogisticsSection({
                 </span>
               </div>
               <p
-                className={`text-[11px] leading-snug ${
+                className={`text-[10.5px] leading-tight ${
                   mode === 'dark' ? 'text-slate-300' : 'text-slate-700'
                 }`}
               >
@@ -624,22 +621,21 @@ export default function LandLogisticsSection({
 
             {/* Signal Stream & Telemetry Waveform Bar */}
             <div
-              className={`p-2.5 rounded-2xl mb-2.5 flex items-center justify-between gap-3 ${
+              className={`p-2.5 rounded-2xl mb-2 flex items-center justify-between gap-2.5 ${
                 mode === 'dark' ? 'bg-white/[0.03] border border-white/[0.06]' : 'bg-slate-50 border border-slate-200'
               }`}
             >
               <div className="flex items-center gap-1.5">
                 <Radio className="w-3.5 h-3.5 text-cyan-400 animate-pulse" />
-                <span className="font-mono text-[9px] uppercase font-bold text-slate-400">
+                <span className="font-mono text-[8.5px] uppercase font-bold text-slate-400">
                   STREAM: 99.8% FIDELITY
                 </span>
               </div>
-              <div className="flex items-end gap-1 h-3.5">
-                <span className="w-1 bg-cyan-400 rounded-xs animate-pulse h-2" />
-                <span className="w-1 bg-cyan-400 rounded-xs animate-pulse h-3.5 delay-75" />
-                <span className="w-1 bg-cyan-400 rounded-xs animate-pulse h-1.5 delay-150" />
-                <span className="w-1 bg-cyan-400 rounded-xs animate-pulse h-3 delay-100" />
-                <span className="w-1 bg-cyan-400 rounded-xs animate-pulse h-2.5 delay-200" />
+              <div className="flex items-end gap-1 h-3">
+                <span className="w-0.5 bg-cyan-400 rounded-xs animate-pulse h-1.5" />
+                <span className="w-0.5 bg-cyan-400 rounded-xs animate-pulse h-3 delay-75" />
+                <span className="w-0.5 bg-cyan-400 rounded-xs animate-pulse h-1 delay-150" />
+                <span className="w-0.5 bg-cyan-400 rounded-xs animate-pulse h-2.5 delay-100" />
               </div>
             </div>
 
@@ -652,7 +648,7 @@ export default function LandLogisticsSection({
               <div className={`flex items-start gap-1.5 ${isAr ? 'text-right flex-row-reverse' : 'text-left'}`}>
                 <Activity className="w-3 h-3 shrink-0 mt-0.5 text-cyan-400" />
                 <p
-                  className={`text-[9.5px] leading-relaxed ${
+                  className={`text-[9px] leading-relaxed ${
                     mode === 'dark' ? 'text-slate-400' : 'text-slate-600'
                   }`}
                 >

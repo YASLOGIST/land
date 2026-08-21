@@ -3,12 +3,13 @@
 /**
  * CorridorDispatchSection — YASLOGIST Autonomous Routing & Trade Corridor Simulator
  *
- * Zero-Defect Directive 3: High-Definition GIS Vector Map Canvas Architecture
- * - Precise geographic world map vectors (continents, coastlines, bathymetry lines).
- * - Lat/Long coordinate grid system (60°N, 30°N, 0°EQ, 30°S, 60°W, 0°GMT, 60°E, 120°E).
+ * Directive 3: Professional High-Fidelity Cartographic GIS Vector Map Canvas
+ * - Realistic geographic SVG continent map (North/South America, Europe, Africa, Middle East, Asia, Australia).
+ * - Multi-stage SVG optical neon luminescence filters (<feGaussianBlur> + <feMerge>).
+ * - Lat/Long graticule coordinate grid (66.5°N Arctic, 23.5°N Tropic, 0° Equator, 23.5°S, 0° GMT, 60°E, 120°E).
  * - Mode-Specific High-Fidelity Path Renderers:
- *   * Air Cargo (supersonic-air): Glowing parabolic curves with altitude & Mach telemetry beacons.
- *   * Ocean Freight (ocean-vessel): Maritime nautical fairways following real global shipping channels.
+ *   * Air Cargo (supersonic-air): Parabolic glowing arc with altitude apex (FL380 / 11,500M, MACH 0.84).
+ *   * Ocean Freight (ocean-vessel): Maritime nautical fairways following real global shipping channels (Suez/Malacca).
  *   * Ground Freight (electric-truck): Multi-lane illuminated highway vectors with charging hub beacons.
  * - Real-time Lat/Long coordinate telemetry for all waypoints and active chokepoints.
  */
@@ -70,13 +71,13 @@ const TRADE_CORRIDORS: (TradeCorridorOption & {
     supportedModes: ['supersonic-air', 'ocean-vessel', 'electric-truck'],
     riskScore: 'LOW // 0.02%',
     chokepointName: t('Suez Maritime Passage', 'ممر السويس الملاحي'),
-    chokepointCoords: [48, 52],
+    chokepointCoords: [57, 44],
     customsManifestType: t('Automated GCC-EU Green Manifest', 'بيان جمركي أخضر مؤتمت للخليج وأوروبا'),
     waypoints: [
-      { name: 'DWC (25°N, 55°E)', coordinates: [18, 72], status: 'synced' },
-      { name: 'SUEZ (30°N, 32°E)', coordinates: [48, 52], status: 'active' },
-      { name: 'MED (36°N, 14°E)', coordinates: [68, 36], status: 'active' },
-      { name: 'RTM (52°N, 4°E)', coordinates: [88, 20], status: 'synced' },
+      { name: 'DWC (25°N, 55°E)', coordinates: [63, 49], status: 'synced' },
+      { name: 'SUEZ (30°N, 32°E)', coordinates: [57, 44], status: 'active' },
+      { name: 'MED (36°N, 14°E)', coordinates: [51, 38], status: 'active' },
+      { name: 'RTM (52°N, 4°E)', coordinates: [47, 28], status: 'synced' },
     ],
   },
   {
@@ -92,13 +93,13 @@ const TRADE_CORRIDORS: (TradeCorridorOption & {
     supportedModes: ['supersonic-air', 'ocean-vessel'],
     riskScore: 'OPTIMAL // 0.01%',
     chokepointName: t('Strait of Malacca', 'مضيق ملقا البحري'),
-    chokepointCoords: [72, 50],
+    chokepointCoords: [76, 56],
     customsManifestType: t('Direct APAC Corridor Protocol', 'بروتوكول ممر آسيا والمحيط الهادئ المباشر'),
     waypoints: [
-      { name: 'RUH (24°N, 46°E)', coordinates: [18, 64], status: 'synced' },
-      { name: 'ARABIA (15°N, 65°E)', coordinates: [44, 68], status: 'active' },
-      { name: 'MALACCA (4°N, 100°E)', coordinates: [72, 50], status: 'active' },
-      { name: 'SIN (1°N, 103°E)', coordinates: [88, 32], status: 'synced' },
+      { name: 'RUH (24°N, 46°E)', coordinates: [61, 48], status: 'synced' },
+      { name: 'ARABIAN SEA (15°N)', coordinates: [66, 55], status: 'active' },
+      { name: 'MALACCA (4°N)', coordinates: [76, 56], status: 'active' },
+      { name: 'SIN (1°N, 103°E)', coordinates: [78, 59], status: 'synced' },
     ],
   },
   {
@@ -114,13 +115,13 @@ const TRADE_CORRIDORS: (TradeCorridorOption & {
     supportedModes: ['supersonic-air', 'ocean-vessel'],
     riskScore: 'ZERO-LOSS // 0.00%',
     chokepointName: t('North Atlantic Jetstream Front', 'التيار النفاث لشمال الأطلسي'),
-    chokepointCoords: [50, 24],
+    chokepointCoords: [35, 24],
     customsManifestType: t('Transatlantic Zero-Trust Transit', 'عبور رقمي آمن عبر الأطلسي'),
     waypoints: [
-      { name: 'FRA (50°N, 8°E)', coordinates: [18, 34], status: 'synced' },
-      { name: 'ATL-AIR (58°N, 35°W)', coordinates: [50, 22], status: 'active' },
-      { name: 'HALIFAX (44°N, 63°W)', coordinates: [72, 38], status: 'active' },
-      { name: 'ORD (42°N, 87°W)', coordinates: [88, 56], status: 'synced' },
+      { name: 'FRA (50°N, 8°E)', coordinates: [49, 29], status: 'synced' },
+      { name: 'ATL-AIR (58°N, 35°W)', coordinates: [35, 24], status: 'active' },
+      { name: 'HALIFAX (44°N, 63°W)', coordinates: [26, 33], status: 'active' },
+      { name: 'ORD (42°N, 87°W)', coordinates: [20, 35], status: 'synced' },
     ],
   },
   {
@@ -136,13 +137,13 @@ const TRADE_CORRIDORS: (TradeCorridorOption & {
     supportedModes: ['ocean-vessel', 'supersonic-air'],
     riskScore: 'MONITORED // 0.04%',
     chokepointName: t('Mid-Pacific International Date Line', 'خط التاريخ الدولي وسط الهادئ'),
-    chokepointCoords: [52, 38],
+    chokepointCoords: [94, 38],
     customsManifestType: t('Trans-Pacific Digital Clearing', 'تخليص رقمي فوري عبر المحيط الهادئ'),
     waypoints: [
-      { name: 'SHA (31°N, 121°E)', coordinates: [14, 46], status: 'synced' },
-      { name: 'PAC-DEEP (28°N, 175°W)', coordinates: [52, 38], status: 'active' },
-      { name: 'HAWAII (21°N, 157°W)', coordinates: [72, 54], status: 'active' },
-      { name: 'LAX (34°N, 118°W)', coordinates: [90, 48], status: 'synced' },
+      { name: 'SHA (31°N, 121°E)', coordinates: [81, 42], status: 'synced' },
+      { name: 'PAC-DEEP (28°N)', coordinates: [94, 38], status: 'active' },
+      { name: 'HAWAII (21°N)', coordinates: [10, 48], status: 'active' },
+      { name: 'LAX (34°N, 118°W)', coordinates: [17, 39], status: 'synced' },
     ],
   },
 ]
@@ -246,7 +247,7 @@ export default function CorridorDispatchSection() {
     [selectedCargoId],
   )
 
-  // Mathematical Zero-Trust Calculation
+  // Pure Zero-Trust Mathematical Calculation
   const calculation: DispatchSimulationOutput = useMemo(() => {
     const safePayload = Math.max(1, Math.min(150, payloadTons || 1))
     const dist = activeCorridor.distanceKm
@@ -324,13 +325,15 @@ export default function CorridorDispatchSection() {
     const wp = activeCorridor.waypoints
     if (selectedModeId === 'supersonic-air') {
       // Parabolic high-altitude flight curve
-      return `M ${wp[0].coordinates[0]} ${wp[0].coordinates[1]} Q 50 8 ${wp[3].coordinates[0]} ${wp[3].coordinates[1]}`
+      const midX = (wp[0].coordinates[0] + wp[3].coordinates[0]) / 2
+      const apexY = Math.min(wp[0].coordinates[1], wp[3].coordinates[1]) - 14
+      return `M ${wp[0].coordinates[0]} ${wp[0].coordinates[1]} Q ${midX} ${Math.max(6, apexY)} ${wp[3].coordinates[0]} ${wp[3].coordinates[1]}`
     } else if (selectedModeId === 'ocean-vessel') {
-      // Realistic maritime fairway curve through chokepoints
-      return `M ${wp[0].coordinates[0]} ${wp[0].coordinates[1]} C ${wp[1].coordinates[0]} ${wp[1].coordinates[1] + 8}, ${wp[2].coordinates[0]} ${wp[2].coordinates[1] - 6}, ${wp[3].coordinates[0]} ${wp[3].coordinates[1]}`
+      // Realistic maritime fairway curve through actual shipping waypoints
+      return `M ${wp[0].coordinates[0]} ${wp[0].coordinates[1]} C ${wp[1].coordinates[0]} ${wp[1].coordinates[1]}, ${wp[2].coordinates[0]} ${wp[2].coordinates[1]}, ${wp[3].coordinates[0]} ${wp[3].coordinates[1]}`
     } else {
-      // Highway vector segments
-      return `M ${wp[0].coordinates[0]} ${wp[0].coordinates[1]} Q ${wp[1].coordinates[0]} ${wp[1].coordinates[1]} ${wp[2].coordinates[0]} ${wp[2].coordinates[1]} T ${wp[3].coordinates[0]} ${wp[3].coordinates[1]}`
+      // Highway vector segments with terrestrial routing
+      return `M ${wp[0].coordinates[0]} ${wp[0].coordinates[1]} L ${wp[1].coordinates[0]} ${wp[1].coordinates[1]} L ${wp[2].coordinates[0]} ${wp[2].coordinates[1]} L ${wp[3].coordinates[0]} ${wp[3].coordinates[1]}`
     }
   }, [activeCorridor, selectedModeId])
 
@@ -544,10 +547,10 @@ export default function CorridorDispatchSection() {
             </button>
           </div>
 
-          {/* Right Column: High-Definition GIS Vector Map Canvas (7 Columns) */}
+          {/* Right Column: Professional Cartographic GIS Vector Map Canvas (7 Columns) */}
           <div className="lg:col-span-7 flex flex-col gap-6">
             
-            {/* Top Dynamic GIS Vector Canvas Card */}
+            {/* Dynamic Cartographic GIS Vector Canvas Card */}
             <div
               className={`relative rounded-3xl p-6 sm:p-7 overflow-hidden backdrop-blur-2xl border transition-all duration-300 ${
                 mode === 'dark'
@@ -579,103 +582,148 @@ export default function CorridorDispatchSection() {
                 </div>
               </div>
 
-              {/* High-Definition Vector GIS Map Canvas */}
-              <div className="relative w-full h-64 sm:h-72 rounded-2xl overflow-hidden bg-slate-950/90 border border-white/5 p-4 flex items-center justify-center">
+              {/* High-Resolution Cartographic GIS Vector Map Canvas */}
+              <div className="relative w-full h-72 sm:h-80 rounded-2xl overflow-hidden bg-[#030712] border border-cyan-500/20 p-4 flex items-center justify-center">
                 
-                {/* SVG Geographic Continent Vectors & Lat/Long Coordinate Grid */}
-                <svg className="absolute inset-0 w-full h-full pointer-events-none opacity-25" viewBox="0 0 100 100" preserveAspectRatio="none">
-                  {/* Lat/Long Geographic Parallels & Meridians */}
-                  <line x1="0" y1="20" x2="100" y2="20" stroke="rgba(6,182,212,0.4)" strokeWidth="0.5" strokeDasharray="1 2" />
-                  <line x1="0" y1="50" x2="100" y2="50" stroke="rgba(6,182,212,0.6)" strokeWidth="0.75" />
-                  <line x1="0" y1="80" x2="100" y2="80" stroke="rgba(6,182,212,0.4)" strokeWidth="0.5" strokeDasharray="1 2" />
-                  
-                  <line x1="25" y1="0" x2="25" y2="100" stroke="rgba(6,182,212,0.4)" strokeWidth="0.5" strokeDasharray="1 2" />
-                  <line x1="50" y1="0" x2="50" y2="100" stroke="rgba(6,182,212,0.6)" strokeWidth="0.75" />
-                  <line x1="75" y1="0" x2="75" y2="100" stroke="rgba(6,182,212,0.4)" strokeWidth="0.5" strokeDasharray="1 2" />
+                {/* SVG Cartographic Geographic World Map & Multi-Stage Neon Glow Filters */}
+                <svg className="absolute inset-0 w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
+                  <defs>
+                    {/* Multi-Stage Genuine Optical Neon Glow Filter for Cyan */}
+                    <filter id="gis-neon-cyan" x="-50%" y="-50%" width="200%" height="200%">
+                      <feGaussianBlur in="SourceGraphic" stdDeviation="1.5" result="blur1" />
+                      <feGaussianBlur in="SourceGraphic" stdDeviation="3.5" result="blur2" />
+                      <feMerge>
+                        <feMergeNode in="blur2" />
+                        <feMergeNode in="blur1" />
+                        <feMergeNode in="SourceGraphic" />
+                      </feMerge>
+                    </filter>
 
-                  {/* Stylized World Continent Outlines */}
-                  {/* Eurasia & Middle East */}
-                  <path d="M 22 28 Q 35 15 55 18 T 85 24 Q 92 38 88 50 T 65 60 Q 45 68 32 55 Z" fill="rgba(6,182,212,0.08)" stroke="rgba(6,182,212,0.25)" strokeWidth="0.8" />
-                  {/* Africa */}
-                  <path d="M 30 52 Q 44 48 48 62 T 40 85 Q 32 88 28 72 Z" fill="rgba(6,182,212,0.06)" stroke="rgba(6,182,212,0.2)" strokeWidth="0.8" />
-                  {/* Americas (East/West Shelf) */}
-                  <path d="M 5 22 Q 14 18 16 32 T 12 55 Q 8 68 4 60 Z" fill="rgba(6,182,212,0.05)" stroke="rgba(6,182,212,0.18)" strokeWidth="0.8" />
-                  {/* Oceanic Shipping Fairway Bathymetry Arcs */}
-                  <path d="M 0 50 Q 50 42 100 50" fill="none" stroke="rgba(59,130,246,0.15)" strokeWidth="1.2" strokeDasharray="2 3" />
+                    {/* Optical Neon Glow Filter for Emerald */}
+                    <filter id="gis-neon-emerald" x="-50%" y="-50%" width="200%" height="200%">
+                      <feGaussianBlur in="SourceGraphic" stdDeviation="2" result="blur" />
+                      <feMerge>
+                        <feMergeNode in="blur" />
+                        <feMergeNode in="SourceGraphic" />
+                      </feMerge>
+                    </filter>
+
+                    {/* Gradient Beam for Active Route */}
+                    <linearGradient id="gis-active-route-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                      <stop offset="0%" stopColor="#22d3ee" />
+                      <stop offset="50%" stopColor="#06b6d4" />
+                      <stop offset="100%" stopColor="#10b981" />
+                    </linearGradient>
+                  </defs>
+
+                  {/* 1. Geographic Graticule (Lat/Long Navigation Parallels & Meridians) */}
+                  <g stroke="rgba(6,182,212,0.15)" strokeWidth="0.4" strokeDasharray="1.5 2">
+                    {/* Arctic Circle (66.5°N) */}
+                    <line x1="0" y1="18" x2="100" y2="18" />
+                    {/* Tropic of Cancer (23.5°N) */}
+                    <line x1="0" y1="40" x2="100" y2="40" />
+                    {/* Equator (0°) */}
+                    <line x1="0" y1="58" x2="100" y2="58" stroke="rgba(6,182,212,0.3)" strokeWidth="0.6" strokeDasharray="none" />
+                    {/* Tropic of Capricorn (23.5°S) */}
+                    <line x1="0" y1="76" x2="100" y2="76" />
+                    
+                    {/* Meridians: 120°W, 60°W, 0° GMT, 60°E, 120°E */}
+                    <line x1="15" y1="0" x2="15" y2="100" />
+                    <line x1="32" y1="0" x2="32" y2="100" />
+                    <line x1="50" y1="0" x2="50" y2="100" stroke="rgba(6,182,212,0.3)" strokeWidth="0.6" strokeDasharray="none" />
+                    <line x1="68" y1="0" x2="68" y2="100" />
+                    <line x1="86" y1="0" x2="86" y2="100" />
+                  </g>
+
+                  {/* 2. Realistic Cartographic World Continent Outlines */}
+                  <g fill="rgba(6,182,212,0.06)" stroke="rgba(6,182,212,0.35)" strokeWidth="0.65">
+                    {/* North America (Alaska, Canada, US, Mexico) */}
+                    <path d="M 6 12 Q 12 10 18 14 L 28 16 Q 30 22 25 30 L 28 35 Q 26 42 20 44 L 14 38 Q 8 32 6 22 Z" />
+                    {/* South America */}
+                    <path d="M 23 48 Q 28 47 32 54 L 30 68 Q 28 82 23 88 L 20 74 Q 18 58 23 48 Z" />
+                    {/* Europe & Scandinavia */}
+                    <path d="M 45 16 Q 50 14 54 18 L 52 25 Q 56 28 54 34 L 46 36 Q 42 32 45 22 Z" />
+                    {/* Africa & Madagascar */}
+                    <path d="M 46 38 Q 60 38 62 48 L 58 64 Q 54 82 48 80 L 42 60 Q 40 45 46 38 Z M 64 66 L 66 74 L 64 76 Z" />
+                    {/* Middle East & Arabian Peninsula */}
+                    <path d="M 58 38 Q 65 38 67 45 L 64 54 Q 58 52 57 44 Z" />
+                    {/* Asia & India */}
+                    <path d="M 56 16 Q 78 12 90 20 L 92 38 Q 86 48 80 48 L 74 38 Q 68 34 62 36 Z M 68 40 Q 72 42 74 50 L 70 56 Q 66 52 68 40 Z" />
+                    {/* Southeast Asia & Indonesia Archipelago */}
+                    <path d="M 77 50 L 82 52 L 80 58 Z M 76 60 L 84 62 M 86 58 L 90 64" />
+                    {/* Australia */}
+                    <path d="M 82 66 Q 92 64 94 72 L 90 82 Q 82 84 80 76 Z" />
+                  </g>
+
+                  {/* 3. Oceanic Bathymetric Shipping Channels */}
+                  <g fill="none" stroke="rgba(59,130,246,0.2)" strokeWidth="0.8" strokeDasharray="2 3">
+                    <path d="M 0 35 Q 25 30 50 35 T 100 35" />
+                    <path d="M 0 58 Q 50 54 100 58" />
+                  </g>
+
+                  {/* 4. Active Telemetry Guide Track */}
+                  <path
+                    d={trajectorySvgPath}
+                    fill="none"
+                    stroke={selectedModeId === 'supersonic-air' ? 'rgba(6,182,212,0.3)' : 'rgba(59,130,246,0.3)'}
+                    strokeWidth={selectedModeId === 'electric-truck' ? '5' : '3.5'}
+                  />
+
+                  {/* 5. Glowing Animated Active Trajectory Beam with True Neon Filter */}
+                  <motion.path
+                    d={trajectorySvgPath}
+                    fill="none"
+                    stroke="url(#gis-active-route-gradient)"
+                    strokeWidth={selectedModeId === 'electric-truck' ? '3' : '2.2'}
+                    strokeDasharray={selectedModeId === 'supersonic-air' ? '5 2.5' : '4 2'}
+                    filter="url(#gis-neon-cyan)"
+                    initial={{ strokeDashoffset: 0 }}
+                    animate={{ strokeDashoffset: -26 }}
+                    transition={{ duration: 1.8, repeat: Infinity, ease: 'linear' }}
+                  />
+
+                  {/* 6. Waypoint Nodes with Optical Neon Glow */}
+                  {activeCorridor.waypoints.map((wp, i) => (
+                    <g key={i}>
+                      <circle cx={wp.coordinates[0]} cy={wp.coordinates[1]} r="4" fill="rgba(6,182,212,0.3)" filter="url(#gis-neon-cyan)" />
+                      <circle cx={wp.coordinates[0]} cy={wp.coordinates[1]} r="2" fill="#22d3ee" />
+                      <circle cx={wp.coordinates[0]} cy={wp.coordinates[1]} r="1" fill="#ffffff" />
+                    </g>
+                  ))}
+
+                  {/* 7. Active Chokepoint Bottleneck Node Marker */}
+                  <g>
+                    <circle cx={activeCorridor.chokepointCoords[0]} cy={activeCorridor.chokepointCoords[1]} r="5" fill="rgba(245,158,11,0.3)" filter="url(#gis-neon-cyan)" />
+                    <circle cx={activeCorridor.chokepointCoords[0]} cy={activeCorridor.chokepointCoords[1]} r="2.5" fill="#f59e0b" />
+                  </g>
                 </svg>
 
-                {/* GIS Lat/Long Grid Degree Indicators */}
-                <div className="absolute top-2 left-3 text-[8px] font-mono text-cyan-400/50 pointer-events-none">
-                  LAT: 60°00&apos;N // MERIDIAN: 0°00&apos;GMT
+                {/* Graticule Navigation Degree Labels */}
+                <div className="absolute top-2 left-3 text-[7.5px] font-mono text-cyan-400/60 pointer-events-none">
+                  LAT: 66.5°N ARCTIC // MERIDIAN: 0°00&apos;GMT
                 </div>
-                <div className="absolute top-2 right-3 text-[8px] font-mono text-cyan-400/50 pointer-events-none">
-                  LAT: 30°00&apos;N // APAC SECTOR
+                <div className="absolute top-2 right-3 text-[7.5px] font-mono text-cyan-400/60 pointer-events-none">
+                  LAT: 23.5°N TROPIC // 120°E APAC
                 </div>
-                <div className="absolute bottom-2 left-3 text-[8px] font-mono text-cyan-400/50 pointer-events-none">
-                  LAT: 0°00&apos;EQ // MARITIME CORRIDOR
+                <div className="absolute bottom-2 left-3 text-[7.5px] font-mono text-cyan-400/60 pointer-events-none">
+                  LAT: 0°00&apos;EQ // NAUTICAL CORRIDOR
                 </div>
 
                 {/* Radar Sweep Effect */}
                 <motion.div
                   animate={{ rotate: 360 }}
-                  transition={{ duration: 8, repeat: Infinity, ease: 'linear' }}
-                  className="absolute inset-0 origin-center pointer-events-none opacity-20 bg-[conic-gradient(from_0deg,transparent_0deg,rgba(6,182,212,0.6)_60deg,transparent_60.1deg)]"
+                  transition={{ duration: 9, repeat: Infinity, ease: 'linear' }}
+                  className="absolute inset-0 origin-center pointer-events-none opacity-15 bg-[conic-gradient(from_0deg,transparent_0deg,rgba(6,182,212,0.5)_60deg,transparent_60.1deg)]"
                 />
-
-                {/* High-Fidelity Mode-Specific Route Telemetry Vector Engine */}
-                <svg className="w-full h-full relative z-10" viewBox="0 0 100 100" preserveAspectRatio="none">
-                  <defs>
-                    <linearGradient id="gis-active-beam-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                      <stop offset="0%" stopColor="#06b6d4" />
-                      <stop offset="50%" stopColor="#3b82f6" />
-                      <stop offset="100%" stopColor="#10b981" />
-                    </linearGradient>
-                  </defs>
-
-                  {/* Mode-Specific Background Guide Paths */}
-                  <path
-                    d={trajectorySvgPath}
-                    fill="none"
-                    stroke={selectedModeId === 'supersonic-air' ? 'rgba(6,182,212,0.25)' : 'rgba(59,130,246,0.2)'}
-                    strokeWidth={selectedModeId === 'electric-truck' ? '6' : '4'}
-                  />
-
-                  {/* Animated Active Route Beam */}
-                  <motion.path
-                    d={trajectorySvgPath}
-                    fill="none"
-                    stroke="url(#gis-active-beam-gradient)"
-                    strokeWidth={selectedModeId === 'electric-truck' ? '3.5' : '2.5'}
-                    strokeDasharray={selectedModeId === 'supersonic-air' ? '6 3' : '4 2'}
-                    initial={{ strokeDashoffset: 0 }}
-                    animate={{ strokeDashoffset: -28 }}
-                    transition={{ duration: 1.8, repeat: Infinity, ease: 'linear' }}
-                  />
-
-                  {/* Waypoint Nodes with Glowing Ring Pulse */}
-                  {activeCorridor.waypoints.map((wp, i) => (
-                    <g key={i}>
-                      <circle cx={wp.coordinates[0]} cy={wp.coordinates[1]} r="4" fill="rgba(6,182,212,0.25)" />
-                      <circle cx={wp.coordinates[0]} cy={wp.coordinates[1]} r="2.5" fill="#06b6d4" />
-                      <circle cx={wp.coordinates[0]} cy={wp.coordinates[1]} r="1.2" fill="#ffffff" />
-                    </g>
-                  ))}
-
-                  {/* Active Chokepoint Bottleneck Node Marker */}
-                  <g>
-                    <circle cx={activeCorridor.chokepointCoords[0]} cy={activeCorridor.chokepointCoords[1]} r="5" fill="rgba(245,158,11,0.25)" />
-                    <circle cx={activeCorridor.chokepointCoords[0]} cy={activeCorridor.chokepointCoords[1]} r="2.5" fill="#f59e0b" />
-                  </g>
-                </svg>
 
                 {/* Waypoint GIS Lat/Long Coordinates Readouts */}
                 {activeCorridor.waypoints.map((wp, i) => (
                   <div
                     key={i}
                     style={{ left: `${wp.coordinates[0]}%`, top: `${wp.coordinates[1]}%` }}
-                    className="absolute -translate-x-1/2 -translate-y-6 z-20 pointer-events-none"
+                    className="absolute -translate-x-1/2 -translate-y-5 z-20 pointer-events-none"
                   >
-                    <span className="font-mono text-[8.5px] font-extrabold px-1.5 py-0.5 rounded-md bg-slate-950/90 text-cyan-300 border border-cyan-500/40 shadow-xs whitespace-nowrap">
+                    <span className="font-mono text-[8px] font-extrabold px-1.5 py-0.5 rounded bg-slate-950/95 text-cyan-300 border border-cyan-500/50 shadow-md whitespace-nowrap">
                       {wp.name}
                     </span>
                   </div>
@@ -686,14 +734,14 @@ export default function CorridorDispatchSection() {
                   style={{ left: `${activeCorridor.chokepointCoords[0]}%`, top: `${activeCorridor.chokepointCoords[1]}%` }}
                   className="absolute -translate-x-1/2 translate-y-3 z-20 pointer-events-none"
                 >
-                  <span className="font-mono text-[8.5px] font-bold px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40 whitespace-nowrap backdrop-blur-sm">
+                  <span className="font-mono text-[8px] font-bold px-2 py-0.5 rounded bg-amber-950/90 text-amber-300 border border-amber-500/50 whitespace-nowrap backdrop-blur-sm shadow-md">
                     ⚡ {activeCorridor.chokepointName[language]}
                   </span>
                 </div>
 
                 {/* Bottom Customs Protocol Badge */}
                 <div className={`absolute bottom-2.5 ${isRTL ? 'left-2.5' : 'right-2.5'} z-20`}>
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-[10px] font-mono font-bold bg-slate-950/90 text-emerald-400 border border-emerald-500/30 backdrop-blur-md">
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-[9.5px] font-mono font-bold bg-slate-950/95 text-emerald-400 border border-emerald-500/40 backdrop-blur-md shadow-md">
                     <ShieldCheck className="w-3 h-3 text-emerald-400" />
                     {activeCorridor.customsManifestType[language]}
                   </span>
