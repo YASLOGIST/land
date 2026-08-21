@@ -1,19 +1,23 @@
 'use client'
 
 /**
- * DisruptionCommandSection — YASLOGIST 6G AI Crisis Disruption Engine
+ * DisruptionCommandSection — YASLOGIST 6G Interactive AI Crisis Disruption Engine
  *
- * True Cartographic GIS Engine (Real World Natural Earth Geometry & WGS-84 Telemetry)
- * - Authentic 110m TopoJSON world continent coastlines and national boundaries.
- * - Exact Equirectangular WGS-84 coordinate mapping on 1000x500 cartographic canvas.
- * - Multi-stage genuine optical neon glow SVG filters (<feGaussianBlur> + <feMerge>).
- * - Luminous Visual Channels:
- *   * Red Disrupted Corridors: Deep glowing neon rose/red with alert pulse drop-shadows and chokepoint hold telemetry.
- *   * Green AI Blockchain Bypasses: Cyber emerald glowing bezier curves with animated high-speed particle dashes.
- * - Synchronized optical diamond glassmorphism with deep backdrop-blur-3xl styling and dynamic contextual tinting.
+ * Directives:
+ * 1. Immersive Fullscreen Mode (The "Crisis Command View"):
+ *    - Maximize/Minimize toggle in the HUD header.
+ *    - Fixed 100vw/100vh viewport transition with backdrop-blur-3xl and Escape listener.
+ * 2. Interactive Pan, Zoom & Center-on-Click Physics:
+ *    - Fluid drag-to-pan, inertia-based wheel zooming (1.0x to 6.0x), and on-screen zoom HUD.
+ *    - On-Click Spatial Navigation: Clicking any incident chokepoint smoothly animates
+ *      and centers the viewport directly onto that coordinate's bounding box.
+ * 3. Contextual Data HUDs (Incident Telemetry on Click):
+ *    - Interactive glassmorphic tooltip linked to the active incident coordinate displaying
+ *      localized crisis severity, meteorology, holding hours, and bypass readiness.
+ * 4. True Cartographic GIS Engine (1000x500 WGS-84 Equirectangular Natural Earth Dataset).
  */
 
-import { useState, useMemo, useCallback } from 'react'
+import { useState, useMemo, useCallback, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useTheme } from 'next-themes'
 import {
@@ -29,6 +33,11 @@ import {
   Copy,
   CheckCircle2,
   Terminal,
+  Maximize2,
+  Minimize2,
+  Plus,
+  Minus,
+  RotateCcw,
 } from 'lucide-react'
 import { useLanguage } from '@/hooks/use-language'
 import type { BilingualText } from '@/types/land-logistics'
@@ -39,6 +48,7 @@ import type {
 } from '@/types/disruption'
 import { WORLD_LAND_SVG_PATH, WORLD_BORDERS_SVG_PATH } from '@/data/world-land-110m'
 import { projectGeo } from '@/utils/gis-projection'
+import { useGisPanZoom } from '@/hooks/useGisPanZoom'
 
 const t = (en: string, ar: string): BilingualText => ({ en, ar })
 
@@ -55,6 +65,8 @@ interface RealDisruptionScenario extends DisruptionScenarioOption {
   chokepointGps: [number, number]
   realBlockedSvgPath: string
   realBypassSvgPath: string
+  localizedMeteorology: BilingualText
+  liveHoldingDelay: string
 }
 
 const DISRUPTION_SCENARIOS: RealDisruptionScenario[] = [
@@ -78,10 +90,10 @@ const DISRUPTION_SCENARIOS: RealDisruptionScenario[] = [
     radarCoordinates: [59.04, 33.38],
     blockedPathLabel: t('MARITIME STALL // +84H DELAY', 'توقف ملاحي // تأخير +84 ساعة'),
     bypassPathLabel: t('LANDBRIDGE RAIL BYPASS // -76H', 'تحويل بري أخضر // توفير 76 ساعة'),
-    // Real maritime channel stall at Suez
     realBlockedSvgPath: 'M 653.6 180.0 L 620.8 215.0 L 590.4 166.9',
-    // Overland rail bypass curve through Anatolia to Rotterdam
     realBypassSvgPath: 'M 653.6 180.0 Q 560.0 90.0 512.4 105.8',
+    localizedMeteorology: t('Moderate 26°C // Cross-winds 18kts', 'معتدل 26°م // رياح عرضية 18 عقدة'),
+    liveHoldingDelay: '84.0 HOURS ESTIMATED',
     strategies: [
       {
         id: 'speed',
@@ -140,6 +152,8 @@ const DISRUPTION_SCENARIOS: RealDisruptionScenario[] = [
     bypassPathLabel: t('FL450 POLAR JETSTREAM VECTOR // -32H', 'مسار قطبي فائق الارتفاع // توفير 32 ساعة'),
     realBlockedSvgPath: 'M 523.8 111.0 L 402.8 94.4',
     realBypassSvgPath: 'M 523.8 111.0 Q 380.0 40.0 255.8 133.4',
+    localizedMeteorology: t('Blizzard Front // Jetstream Headwind 72kts', 'جبهة عاصفة ثلجية // رياح نفاثة 72 عقدة'),
+    liveHoldingDelay: '36.0 HOURS GROUND STOP',
     strategies: [
       {
         id: 'speed',
@@ -198,6 +212,8 @@ const DISRUPTION_SCENARIOS: RealDisruptionScenario[] = [
     bypassPathLabel: t('ZERO-TRUST GREEN LANE // -46H', 'المسار الأخضر المشفر // توفير 46 ساعة'),
     realBlockedSvgPath: 'M 629.6 181.4 L 694.4 194.4',
     realBypassSvgPath: 'M 629.6 181.4 Q 710.0 160.0 788.4 246.3',
+    localizedMeteorology: t('Clear 28°C // High Volume Dwell Queue', 'صافٍ 28°م // طابور انتظار كثيف'),
+    liveHoldingDelay: '48.0 HOURS MANUAL QUEUE',
     strategies: [
       {
         id: 'speed',
@@ -256,6 +272,8 @@ const DISRUPTION_SCENARIOS: RealDisruptionScenario[] = [
     bypassPathLabel: t('AUXILIARY CRYO NIGHT DISPATCH // -22H', 'نقل ليلي بتبريد ذكي // توفير 22 ساعة'),
     realBlockedSvgPath: 'M 633.3 183.3 L 644.4 177.8',
     realBypassSvgPath: 'M 633.3 183.3 Q 645.0 150.0 655.6 180.6',
+    localizedMeteorology: t('Extreme Heatwave +49°C // High Sun Radiation', 'حرارة شديدة +49°م // إشعاع شمسي مكثف'),
+    liveHoldingDelay: '24.0 HOURS HIGHWAY DWELL',
     strategies: [
       {
         id: 'zero-loss-cryo',
@@ -308,8 +326,27 @@ export default function DisruptionCommandSection() {
 
   const [selectedScenarioId, setSelectedScenarioId] = useState<string>('suez-congestion')
   const [selectedStrategyId, setSelectedStrategyId] = useState<StrategyModeId>('speed')
+  const [isFullscreen, setIsFullscreen] = useState<boolean>(false)
   const [authModalOpen, setAuthModalOpen] = useState<boolean>(false)
   const [copiedToken, setCopiedToken] = useState<boolean>(false)
+  const [selectedIncidentHud, setSelectedIncidentHud] = useState<boolean>(false)
+
+  // Interactive Pan-Zoom Physics Hook
+  const {
+    transform,
+    isDragging,
+    handleMouseDown,
+    handleMouseMove,
+    handleMouseUp,
+    handleTouchStart,
+    handleTouchMove,
+    handleTouchEnd,
+    handleWheel,
+    zoomIn,
+    zoomOut,
+    resetView,
+    centerOnPoint,
+  } = useGisPanZoom({ minScale: 1.0, maxScale: 6.0, viewBoxWidth: 1000, viewBoxHeight: 500 })
 
   const activeScenario = useMemo(
     () => DISRUPTION_SCENARIOS.find((s) => s.id === selectedScenarioId) || DISRUPTION_SCENARIOS[0],
@@ -322,6 +359,18 @@ export default function DisruptionCommandSection() {
       activeScenario.strategies[0],
     [activeScenario, selectedStrategyId],
   )
+
+  // Keyboard Escape Handler for Fullscreen
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setIsFullscreen(false)
+        setSelectedIncidentHud(false)
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [])
 
   // Pure Zero-Trust Immutable Simulation Engine
   const simulation: DisruptionSimulationResult = useMemo(() => {
@@ -358,6 +407,11 @@ export default function DisruptionCommandSection() {
   const destinationPixels = useMemo(() => projectGeo(activeScenario.destinationGps), [activeScenario])
   const chokepointPixels = useMemo(() => projectGeo(activeScenario.chokepointGps), [activeScenario])
 
+  const handleIncidentEpicenterClick = useCallback(() => {
+    setSelectedIncidentHud(true)
+    centerOnPoint(chokepointPixels[0], chokepointPixels[1], 3.2)
+  }, [centerOnPoint, chokepointPixels])
+
   const ui = {
     kicker: t('6G AUTONOMOUS DISRUPTION COMMAND CENTER', 'مركز القيادة والتحكم الذاتي لمعالجة الاختناقات 6G'),
     title: t('AI-Powered Global Incident Resolution', 'معالجة فورية لأزمات سلاسل التوريد بالذكاء الاصطناعي'),
@@ -375,6 +429,11 @@ export default function DisruptionCommandSection() {
     copy: t('Copy Authorization Token', 'نسخ رمز التفويض'),
     copied: t('Token Copied', 'تم نسخ الرمز'),
     close: t('Close', 'إغلاق'),
+    fullscreen: t('Crisis World View', 'عرض أزمات العالم الكامل للشاشة'),
+    exitFullscreen: t('Exit Fullscreen', 'إنهاء وضع ملء الشاشة'),
+    zoomIn: t('Zoom In', 'تكبير'),
+    zoomOut: t('Zoom Out', 'تصغير'),
+    resetView: t('Reset View', 'إعادة ضبط الخريطة'),
   }
 
   return (
@@ -449,6 +508,8 @@ export default function DisruptionCommandSection() {
                   onClick={() => {
                     setSelectedScenarioId(scenario.id)
                     setSelectedStrategyId('speed')
+                    setSelectedIncidentHud(false)
+                    resetView()
                   }}
                   className={`p-5 rounded-3xl text-start transition-all duration-300 border backdrop-blur-3xl flex flex-col justify-between ${
                     isSelected
@@ -498,10 +559,12 @@ export default function DisruptionCommandSection() {
           {/* Right Column: Cartographic GIS Crisis Map & AI Resolution Console (7 Columns) */}
           <div
             className={`lg:col-span-7 rounded-3xl p-6 sm:p-8 backdrop-blur-3xl border border-rose-500/30 shadow-[0_16px_50px_rgba(244,63,94,0.15)] transition-all duration-300 flex flex-col justify-between ${
-              mode === 'dark' ? 'bg-slate-950/85' : 'bg-white/95'
+              isFullscreen
+                ? 'fixed inset-0 z-[100] w-screen h-screen rounded-none p-6 sm:p-10 bg-slate-950/98 backdrop-blur-3xl flex flex-col justify-between overflow-hidden'
+                : mode === 'dark' ? 'bg-slate-950/85' : 'bg-white/95'
             }`}
           >
-            {/* Top Incident Status Header */}
+            {/* Top Incident Status Header with Fullscreen Trigger */}
             <div>
               <div className="flex items-center justify-between pb-3.5 mb-4 border-b border-white/[0.08] dark:border-white/[0.08]">
                 <div className="flex items-center gap-2.5">
@@ -517,17 +580,43 @@ export default function DisruptionCommandSection() {
                     </span>
                   </div>
                 </div>
-                <div className="flex items-center gap-2 font-mono text-[9.5px] font-bold text-slate-400">
-                  <Terminal className="w-3.5 h-3.5 text-cyan-400" />
-                  <span>CONFIDENCE: {activeStrategy.confidenceScore}%</span>
+
+                <div className="flex items-center gap-2.5">
+                  <div className="flex items-center gap-1.5 font-mono text-[9.5px] font-bold text-slate-400">
+                    <Terminal className="w-3.5 h-3.5 text-cyan-400" />
+                    <span>CONFIDENCE: {activeStrategy.confidenceScore}%</span>
+                  </div>
+
+                  {/* Fullscreen Toggle */}
+                  <button
+                    onClick={() => setIsFullscreen(!isFullscreen)}
+                    title={isFullscreen ? ui.exitFullscreen[language] : ui.fullscreen[language]}
+                    className="p-1.5 rounded-xl border border-white/10 bg-slate-800/70 hover:bg-slate-700 text-rose-300 hover:text-white transition-colors"
+                  >
+                    {isFullscreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
+                  </button>
                 </div>
               </div>
 
-              {/* High-Resolution Cartographic GIS Crisis Vector Map Canvas (1000x500 WGS-84) */}
-              <div className="relative w-full h-64 sm:h-72 rounded-2xl overflow-hidden bg-[#030712] border border-rose-500/25 p-4 mb-5 flex items-center justify-center">
-                
+              {/* High-Resolution Interactive Cartographic GIS Crisis Vector Map Canvas (1000x500 WGS-84) */}
+              <div
+                onMouseDown={handleMouseDown}
+                onMouseMove={handleMouseMove}
+                onMouseUp={handleMouseUp}
+                onTouchStart={handleTouchStart}
+                onTouchMove={handleTouchMove}
+                onTouchEnd={handleTouchEnd}
+                onWheel={handleWheel}
+                className={`relative w-full rounded-2xl overflow-hidden bg-[#030712] border border-rose-500/25 p-4 mb-5 flex items-center justify-center select-none ${
+                  isDragging ? 'cursor-grabbing' : 'cursor-grab'
+                } ${isFullscreen ? 'h-[500px]' : 'h-64 sm:h-72'}`}
+              >
                 {/* SVG Real World Cartographic Map with Natural Earth TopoJSON & Multi-Stage Optical Neon */}
-                <svg className="absolute inset-0 w-full h-full" viewBox="0 0 1000 500" preserveAspectRatio="none">
+                <svg
+                  className="absolute inset-0 w-full h-full"
+                  viewBox="0 0 1000 500"
+                  preserveAspectRatio="none"
+                >
                   <defs>
                     {/* Genuine Multi-Stage Optical Neon Filter for Rose/Red */}
                     <filter id="crisis-real-red" x="-50%" y="-50%" width="200%" height="200%">
@@ -559,64 +648,108 @@ export default function DisruptionCommandSection() {
                     </linearGradient>
                   </defs>
 
-                  {/* 1. Cartographic Lat/Long Graticule Grid */}
-                  <g stroke="rgba(244,63,94,0.12)" strokeWidth="0.8" strokeDasharray="4 6">
-                    <line x1="0" y1="65.3" x2="1000" y2="65.3" />
-                    <line x1="0" y1="184.7" x2="1000" y2="184.7" />
-                    <line x1="0" y1="250.0" x2="1000" y2="250.0" stroke="rgba(244,63,94,0.25)" strokeWidth="1.2" strokeDasharray="none" />
-                    <line x1="0" y1="315.3" x2="1000" y2="315.3" />
-                    <line x1="166.7" y1="0" x2="166.7" y2="500" />
-                    <line x1="333.3" y1="0" x2="333.3" y2="500" />
-                    <line x1="500.0" y1="0" x2="500.0" y2="500" stroke="rgba(244,63,94,0.25)" strokeWidth="1.2" strokeDasharray="none" />
-                    <line x1="666.7" y1="0" x2="666.7" y2="500" />
-                    <line x1="833.3" y1="0" x2="833.3" y2="500" />
+                  {/* Transform Matrix Group for Smooth 60fps Pan and Zoom */}
+                  <g
+                    transform={`translate(${transform.x}, ${transform.y}) scale(${transform.scale})`}
+                    style={{ transformOrigin: '500px 250px', willChange: 'transform' }}
+                  >
+                    {/* 1. Cartographic Lat/Long Graticule Grid */}
+                    <g stroke="rgba(244,63,94,0.12)" strokeWidth="0.8" strokeDasharray="4 6">
+                      <line x1="0" y1="65.3" x2="1000" y2="65.3" />
+                      <line x1="0" y1="184.7" x2="1000" y2="184.7" />
+                      <line x1="0" y1="250.0" x2="1000" y2="250.0" stroke="rgba(244,63,94,0.25)" strokeWidth="1.2" strokeDasharray="none" />
+                      <line x1="0" y1="315.3" x2="1000" y2="315.3" />
+                      <line x1="166.7" y1="0" x2="166.7" y2="500" />
+                      <line x1="333.3" y1="0" x2="333.3" y2="500" />
+                      <line x1="500.0" y1="0" x2="500.0" y2="500" stroke="rgba(244,63,94,0.25)" strokeWidth="1.2" strokeDasharray="none" />
+                      <line x1="666.7" y1="0" x2="666.7" y2="500" />
+                      <line x1="833.3" y1="0" x2="833.3" y2="500" />
+                    </g>
+
+                    {/* 2. Real Cartographic World Continents & Coastlines (Natural Earth Dataset) */}
+                    <path
+                      d={WORLD_LAND_SVG_PATH}
+                      fill="rgba(244,63,94,0.04)"
+                      stroke="rgba(244,63,94,0.4)"
+                      strokeWidth="1.2"
+                      className="pointer-events-none"
+                    />
+                    <path
+                      d={WORLD_BORDERS_SVG_PATH}
+                      fill="none"
+                      stroke="rgba(244,63,94,0.18)"
+                      strokeWidth="0.75"
+                      className="pointer-events-none"
+                    />
+
+                    {/* 3. Luminous Red Disrupted Track (Terminating at blocked chokepoint) */}
+                    <path
+                      d={activeScenario.realBlockedSvgPath}
+                      fill="none"
+                      stroke="rgba(244,63,94,0.95)"
+                      strokeWidth="6"
+                      strokeDasharray="8 6"
+                      filter="url(#crisis-real-red)"
+                      className="pointer-events-none"
+                    />
+
+                    {/* 4. Luminous Cyber Emerald AI Blockchain Bypass Trajectory */}
+                    <motion.path
+                      d={activeScenario.realBypassSvgPath}
+                      fill="none"
+                      stroke="url(#crisis-real-bypass-gradient)"
+                      strokeWidth="7"
+                      strokeDasharray="12 6"
+                      filter="url(#crisis-real-emerald)"
+                      initial={{ strokeDashoffset: 0 }}
+                      animate={{ strokeDashoffset: -60 }}
+                      transition={{ duration: 1.8, repeat: Infinity, ease: 'linear' }}
+                      className="pointer-events-none"
+                    />
+
+                    {/* 5. Origin & Destination Nodes */}
+                    <circle cx={originPixels[0]} cy={originPixels[1]} r="7" fill="#22d3ee" filter="url(#crisis-real-emerald)" />
+                    <circle cx={destinationPixels[0]} cy={destinationPixels[1]} r="8" fill="#10b981" filter="url(#crisis-real-emerald)" />
+
+                    {/* 6. Disrupted Chokepoint Emergency Node with Interactive Center-on-Click */}
+                    <g
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        handleIncidentEpicenterClick()
+                      }}
+                      className="cursor-pointer"
+                    >
+                      <circle cx={chokepointPixels[0]} cy={chokepointPixels[1]} r="16" fill="rgba(244,63,94,0.45)" filter="url(#crisis-real-red)" />
+                      <circle cx={chokepointPixels[0]} cy={chokepointPixels[1]} r="8" fill="#f43f5e" />
+                      <circle cx={chokepointPixels[0]} cy={chokepointPixels[1]} r="3" fill="#ffffff" />
+                    </g>
                   </g>
-
-                  {/* 2. Real Cartographic World Continents & Coastlines (Natural Earth Dataset) */}
-                  <path
-                    d={WORLD_LAND_SVG_PATH}
-                    fill="rgba(244,63,94,0.04)"
-                    stroke="rgba(244,63,94,0.4)"
-                    strokeWidth="1.2"
-                  />
-                  <path
-                    d={WORLD_BORDERS_SVG_PATH}
-                    fill="none"
-                    stroke="rgba(244,63,94,0.18)"
-                    strokeWidth="0.75"
-                  />
-
-                  {/* 3. Luminous Red Disrupted Track (Terminating at blocked chokepoint) */}
-                  <path
-                    d={activeScenario.realBlockedSvgPath}
-                    fill="none"
-                    stroke="rgba(244,63,94,0.95)"
-                    strokeWidth="6"
-                    strokeDasharray="8 6"
-                    filter="url(#crisis-real-red)"
-                  />
-
-                  {/* 4. Luminous Cyber Emerald AI Blockchain Bypass Trajectory */}
-                  <motion.path
-                    d={activeScenario.realBypassSvgPath}
-                    fill="none"
-                    stroke="url(#crisis-real-bypass-gradient)"
-                    strokeWidth="7"
-                    strokeDasharray="12 6"
-                    filter="url(#crisis-real-emerald)"
-                    initial={{ strokeDashoffset: 0 }}
-                    animate={{ strokeDashoffset: -60 }}
-                    transition={{ duration: 1.8, repeat: Infinity, ease: 'linear' }}
-                  />
-
-                  {/* 5. Origin & Destination Nodes */}
-                  <circle cx={originPixels[0]} cy={originPixels[1]} r="7" fill="#22d3ee" filter="url(#crisis-real-emerald)" />
-                  <circle cx={destinationPixels[0]} cy={destinationPixels[1]} r="8" fill="#10b981" filter="url(#crisis-real-emerald)" />
-
-                  {/* 6. Disrupted Chokepoint Emergency Node */}
-                  <circle cx={chokepointPixels[0]} cy={chokepointPixels[1]} r="14" fill="rgba(244,63,94,0.4)" filter="url(#crisis-real-red)" />
-                  <circle cx={chokepointPixels[0]} cy={chokepointPixels[1]} r="7" fill="#f43f5e" />
                 </svg>
+
+                {/* On-Screen Zoom & View Control HUD */}
+                <div className="absolute top-3 right-3 z-30 flex flex-col gap-1.5 bg-slate-950/85 backdrop-blur-md p-1.5 rounded-2xl border border-white/10 shadow-lg">
+                  <button
+                    onClick={zoomIn}
+                    title={ui.zoomIn[language]}
+                    className="p-1.5 rounded-xl hover:bg-slate-800 text-slate-300 hover:text-white transition-colors"
+                  >
+                    <Plus className="w-3.5 h-3.5" />
+                  </button>
+                  <button
+                    onClick={zoomOut}
+                    title={ui.zoomOut[language]}
+                    className="p-1.5 rounded-xl hover:bg-slate-800 text-slate-300 hover:text-white transition-colors"
+                  >
+                    <Minus className="w-3.5 h-3.5" />
+                  </button>
+                  <button
+                    onClick={resetView}
+                    title={ui.resetView[language]}
+                    className="p-1.5 rounded-xl hover:bg-slate-800 text-slate-300 hover:text-white transition-colors border-t border-white/10"
+                  >
+                    <RotateCcw className="w-3.5 h-3.5" />
+                  </button>
+                </div>
 
                 {/* Top Corner GIS Coordinates Readout */}
                 <div className="absolute top-2 left-3 text-[8px] font-mono text-rose-400/90 pointer-events-none">
@@ -639,18 +772,53 @@ export default function DisruptionCommandSection() {
                   </span>
                 </div>
 
-                {/* Disrupted Path Label */}
-                <div
-                  style={{
-                    left: `${(chokepointPixels[0] / 10).toFixed(1)}%`,
-                    top: `${(chokepointPixels[1] / 5).toFixed(1)}%`,
-                  }}
-                  className="absolute -translate-x-1/2 translate-y-4 z-20 pointer-events-none"
-                >
-                  <span className="font-mono text-[8.5px] font-bold px-2 py-0.5 rounded bg-rose-950/95 text-rose-200 border border-rose-500/60 shadow-[0_0_12px_rgba(244,63,94,0.4)] whitespace-nowrap">
-                    ✕ {activeScenario.blockedPathLabel[language]}
-                  </span>
-                </div>
+                {/* Contextual Incident Telemetry HUD Tooltip on Click */}
+                <AnimatePresence>
+                  {selectedIncidentHud && (
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0.9, y: 10 }}
+                      animate={{ opacity: 1, scale: 1, y: 0 }}
+                      exit={{ opacity: 0, scale: 0.9, y: 10 }}
+                      className={`absolute bottom-4 ${
+                        isRTL ? 'right-4' : 'left-4'
+                      } z-40 max-w-sm w-full p-4 rounded-2xl border border-rose-500/50 bg-slate-900/95 backdrop-blur-2xl shadow-[0_0_35px_rgba(244,63,94,0.35)] text-white font-mono`}
+                    >
+                      <div className="flex items-center justify-between pb-2 mb-2.5 border-b border-white/10">
+                        <div className="flex items-center gap-2">
+                          <AlertTriangle className="w-3.5 h-3.5 text-rose-400" />
+                          <span className="font-bold text-xs text-rose-300 truncate">
+                            {activeScenario.code}
+                          </span>
+                        </div>
+                        <button
+                          onClick={() => setSelectedIncidentHud(false)}
+                          className="p-1 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white transition-colors"
+                        >
+                          <X className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+
+                      <div className="space-y-2 text-[10.5px]">
+                        <div className="flex justify-between">
+                          <span className="text-slate-400">SEVERITY:</span>
+                          <span className="text-rose-400 font-bold">{activeScenario.severity}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-slate-400">METEOROLOGY:</span>
+                          <span className="text-amber-300 font-semibold">{activeScenario.localizedMeteorology[language]}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-slate-400">HOLDING TIME:</span>
+                          <span className="text-rose-400 font-bold">{activeScenario.liveHoldingDelay}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-slate-400">BYPASS PROTOCOL:</span>
+                          <span className="text-emerald-400 font-bold">{activeStrategy.name[language]}</span>
+                        </div>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
 
                 {/* Active Protocol Badge (Bottom) */}
                 <div className={`absolute bottom-2.5 ${isRTL ? 'left-2.5' : 'right-2.5'} z-20`}>
