@@ -81,10 +81,32 @@ interface RealTradeCorridor extends TradeCorridorOption {
   chokepointGps: [number, number]
   catTurbulenceGps: [number, number]
   piracyZoneGps: [number, number]
+  seaIceZoneGps: [number, number]
   flightLevel: string
+  flightLevelRange: string
   headwindKts: number
+  outsideAirTempC: number
   bathymetryDepthM: number
+  surfaceCurrentsKts: string
+  seaIceCoverage: string
   axleLoadLimitT: number
+  clearanceHeightM: number
+  railSlotTime: string
+  // Aviation Layer Vectors (Navy Optimal, Cyan Alt, Neon Red CAT, Lime Fuel-Save)
+  aviationOptimalNavyPath: string
+  aviationAltCyanPath: string
+  aviationWarningRedPath: string
+  aviationLimeFuelSavePath: string
+  // Maritime Layer Vectors (Teal Fairway, Amber Congestion, Sea-Ice Arc)
+  maritimeTealSafePath: string
+  maritimeAmberCongestionPath: string
+  maritimeSeaIcePath: string
+  // Land Layer Vectors (Burnt Orange Highway, Olive Rural, Forest Green Rail, Charcoal Closed)
+  landBurntOrangeHighwayPath: string
+  landOliveRuralPath: string
+  landForestGreenRailPath: string
+  landCharcoalClosedPath: string
+  // Legacy & Trajectory Aliases
   realAirPath: string
   realOceanPath: string
   realLandPath: string
@@ -109,14 +131,36 @@ const TRADE_CORRIDORS: RealTradeCorridor[] = [
     supportedModes: ['supersonic-air', 'ocean-vessel', 'electric-truck'],
     riskScore: 'LOW // 0.02%',
     flightLevel: 'FL380 // 11,580M',
+    flightLevelRange: 'FL280 - FL410 (CRUISE FL380)',
     headwindKts: 42,
+    outsideAirTempC: -52,
     bathymetryDepthM: 32,
+    surfaceCurrentsKts: '1.4 KTS NW',
+    seaIceCoverage: '0.0% (TROPICAL/MEDITERRANEAN)',
     axleLoadLimitT: 44,
+    clearanceHeightM: 4.8,
+    railSlotTime: 'SLOT #84-A // 04:15 UTC',
     chokepointName: t('Suez Maritime Gateway', 'ممر السويس الملاحي'),
     chokepointGps: [32.55, 29.93],
     catTurbulenceGps: [38.0, 36.0],
     piracyZoneGps: [48.0, 13.0],
+    seaIceZoneGps: [-10.0, 64.0],
     customsManifestType: t('Automated GCC-EU Green Manifest', 'بيان جمركي أخضر مؤتمت للخليج وأوروبا'),
+    // Aviation Layer Vectors
+    aviationOptimalNavyPath: 'M 653.6 180.0 Q 585.0 125.0 512.4 105.8',
+    aviationAltCyanPath: 'M 653.6 180.0 Q 590.0 145.0 512.4 105.8',
+    aviationWarningRedPath: 'M 605.5 150.0 Q 590.0 138.0 575.0 132.0',
+    aviationLimeFuelSavePath: 'M 653.6 180.0 Q 570.0 110.0 512.4 105.8',
+    // Maritime Layer Vectors
+    maritimeTealSafePath: 'M 653.6 180.0 L 657.0 176.4 L 664.0 185.0 L 620.8 215.0 L 606.0 194.0 L 590.4 166.9 L 540.3 149.4 L 484.4 150.0 L 475.0 128.0 L 498.6 111.1 L 512.4 105.8',
+    maritimeAmberCongestionPath: 'M 590.4 166.9 L 575.0 158.0 L 560.0 152.0',
+    maritimeSeaIcePath: 'M 470.0 100.0 Q 480.0 95.0 500.0 92.0',
+    // Land Layer Vectors
+    landBurntOrangeHighwayPath: 'M 653.6 180.0 L 629.6 181.4 L 599.7 161.4 L 580.6 136.1 L 538.9 116.7 L 512.4 105.8',
+    landOliveRuralPath: 'M 653.6 180.0 L 640.0 170.0 L 610.0 150.0 L 565.0 125.0 L 512.4 105.8',
+    landForestGreenRailPath: 'M 653.6 180.0 L 625.0 175.0 L 585.0 145.0 L 545.0 120.0 L 512.4 105.8',
+    landCharcoalClosedPath: 'M 605.0 165.0 L 595.0 155.0',
+    // Legacy mapping
     realAirPath: 'M 653.6 180.0 Q 585.0 125.0 512.4 105.8',
     realOceanPath: 'M 653.6 180.0 L 657.0 176.4 L 664.0 185.0 L 620.8 215.0 L 606.0 194.0 L 590.4 166.9 L 540.3 149.4 L 484.4 150.0 L 475.0 128.0 L 498.6 111.1 L 512.4 105.8',
     realLandPath: 'M 653.6 180.0 L 629.6 181.4 L 599.7 161.4 L 580.6 136.1 L 538.9 116.7 L 512.4 105.8',
@@ -192,14 +236,36 @@ const TRADE_CORRIDORS: RealTradeCorridor[] = [
     supportedModes: ['supersonic-air', 'ocean-vessel'],
     riskScore: 'OPTIMAL // 0.01%',
     flightLevel: 'FL410 // 12,500M',
+    flightLevelRange: 'FL310 - FL410 (HIGH CRUISE FL410)',
     headwindKts: 28,
+    outsideAirTempC: -48,
     bathymetryDepthM: 65,
+    surfaceCurrentsKts: '0.9 KTS SE',
+    seaIceCoverage: '0.0% (INDIAN OCEAN)',
     axleLoadLimitT: 40,
+    clearanceHeightM: 4.5,
+    railSlotTime: 'SLOT #12-C // 08:30 UTC',
     chokepointName: t('Strait of Malacca', 'مضيق ملقا البحري'),
     chokepointGps: [100.0, 4.0],
     catTurbulenceGps: [82.0, 10.0],
     piracyZoneGps: [98.0, 4.5],
+    seaIceZoneGps: [80.0, 70.0],
     customsManifestType: t('Direct APAC Corridor Protocol', 'بروتوكول ممر آسيا والمحيط الهادئ المباشر'),
+    // Aviation Layer Vectors
+    aviationOptimalNavyPath: 'M 629.6 181.4 Q 710.0 200.0 788.4 246.3',
+    aviationAltCyanPath: 'M 629.6 181.4 Q 695.0 215.0 788.4 246.3',
+    aviationWarningRedPath: 'M 727.0 222.0 Q 735.0 228.0 745.0 235.0',
+    aviationLimeFuelSavePath: 'M 629.6 181.4 Q 720.0 185.0 788.4 246.3',
+    // Maritime Layer Vectors
+    maritimeTealSafePath: 'M 629.6 181.4 L 664.0 185.0 L 680.6 208.3 L 723.9 233.6 L 777.8 238.9 L 788.4 246.3',
+    maritimeAmberCongestionPath: 'M 770.0 238.0 L 785.0 245.0',
+    maritimeSeaIcePath: 'M 750.0 80.0 Q 770.0 75.0 790.0 70.0',
+    // Land Layer Vectors
+    landBurntOrangeHighwayPath: 'M 629.6 181.4 L 680.0 175.0 L 730.0 190.0 L 788.4 246.3',
+    landOliveRuralPath: 'M 629.6 181.4 L 670.0 190.0 L 720.0 210.0 L 788.4 246.3',
+    landForestGreenRailPath: 'M 629.6 181.4 L 690.0 180.0 L 740.0 200.0 L 788.4 246.3',
+    landCharcoalClosedPath: 'M 700.0 185.0 L 710.0 190.0',
+    // Legacy mapping
     realAirPath: 'M 629.6 181.4 Q 710.0 200.0 788.4 246.3',
     realOceanPath: 'M 629.6 181.4 L 664.0 185.0 L 680.6 208.3 L 723.9 233.6 L 777.8 238.9 L 788.4 246.3',
     realLandPath: 'M 629.6 181.4 L 680.0 175.0 L 730.0 190.0 L 788.4 246.3',
@@ -257,14 +323,36 @@ const TRADE_CORRIDORS: RealTradeCorridor[] = [
     supportedModes: ['supersonic-air', 'ocean-vessel'],
     riskScore: 'ZERO-LOSS // 0.00%',
     flightLevel: 'FL360 // 10,970M',
+    flightLevelRange: 'FL280 - FL390 (POLAR FL360)',
     headwindKts: 68,
+    outsideAirTempC: -56,
     bathymetryDepthM: 3800,
+    surfaceCurrentsKts: '2.1 KTS SW',
+    seaIceCoverage: '18.4% (SUB-POLAR DRIFT)',
     axleLoadLimitT: 44,
+    clearanceHeightM: 4.8,
+    railSlotTime: 'SLOT #91-K // 11:20 UTC',
     chokepointName: t('North Atlantic Jetstream Front', 'التيار النفاث لشمال الأطلسي'),
     chokepointGps: [-35.0, 56.0],
     catTurbulenceGps: [-35.0, 56.0],
     piracyZoneGps: [-45.0, 40.0],
+    seaIceZoneGps: [-40.0, 60.0],
     customsManifestType: t('Transatlantic Zero-Trust Transit', 'عبور رقمي آمن عبر الأطلسي'),
+    // Aviation Layer Vectors
+    aviationOptimalNavyPath: 'M 523.8 111.0 Q 402.8 70.0 255.8 133.4',
+    aviationAltCyanPath: 'M 523.8 111.0 Q 390.0 95.0 255.8 133.4',
+    aviationWarningRedPath: 'M 420.0 80.0 Q 400.0 75.0 380.0 85.0',
+    aviationLimeFuelSavePath: 'M 523.8 111.0 Q 380.0 55.0 255.8 133.4',
+    // Maritime Layer Vectors
+    maritimeTealSafePath: 'M 523.8 111.0 L 498.6 111.1 L 460.0 120.0 L 402.8 135.0 L 323.6 126.1 L 275.0 130.0 L 255.8 133.4',
+    maritimeAmberCongestionPath: 'M 480.0 115.0 L 460.0 120.0',
+    maritimeSeaIcePath: 'M 380.0 70.0 Q 400.0 78.0 430.0 85.0',
+    // Land Layer Vectors
+    landBurntOrangeHighwayPath: 'M 523.8 111.0 L 480.0 115.0 L 323.6 126.1 L 255.8 133.4',
+    landOliveRuralPath: 'M 523.8 111.0 L 490.0 125.0 L 310.0 135.0 L 255.8 133.4',
+    landForestGreenRailPath: 'M 523.8 111.0 L 475.0 112.0 L 320.0 122.0 L 255.8 133.4',
+    landCharcoalClosedPath: 'M 330.0 124.0 L 320.0 128.0',
+    // Legacy mapping
     realAirPath: 'M 523.8 111.0 Q 402.8 70.0 255.8 133.4',
     realOceanPath: 'M 523.8 111.0 L 498.6 111.1 L 460.0 120.0 L 402.8 135.0 L 323.6 126.1 L 275.0 130.0 L 255.8 133.4',
     realLandPath: 'M 523.8 111.0 L 480.0 115.0 L 323.6 126.1 L 255.8 133.4',
@@ -321,14 +409,36 @@ const TRADE_CORRIDORS: RealTradeCorridor[] = [
     supportedModes: ['ocean-vessel', 'supersonic-air'],
     riskScore: 'MONITORED // 0.04%',
     flightLevel: 'FL390 // 11,890M',
+    flightLevelRange: 'FL300 - FL410 (PACIFIC FL390)',
     headwindKts: 54,
+    outsideAirTempC: -50,
     bathymetryDepthM: 5200,
+    surfaceCurrentsKts: '1.6 KTS E',
+    seaIceCoverage: '0.0% (PACIFIC EQUATORIAL)',
     axleLoadLimitT: 42,
+    clearanceHeightM: 4.6,
+    railSlotTime: 'SLOT #04-P // 14:00 UTC',
     chokepointName: t('Mid-Pacific International Date Line', 'خط التاريخ الدولي وسط الهادئ'),
     chokepointGps: [-175.0, 28.0],
     catTurbulenceGps: [150.0, 35.0],
     piracyZoneGps: [130.0, 20.0],
+    seaIceZoneGps: [170.0, 65.0],
     customsManifestType: t('Trans-Pacific Digital Clearing', 'تخليص رقمي فوري عبر المحيط الهادئ'),
+    // Aviation Layer Vectors
+    aviationOptimalNavyPath: 'M 837.4 163.3 Q 950.0 120.0 1000.0 135.0 M 0.0 135.0 Q 80.0 135.0 171.1 155.7',
+    aviationAltCyanPath: 'M 837.4 163.3 Q 940.0 135.0 1000.0 145.0 M 0.0 145.0 Q 80.0 145.0 171.1 155.7',
+    aviationWarningRedPath: 'M 910.0 138.0 Q 930.0 132.0 950.0 128.0',
+    aviationLimeFuelSavePath: 'M 837.4 163.3 Q 950.0 105.0 1000.0 125.0 M 0.0 125.0 Q 80.0 125.0 171.1 155.7',
+    // Maritime Layer Vectors
+    maritimeTealSafePath: 'M 837.4 163.3 L 888.1 150.8 L 980.0 170.0 L 1000.0 175.0 M 0.0 175.0 L 61.7 190.8 L 171.1 155.7',
+    maritimeAmberCongestionPath: 'M 840.0 162.0 L 860.0 158.0 M 150.0 160.0 L 171.1 155.7',
+    maritimeSeaIcePath: 'M 950.0 60.0 Q 980.0 65.0 1000.0 70.0',
+    // Land Layer Vectors
+    landBurntOrangeHighwayPath: 'M 837.4 163.3 L 888.1 150.8 L 171.1 155.7',
+    landOliveRuralPath: 'M 837.4 163.3 L 870.0 165.0 L 160.0 160.0 L 171.1 155.7',
+    landForestGreenRailPath: 'M 837.4 163.3 L 895.0 148.0 L 175.0 150.0 L 171.1 155.7',
+    landCharcoalClosedPath: 'M 880.0 155.0 L 890.0 152.0',
+    // Legacy mapping
     realAirPath: 'M 837.4 163.3 Q 950.0 120.0 1000.0 135.0 M 0.0 135.0 Q 80.0 135.0 171.1 155.7',
     realOceanPath: 'M 837.4 163.3 L 888.1 150.8 L 980.0 170.0 L 1000.0 175.0 M 0.0 175.0 L 61.7 190.8 L 171.1 155.7',
     realLandPath: 'M 837.4 163.3 L 888.1 150.8 L 171.1 155.7',
@@ -985,7 +1095,9 @@ export default function CorridorDispatchSection() {
                 <svg
                   className="absolute inset-0 w-full h-full"
                   viewBox="0 0 1000 500"
-                  preserveAspectRatio="none"
+                  preserveAspectRatio="xMidYMid meet"
+                  shapeRendering="geometricPrecision"
+                  textRendering="geometricPrecision"
                 >
                   <defs>
                     {/* Genuine Multi-Stage Optical Neon Filters */}
@@ -999,7 +1111,71 @@ export default function CorridorDispatchSection() {
                       </feMerge>
                     </filter>
 
+                    <filter id="gis-real-navy" x="-50%" y="-50%" width="200%" height="200%">
+                      <feGaussianBlur in="SourceGraphic" stdDeviation="4" result="blur" />
+                      <feMerge>
+                        <feMergeNode in="blur" />
+                        <feMergeNode in="SourceGraphic" />
+                      </feMerge>
+                    </filter>
+
+                    <filter id="gis-real-neon-red" x="-50%" y="-50%" width="200%" height="200%">
+                      <feGaussianBlur in="SourceGraphic" stdDeviation="4" result="blur" />
+                      <feMerge>
+                        <feMergeNode in="blur" />
+                        <feMergeNode in="SourceGraphic" />
+                      </feMerge>
+                    </filter>
+
+                    <filter id="gis-real-lime" x="-50%" y="-50%" width="200%" height="200%">
+                      <feGaussianBlur in="SourceGraphic" stdDeviation="4" result="blur" />
+                      <feMerge>
+                        <feMergeNode in="blur" />
+                        <feMergeNode in="SourceGraphic" />
+                      </feMerge>
+                    </filter>
+
+                    <filter id="gis-real-teal" x="-50%" y="-50%" width="200%" height="200%">
+                      <feGaussianBlur in="SourceGraphic" stdDeviation="4" result="blur" />
+                      <feMerge>
+                        <feMergeNode in="blur" />
+                        <feMergeNode in="SourceGraphic" />
+                      </feMerge>
+                    </filter>
+
+                    <filter id="gis-real-amber" x="-50%" y="-50%" width="200%" height="200%">
+                      <feGaussianBlur in="SourceGraphic" stdDeviation="4" result="blur" />
+                      <feMerge>
+                        <feMergeNode in="blur" />
+                        <feMergeNode in="SourceGraphic" />
+                      </feMerge>
+                    </filter>
+
+                    <filter id="gis-real-white-glow" x="-50%" y="-50%" width="200%" height="200%">
+                      <feGaussianBlur in="SourceGraphic" stdDeviation="5" result="blur" />
+                      <feMerge>
+                        <feMergeNode in="blur" />
+                        <feMergeNode in="SourceGraphic" />
+                      </feMerge>
+                    </filter>
+
                     <filter id="gis-real-purple" x="-50%" y="-50%" width="200%" height="200%">
+                      <feGaussianBlur in="SourceGraphic" stdDeviation="4" result="blur" />
+                      <feMerge>
+                        <feMergeNode in="blur" />
+                        <feMergeNode in="SourceGraphic" />
+                      </feMerge>
+                    </filter>
+
+                    <filter id="gis-real-burnt-orange" x="-50%" y="-50%" width="200%" height="200%">
+                      <feGaussianBlur in="SourceGraphic" stdDeviation="4" result="blur" />
+                      <feMerge>
+                        <feMergeNode in="blur" />
+                        <feMergeNode in="SourceGraphic" />
+                      </feMerge>
+                    </filter>
+
+                    <filter id="gis-real-forest-green" x="-50%" y="-50%" width="200%" height="200%">
                       <feGaussianBlur in="SourceGraphic" stdDeviation="4" result="blur" />
                       <feMerge>
                         <feMergeNode in="blur" />
@@ -1077,52 +1253,175 @@ export default function CorridorDispatchSection() {
                       </g>
                     )}
 
-                    {/* 4. AVIATION LAYER: Clear Air Turbulence (CAT) Zone */}
+                    {/* ─── 4. AVIATION LAYER: FL280-FL410, Headwind/OAT, CAT Zones (Navy, Cyan, Neon Red, Lime) ─── */}
                     {selectedModeId === 'supersonic-air' && (
                       <g className="pointer-events-none">
+                        {/* Navy Optimal Jetstream Airway Vector */}
+                        <path
+                          d={activeCorridor.aviationOptimalNavyPath}
+                          fill="none"
+                          stroke="#1d4ed8"
+                          strokeWidth="4"
+                          strokeDasharray="10 4"
+                          filter="url(#gis-real-navy)"
+                          className="opacity-90"
+                        />
+                        {/* Cyan Alternative Vector */}
+                        <path
+                          d={activeCorridor.aviationAltCyanPath}
+                          fill="none"
+                          stroke="#06b6d4"
+                          strokeWidth="2.8"
+                          strokeDasharray="8 6"
+                          filter="url(#gis-real-cyan)"
+                          className="opacity-80"
+                        />
+                        {/* Neon Red CAT Warning Vector */}
+                        <path
+                          d={activeCorridor.aviationWarningRedPath}
+                          fill="none"
+                          stroke="#f43f5e"
+                          strokeWidth="3.5"
+                          strokeDasharray="6 4"
+                          filter="url(#gis-real-neon-red)"
+                          className="opacity-90"
+                        />
+                        {/* Lime Fuel-Save Super-Cruise Vector */}
+                        <path
+                          d={activeCorridor.aviationLimeFuelSavePath}
+                          fill="none"
+                          stroke="#84cc16"
+                          strokeWidth="3"
+                          strokeDasharray="12 5"
+                          filter="url(#gis-real-lime)"
+                          className="opacity-85"
+                        />
+                        {/* Translucent CAT Danger Zone Envelope */}
                         <circle
                           cx={catPixels[0]}
                           cy={catPixels[1]}
-                          r="35"
-                          fill="rgba(244,63,94,0.18)"
-                          stroke="rgba(244,63,94,0.5)"
+                          r="38"
+                          fill="rgba(244,63,94,0.16)"
+                          stroke="rgba(244,63,94,0.7)"
                           strokeWidth="1.5"
                           strokeDasharray="4 4"
+                          filter="url(#gis-real-neon-red)"
                         />
+                        {/* Flight Level Indicators */}
+                        <text
+                          x={catPixels[0] - 25}
+                          y={catPixels[1] - 42}
+                          fill="#f43f5e"
+                          fontSize="8.5"
+                          fontFamily="monospace"
+                          fontWeight="bold"
+                        >
+                          CAT ALERT // FL360-FL410
+                        </text>
                       </g>
                     )}
 
-                    {/* 5. MARITIME LAYER: High-Risk Piracy IMB Zone */}
+                    {/* ─── 5. MARITIME LAYER: Bathymetry, Currents, Sea-Ice, Piracy (Teal, Amber, White Glow, Purple/Red) ─── */}
                     {selectedModeId === 'ocean-vessel' && (
                       <g className="pointer-events-none">
+                        {/* Teal Safe Deep Nautical Fairway */}
+                        <path
+                          d={activeCorridor.maritimeTealSafePath}
+                          fill="none"
+                          stroke="#14b8a6"
+                          strokeWidth="4"
+                          filter="url(#gis-real-teal)"
+                          className="opacity-90"
+                        />
+                        {/* Amber Port/Canal Congestion Zone Vector */}
+                        <path
+                          d={activeCorridor.maritimeAmberCongestionPath}
+                          fill="none"
+                          stroke="#f59e0b"
+                          strokeWidth="3.5"
+                          strokeDasharray="6 4"
+                          filter="url(#gis-real-amber)"
+                          className="opacity-85"
+                        />
+                        {/* Sea-Ice Concentration Polar Arc with White Glow */}
+                        <path
+                          d={activeCorridor.maritimeSeaIcePath}
+                          fill="none"
+                          stroke="#ffffff"
+                          strokeWidth="4.5"
+                          strokeDasharray="8 4"
+                          filter="url(#gis-real-white-glow)"
+                          className="opacity-95"
+                        />
+                        {/* Pulsing IMB High-Risk Piracy Danger Zone */}
                         <circle
                           cx={piracyPixels[0]}
                           cy={piracyPixels[1]}
-                          r="30"
-                          fill="rgba(168,85,247,0.2)"
-                          stroke="rgba(168,85,247,0.6)"
-                          strokeWidth="1.5"
-                          strokeDasharray="3 3"
+                          r="32"
+                          fill="rgba(168,85,247,0.18)"
+                          stroke="rgba(225,29,72,0.75)"
+                          strokeWidth="1.8"
+                          strokeDasharray="4 3"
+                          filter="url(#gis-real-purple)"
+                        />
+                        <text
+                          x={piracyPixels[0] - 30}
+                          y={piracyPixels[1] - 35}
+                          fill="#e11d48"
+                          fontSize="8.5"
+                          fontFamily="monospace"
+                          fontWeight="bold"
+                        >
+                          IMB HIGH-RISK ZONE
+                        </text>
+                      </g>
+                    )}
+
+                    {/* ─── 6. LAND LAYER: Axle Loads, Clearance, Rail Slots (Burnt Orange, Olive, Forest Green, Charcoal) ─── */}
+                    {selectedModeId === 'electric-truck' && (
+                      <g className="pointer-events-none">
+                        {/* Burnt Orange Peak Multi-Lane Heavy Highway Vector */}
+                        <path
+                          d={activeCorridor.landBurntOrangeHighwayPath}
+                          fill="none"
+                          stroke="#ea580c"
+                          strokeWidth="5.5"
+                          strokeDasharray="10 4"
+                          filter="url(#gis-real-burnt-orange)"
+                          className="opacity-90"
+                        />
+                        {/* Olive Rural Alternative Highway */}
+                        <path
+                          d={activeCorridor.landOliveRuralPath}
+                          fill="none"
+                          stroke="#65a30d"
+                          strokeWidth="3.5"
+                          strokeDasharray="8 5"
+                          className="opacity-80"
+                        />
+                        {/* Forest Green Active High-Speed Electric Rail Network */}
+                        <path
+                          d={activeCorridor.landForestGreenRailPath}
+                          fill="none"
+                          stroke="#16a34a"
+                          strokeWidth="4"
+                          strokeDasharray="12 6"
+                          filter="url(#gis-real-forest-green)"
+                          className="opacity-95"
+                        />
+                        {/* Charcoal Closed / Restricted Mountain Pass Segment */}
+                        <path
+                          d={activeCorridor.landCharcoalClosedPath}
+                          fill="none"
+                          stroke="#475569"
+                          strokeWidth="4"
+                          strokeDasharray="4 4"
+                          className="opacity-70"
                         />
                       </g>
                     )}
 
-                    {/* 6. Active Telemetry Guide Track */}
-                    <path
-                      d={activeTrajectoryPath}
-                      fill="none"
-                      stroke={
-                        selectedModeId === 'supersonic-air'
-                          ? 'rgba(6,182,212,0.3)'
-                          : selectedModeId === 'ocean-vessel'
-                            ? 'rgba(20,184,166,0.3)'
-                            : 'rgba(234,88,12,0.3)'
-                      }
-                      strokeWidth={selectedModeId === 'electric-truck' ? '8' : '5'}
-                      className="pointer-events-none"
-                    />
-
-                    {/* 7. Active 6G Telemetry Beam with Genuine Neon Filter */}
+                    {/* Active 6G Telemetry Beam with Genuine Neon Filter */}
                     <motion.path
                       d={activeTrajectoryPath}
                       fill="none"
@@ -1136,15 +1435,15 @@ export default function CorridorDispatchSection() {
                       className="pointer-events-none"
                     />
 
-                    {/* 8. Directive 4: Predictive Purple Telemetry Vector (T+3.0H) */}
+                    {/* ─── 8. Directive 4: 3-Hour "Predictive Purple" Telemetry Shadow (T+3.0H) ─── */}
                     <path
                       d={activeCorridor.predictivePath}
                       fill="none"
                       stroke="#c084fc"
-                      strokeWidth="3.5"
+                      strokeWidth="3.8"
                       strokeDasharray="6 6"
                       filter="url(#gis-real-purple)"
-                      className="opacity-85 pointer-events-none"
+                      className="opacity-90 pointer-events-none"
                     />
 
                     {/* 9. Yellow Resilience Shortcut Vector */}
@@ -1306,27 +1605,33 @@ export default function CorridorDispatchSection() {
                 </div>
               </div>
 
-              {/* Mode-Specific Telemetry Strip (Aviation / Maritime / Land) */}
-              <div className="mt-3.5 pt-3.5 border-t border-white/[0.08] flex items-center justify-between text-xs">
+              {/* Multi-Layered Mode-Specific Telemetry Strip (Aviation / Maritime / Land) */}
+              <div className="mt-3.5 pt-3.5 border-t border-white/[0.08] flex flex-wrap items-center justify-between gap-2 text-xs">
                 {selectedModeId === 'supersonic-air' && (
-                  <div className="flex items-center gap-3 font-mono text-[10.5px]">
-                    <span className="text-cyan-300 font-bold">{activeCorridor.flightLevel}</span>
-                    <span className="text-slate-400">HEADWIND: {activeCorridor.headwindKts} KTS</span>
-                    <span className="text-emerald-400 font-semibold">CAT: MINIMAL</span>
+                  <div className="flex flex-wrap items-center gap-3 font-mono text-[10.5px]">
+                    <span className="text-blue-400 font-bold">NAVY: OPTIMAL ({activeCorridor.flightLevel})</span>
+                    <span className="text-cyan-300 font-bold">CYAN: ALT VECTOR</span>
+                    <span className="text-rose-400 font-bold">RED: CAT TURBULENCE</span>
+                    <span className="text-lime-400 font-bold">LIME: FUEL-SAVE</span>
+                    <span className="text-slate-400">HEADWIND: {activeCorridor.headwindKts} KTS ({activeCorridor.outsideAirTempC}°C)</span>
                   </div>
                 )}
                 {selectedModeId === 'ocean-vessel' && (
-                  <div className="flex items-center gap-3 font-mono text-[10.5px]">
-                    <span className="text-teal-300 font-bold">DEPTH: &gt;{activeCorridor.bathymetryDepthM}M</span>
-                    <span className="text-slate-400">CURRENTS: 1.8 KTS NE</span>
-                    <span className="text-emerald-400 font-semibold">FAIRWAY: SECURED</span>
+                  <div className="flex flex-wrap items-center gap-3 font-mono text-[10.5px]">
+                    <span className="text-teal-300 font-bold">TEAL: SAFE FAIRWAY (&gt;{activeCorridor.bathymetryDepthM}M)</span>
+                    <span className="text-amber-400 font-bold">AMBER: CONGESTION</span>
+                    <span className="text-white font-bold drop-shadow-[0_0_6px_#fff]">ICE: {activeCorridor.seaIceCoverage}</span>
+                    <span className="text-purple-400 font-bold">PURPLE/RED: IMB PIRACY ZONE</span>
+                    <span className="text-slate-400">CURRENTS: {activeCorridor.surfaceCurrentsKts}</span>
                   </div>
                 )}
                 {selectedModeId === 'electric-truck' && (
-                  <div className="flex items-center gap-3 font-mono text-[10.5px]">
-                    <span className="text-emerald-300 font-bold">AXLE: {activeCorridor.axleLoadLimitT}T MAX</span>
-                    <span className="text-slate-400">CLEARANCE: 4.5M</span>
-                    <span className="text-cyan-400 font-semibold">SLOT: #84-A ACTIVE</span>
+                  <div className="flex flex-wrap items-center gap-3 font-mono text-[10.5px]">
+                    <span className="text-orange-400 font-bold">BURNT ORANGE: PEAK HWY ({activeCorridor.axleLoadLimitT}T)</span>
+                    <span className="text-lime-500 font-bold">OLIVE: RURAL ALT</span>
+                    <span className="text-emerald-400 font-bold">FOREST GREEN: ACTIVE RAIL</span>
+                    <span className="text-slate-400 font-bold">CHARCOAL: RESTRICTED</span>
+                    <span className="text-cyan-400 font-semibold">{activeCorridor.railSlotTime}</span>
                   </div>
                 )}
                 <div className="font-mono font-bold text-emerald-400">

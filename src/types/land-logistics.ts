@@ -1,4 +1,12 @@
 import type { LucideIcon } from 'lucide-react'
+import 'react'
+
+declare module 'react' {
+  interface VideoHTMLAttributes<T> extends MediaHTMLAttributes<T> {
+    defaultMuted?: boolean
+    'webkit-playsinline'?: string | boolean
+  }
+}
 
 /** Supported locales for the YASLOGIST platform. */
 export type Language = 'en' | 'ar'
