@@ -1,7 +1,16 @@
 'use client'
 
+import { useEffect, useRef, useState, useCallback } from 'react'
 import { motion } from 'framer-motion'
-import { ChevronDown, ArrowRight, ArrowLeft, Sparkles } from 'lucide-react'
+import {
+  ChevronDown,
+  ArrowRight,
+  ArrowLeft,
+  Sparkles,
+  Radio,
+  ShieldCheck,
+  Cpu,
+} from 'lucide-react'
 import { useTheme } from 'next-themes'
 import { useLanguage } from '@/hooks/use-language'
 
@@ -9,16 +18,23 @@ const t = (en: string, ar: string) => ({ en, ar })
 
 const content = {
   kicker: t(
-    'THE NEXT-GEN SUPPLY CHAIN INTELLIGENCE PLATFORM',
-    'منصة ذكاء سلسلة التوريد من الجيل القادم',
+    'SOVEREIGN 6G AUTONOMOUS SUPPLY CHAIN INFRASTRUCTURE',
+    'البنية التحتية السيادية لسلاسل الإمداد المستقلة 6G',
   ),
   title: t('YASLOGIST', 'YASLOGIST'),
   subtitle: t('AIR · LAND · OCEANS', 'جو · بر · بحر'),
   description: t(
-    'Redefining global logistics through AI-powered intelligence, real-time telemetry monitoring, and autonomous operations across air, land, and ocean networks.',
-    'إعادة ابتكار الخدمات اللوجستية العالمية عبر الذكاء الاصطناعي، والمراقبة الفورية للقياس عن بعد، والعمليات المستقلة عبر الشبكات الجوية والبرية والبحرية.',
+    'Redefining global multimodal logistics through AI telemetry orchestration, predictive routing, and autonomous infrastructure across air corridors, deepwater fairways, and land grids.',
+    'إعادة ابتكار اللوجستيات متعددة الوسائط عبر تنسيق القياس الآني بالذكاء الاصطناعي، والتوجيه التنبؤي، والبنية التحتية المستقلة عبر الممرات الجوية والبحرية والبرية.',
   ),
-  cta: t('Explore Land Operations', 'استكشف العمليات البرية'),
+  cta: t('Explore Operations', 'استكشف العمليات'),
+  scrollPrompt: t('Scroll to Advance Video', 'مرّر للتحكم بالفيديو'),
+  founder: {
+    category: t('PLATFORM FOUNDER', 'مؤسس المنصة'),
+    name: t('Ahmed Yasser Ali', 'أحمد ياسر علي'),
+    role: t('Supply Chain & Logistics Specialist', 'أخصائي سلاسل الإمداد واللوجستيات'),
+    subfooter: t('YASLOGIST · DOKKI, CAIRO', 'ياسلوجيست · الدقي، القاهرة'),
+  },
 }
 
 export default function HeroSection() {
@@ -29,145 +45,296 @@ export default function HeroSection() {
   const isRtl = direction === 'rtl'
   const ArrowIcon = isRtl ? ArrowLeft : ArrowRight
 
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: { staggerChildren: 0.12, delayChildren: 0.15 },
-    },
-  }
+  const sectionRef = useRef<HTMLElement | null>(null)
+  const videoRef = useRef<HTMLVideoElement | null>(null)
+  const animFrameRef = useRef<number | null>(null)
+  const targetTimeRef = useRef<number>(0)
+  const [videoLoaded, setVideoLoaded] = useState(false)
+  const [scrollProgress, setScrollProgress] = useState(0)
 
-  const itemVariants = {
-    hidden: { opacity: 0, y: 25 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] as const } },
+  /* ── 1. Precise Scroll-Driven Video Scrubbing (No Autoplay, No Loop) ── */
+  const handleScroll = useCallback(() => {
+    if (!sectionRef.current || !videoRef.current) return
+
+    const rect = sectionRef.current.getBoundingClientRect()
+    const totalScrollable = sectionRef.current.offsetHeight - window.innerHeight
+
+    if (totalScrollable <= 0) return
+
+    const scrolled = Math.max(0, -rect.top)
+    const rawProgress = Math.min(1, Math.max(0, scrolled / totalScrollable))
+    setScrollProgress(rawProgress)
+
+    const video = videoRef.current
+    if (video.duration && !isNaN(video.duration)) {
+      targetTimeRef.current = rawProgress * video.duration
+    }
+  }, [])
+
+  // Smooth lerp frame loop for silky 60fps video scrubbing
+  useEffect(() => {
+    let isRunning = true
+
+    const updateVideoTime = () => {
+      if (videoRef.current && videoRef.current.duration && !isNaN(videoRef.current.duration)) {
+        const video = videoRef.current
+        const diff = targetTimeRef.current - video.currentTime
+
+        // Fast responsive dampening
+        if (Math.abs(diff) > 0.005) {
+          video.currentTime += diff * 0.35
+        }
+      }
+
+      if (isRunning) {
+        animFrameRef.current = requestAnimationFrame(updateVideoTime)
+      }
+    }
+
+    animFrameRef.current = requestAnimationFrame(updateVideoTime)
+    window.addEventListener('scroll', handleScroll, { passive: true })
+    window.addEventListener('resize', handleScroll, { passive: true })
+    window.addEventListener('touchmove', handleScroll, { passive: true })
+    handleScroll()
+
+    return () => {
+      isRunning = false
+      if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current)
+      window.removeEventListener('scroll', handleScroll)
+      window.removeEventListener('resize', handleScroll)
+      window.removeEventListener('touchmove', handleScroll)
+    }
+  }, [handleScroll])
+
+  const handleLoadedMetadata = () => {
+    setVideoLoaded(true)
+    if (videoRef.current) {
+      videoRef.current.pause()
+      videoRef.current.currentTime = 0
+    }
+    handleScroll()
   }
 
   return (
     <section
-      className={`relative w-full min-h-screen overflow-hidden flex flex-col justify-center items-center pt-20 pb-16 ${
-        mode === 'dark' ? 'bg-slate-950' : 'bg-slate-50'
-      }`}
+      ref={sectionRef}
+      className="relative w-full bg-slate-950 text-white"
+      style={{ height: '140vh' }}
       dir={direction}
     >
-      {/* Ambient background aura */}
-      <div
-        className={`absolute inset-0 z-0 pointer-events-none ${
-          mode === 'dark'
-            ? 'bg-[radial-gradient(ellipse_80%_60%_at_50%_-10%,rgba(6,182,212,0.15),transparent)]'
-            : 'bg-[radial-gradient(ellipse_80%_60%_at_50%_-10%,rgba(6,182,212,0.08),transparent)]'
-        }`}
-      />
-      
-      {/* Tech grid lines */}
-      <div
-        className="absolute inset-0 z-0 opacity-[0.035] pointer-events-none"
-        style={{
-          backgroundImage:
-            'linear-gradient(rgba(6,182,212,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(6,182,212,0.5) 1px, transparent 1px)',
-          backgroundSize: '72px 72px',
-        }}
-      />
-
-      {/* Main Content Container */}
-      <div className="relative z-20 container mx-auto px-6 sm:px-8 flex flex-col items-center justify-center text-center">
-        <motion.div
-          variants={containerVariants}
-          initial="hidden"
-          animate="visible"
-          className="flex flex-col items-center justify-center max-w-4xl"
+      {/* ─── STICKY VIEWPORT CONTAINER ─── */}
+      <div className="sticky top-0 h-screen w-full overflow-hidden flex flex-col justify-between pt-20 pb-6 px-4 sm:px-8 lg:px-12">
+        
+        {/* ─── SCROLL-DRIVEN BACKGROUND VIDEO (NO AUTOPLAY, NO LOOP) ─── */}
+        <video
+          ref={videoRef}
+          playsInline
+          webkit-playsinline="true"
+          muted
+          defaultMuted
+          autoPlay
+          loop
+          preload="auto"
+          disablePictureInPicture
+          disableRemotePlayback
+          onLoadedMetadata={handleLoadedMetadata}
+          className="pointer-events-none absolute inset-0 h-full w-full object-cover scale-[1.02] origin-center z-0 transition-opacity duration-500"
+          style={{
+            transform: 'translateZ(0)',
+            willChange: 'transform',
+            opacity: videoLoaded ? 1 : 0.8,
+          }}
+          aria-hidden="true"
         >
-          {/* Kicker Pill */}
-          <motion.div variants={itemVariants} className="mb-6 sm:mb-8">
-            <span
-              className={`inline-flex items-center gap-2 px-4 py-1.5 rounded-full font-semibold backdrop-blur-xl transition-all duration-300 ${
-                isRtl ? 'text-xs sm:text-sm tracking-normal' : 'text-[10px] sm:text-xs tracking-[0.2em] uppercase'
-              } ${
-                mode === 'light'
-                  ? 'bg-white/80 border border-cyan-500/30 text-cyan-800 shadow-sm'
-                  : 'bg-white/[0.03] border border-white/10 text-cyan-300 shadow-[0_0_20px_rgba(6,182,212,0.15)]'
-              }`}
-            >
-              <Sparkles className="w-3 h-3 text-cyan-400" />
+          <source src="/assets/mainlandbackground.mp4" type="video/mp4" />
+          <source src="/videos/mainlandbackground.mp4" type="video/mp4" />
+          <source src="/mainlandbackground.mp4" type="video/mp4" />
+        </video>
+
+        {/* ─── CLEAN, CRYSTAL-CLEAR NATIVE VIDEO TINT (NO CLUTTER) ─── */}
+        <div
+          className={`absolute inset-0 z-1 pointer-events-none transition-opacity duration-500 ${
+            mode === 'dark'
+              ? 'bg-gradient-to-t from-slate-950/90 via-transparent to-slate-950/45'
+              : 'bg-gradient-to-t from-slate-950/80 via-transparent to-slate-950/35'
+          }`}
+        />
+
+        {/* ─── ELITE CINEMATIC CENTERED YASLOGIST BRANDING & HERO BLOCK ─── */}
+        <div className="relative z-10 my-auto container mx-auto max-w-4xl flex flex-col items-center text-center px-4">
+          
+          {/* Sovereign Kicker Badge */}
+          <motion.div
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="mb-4"
+          >
+            <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-[11px] font-mono font-bold tracking-[0.2em] uppercase backdrop-blur-3xl bg-cyan-500/15 border border-cyan-400/50 text-cyan-300 shadow-[0_0_20px_rgba(6,182,212,0.3)]">
+              <Cpu className="w-3.5 h-3.5 text-cyan-400 animate-pulse" />
               <span>{content.kicker[language]}</span>
             </span>
           </motion.div>
 
-          {/* Title */}
-          <motion.h1
-            variants={itemVariants}
-            className="mb-4 text-6xl sm:text-8xl md:text-9xl font-black tracking-tight leading-none"
+          {/* Master YASLOGIST Title with Sovereign Specular Lighting */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.08 }}
+            className="mb-3 flex items-center justify-center gap-2 sm:gap-3"
           >
-            <span className="bg-gradient-to-r from-cyan-400 via-cyan-200 to-blue-500 bg-clip-text text-transparent drop-shadow-[0_0_35px_rgba(6,182,212,0.3)]">
-              {content.title[language]}
-            </span>
-          </motion.h1>
-
-          {/* Subtitle with Consistent Arabic & English Rendering */}
-          <motion.div variants={itemVariants} className="mb-6 sm:mb-8">
-            <p
-              className={`font-bold ${
-                isRtl
-                  ? 'text-2xl sm:text-3xl tracking-normal'
-                  : 'text-xl sm:text-2xl tracking-[0.45em] uppercase'
-              } ${
-                mode === 'light' ? 'text-slate-700' : 'text-slate-200'
-              }`}
-            >
-              {content.subtitle[language]}
-            </p>
+            <h1 className="text-5xl sm:text-7xl md:text-8xl lg:text-9xl font-black tracking-tight leading-none select-none">
+              <span className="bg-gradient-to-r from-white via-cyan-100 to-cyan-400 bg-clip-text text-transparent drop-shadow-[0_0_45px_rgba(6,182,212,0.5)]">
+                YAS
+              </span>
+              <span className="bg-gradient-to-r from-cyan-300 via-sky-200 to-blue-400 bg-clip-text text-transparent drop-shadow-[0_0_35px_rgba(59,130,246,0.4)]">
+                LOGIST
+              </span>
+              <span className="inline-block w-3 h-3 sm:w-4 sm:h-4 rounded-full bg-cyan-400 animate-pulse shadow-[0_0_15px_rgba(6,182,212,1)] ml-1 align-baseline" />
+            </h1>
           </motion.div>
 
-          {/* Description */}
+          {/* Multimodal Subtitle Banner */}
+          <motion.div
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.65, delay: 0.16 }}
+            className="mb-4"
+          >
+            <span className="inline-flex items-center gap-3 px-5 py-1.5 rounded-2xl bg-black/40 border border-white/20 backdrop-blur-xl text-xs sm:text-sm md:text-base font-black tracking-[0.4em] uppercase text-cyan-300 shadow-[0_0_25px_rgba(6,182,212,0.2)]">
+              <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
+              <span>{content.subtitle[language]}</span>
+              <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
+            </span>
+          </motion.div>
+
+          {/* Concise High-Clarity Description */}
           <motion.p
-            variants={itemVariants}
-            className={`mb-10 sm:mb-12 max-w-2xl text-base sm:text-lg leading-relaxed ${
-              mode === 'light' ? 'text-slate-600' : 'text-slate-300'
-            }`}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.22 }}
+            className="text-xs sm:text-sm md:text-base text-slate-200/90 font-normal leading-relaxed max-w-2xl mb-7 drop-shadow-[0_2px_10px_rgba(0,0,0,0.8)]"
           >
             {content.description[language]}
           </motion.p>
 
-          {/* CTA Button */}
-          <motion.div variants={itemVariants}>
+          {/* Centered CTA & Live 6G Telemetry Beacon */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.75, delay: 0.28 }}
+            className="flex flex-wrap items-center justify-center gap-3.5"
+          >
             <a
-              href="#land-logistics"
-              className={`group relative overflow-hidden inline-flex items-center gap-3 px-8 py-4 rounded-2xl text-base sm:text-lg font-semibold transition-all duration-300 backdrop-blur-2xl ${
-                mode === 'light'
-                  ? 'bg-white/80 border border-slate-300/80 text-cyan-900 hover:border-cyan-500 hover:bg-cyan-50 shadow-md hover:shadow-xl'
-                  : 'bg-white/[0.03] border border-white/15 text-white hover:bg-white/[0.06] hover:border-cyan-400/50 shadow-[0_8px_32px_0_rgba(0,0,0,0.37),inset_0_1px_1px_0_rgba(255,255,255,0.15)] hover:shadow-[0_0_30px_rgba(6,182,212,0.3)]'
-              }`}
+              href="#vision-transition"
+              className="group relative overflow-hidden inline-flex items-center gap-2.5 px-7 py-3.5 rounded-2xl text-sm sm:text-base font-bold transition-all duration-300 bg-cyan-500/25 border border-cyan-400/60 text-white hover:bg-cyan-500/40 hover:border-cyan-300 hover:shadow-[0_0_30px_rgba(6,182,212,0.5)] backdrop-blur-2xl"
             >
-              {/* Specular Top Reflection Line */}
               <div
-                className="absolute inset-x-0 top-0 h-[1.5px] bg-gradient-to-r from-transparent via-white/40 dark:via-cyan-400/40 to-transparent pointer-events-none"
+                className="absolute inset-x-0 top-0 h-[1.5px] bg-gradient-to-r from-transparent via-cyan-300 to-transparent pointer-events-none"
                 aria-hidden="true"
               />
               <span>{content.cta[language]}</span>
               <ArrowIcon
-                className={`w-5 h-5 text-cyan-400 transition-transform duration-300 ${
-                  isRtl ? 'group-hover:-translate-x-1.5' : 'group-hover:translate-x-1.5'
+                className={`w-4 h-4 text-cyan-400 transition-transform duration-300 ${
+                  isRtl ? 'group-hover:-translate-x-1' : 'group-hover:translate-x-1'
                 }`}
               />
             </a>
-          </motion.div>
-        </motion.div>
-      </div>
 
-      {/* Scroll indicator */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 1.2, duration: 0.8 }}
-        className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 pointer-events-none"
-      >
-        <motion.div
-          animate={{ y: [0, 8, 0] }}
-          transition={{ repeat: Infinity, duration: 2, ease: 'easeInOut' }}
-          className={mode === 'light' ? 'text-slate-400' : 'text-slate-500'}
+            {/* Satellite Mesh Beacon */}
+            <div className="inline-flex items-center gap-2 px-4 py-3 rounded-2xl bg-black/60 border border-white/20 text-[11px] font-mono text-slate-300 backdrop-blur-2xl shadow-[0_0_20px_rgba(0,0,0,0.5)]">
+              <Radio className="w-3.5 h-3.5 text-emerald-400 animate-pulse" />
+              <span className="text-emerald-400 font-bold">6G MESH ONLINE</span>
+              <ShieldCheck className="w-3.5 h-3.5 text-cyan-400 ml-1" />
+            </div>
+          </motion.div>
+        </div>
+
+        {/* ─── STRICTLY ANCHORED BOTTOM-RIGHT FOUNDER PROFILE CARD (NEVER FLIPS SIDES) ─── */}
+        <div
+          dir="ltr"
+          className="hidden md:block absolute bottom-14 sm:bottom-16 right-4 sm:right-8 z-20"
         >
-          <ChevronDown className="w-6 h-6 opacity-70" />
-        </motion.div>
-      </motion.div>
+          <motion.div
+            initial={{ opacity: 0, scale: 0.94, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.35, ease: [0.22, 1, 0.36, 1] }}
+            className={`w-auto min-w-[300px] sm:min-w-[340px] max-w-sm rounded-2xl sm:rounded-3xl p-4 sm:p-5 border backdrop-blur-3xl transition-all duration-300 shadow-[0_20px_50px_rgba(0,0,0,0.6),inset_0_1px_1.5px_rgba(255,255,255,0.2)] ${
+              mode === 'dark'
+                ? 'border-cyan-500/35 bg-[#050D24]/90 hover:border-cyan-400/60 shadow-[0_0_35px_rgba(6,182,212,0.25)]'
+                : 'border-cyan-500/30 bg-[#071330]/95 hover:border-cyan-400/50 shadow-[0_0_25px_rgba(6,182,212,0.15)]'
+            }`}
+          >
+            {/* Specular Top Reflection Line */}
+            <div
+              className="absolute inset-x-0 top-0 h-[1.5px] bg-gradient-to-r from-transparent via-cyan-400/70 to-transparent pointer-events-none"
+              aria-hidden="true"
+            />
+
+            <div className="flex items-center gap-4">
+              {/* Circular Portrait Frame with Subtle Cyan Glow */}
+              <div className="relative shrink-0 w-14 h-14 sm:w-16 sm:h-16 rounded-full p-[2px] bg-gradient-to-tr from-cyan-400 via-sky-300 to-blue-500 shadow-[0_0_16px_rgba(6,182,212,0.55)]">
+                <div className="w-full h-full rounded-full overflow-hidden bg-slate-950 flex items-center justify-center">
+                  <img
+                    src="/assets/founder-original.png"
+                    alt={content.founder.name[language]}
+                    className="w-full h-full object-cover object-top"
+                    loading="eager"
+                  />
+                </div>
+              </div>
+
+              {/* Founder Information Structure */}
+              <div className="flex flex-col text-left">
+                {/* Category Header: PLATFORM FOUNDER (Cyan luminous styling) */}
+                <span className="text-[10px] sm:text-[11px] font-mono font-bold tracking-[0.2em] uppercase text-cyan-400 drop-shadow-[0_0_8px_rgba(6,182,212,0.6)]">
+                  {content.founder.category[language]}
+                </span>
+
+                {/* Name: Ahmed Yasser Ali (Bold, clean executive typography) */}
+                <h3 className="text-base sm:text-lg font-black text-white tracking-tight leading-tight mt-0.5">
+                  {content.founder.name[language]}
+                </h3>
+
+                {/* Role: Supply Chain & Logistics Specialist */}
+                <p className="text-[11.5px] sm:text-xs font-medium text-slate-300 leading-snug mt-0.5">
+                  {content.founder.role[language]}
+                </p>
+
+                {/* Sub-footer: YASLOGIST · DOKKI, CAIRO */}
+                <span className="text-[9.5px] sm:text-[10px] font-mono font-bold tracking-[0.16em] uppercase text-cyan-400/90 mt-1">
+                  {content.founder.subfooter[language]}
+                </span>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+
+        {/* ─── BOTTOM SCRUBBING HINT & PROGRESS HUD ─── */}
+        <div className="relative z-10 flex items-center justify-between pt-3 border-t border-white/10 text-xs font-mono text-slate-400">
+          <div className="flex items-center gap-2">
+            <ChevronDown className="w-4 h-4 text-cyan-400 animate-bounce" />
+            <span className="font-bold text-slate-300">{content.scrollPrompt[language]}</span>
+          </div>
+
+          {/* Scrub Timeline Indicator */}
+          <div className="flex items-center gap-2">
+            <span className="text-[10px] text-cyan-400 font-bold">
+              TIMELINE: {Math.round(scrollProgress * 100)}%
+            </span>
+            <div className="w-24 sm:w-32 h-1.5 rounded-full bg-slate-800 overflow-hidden">
+              <div
+                className="h-full bg-gradient-to-r from-cyan-400 to-emerald-400 transition-all duration-75"
+                style={{ width: `${Math.round(scrollProgress * 100)}%` }}
+              />
+            </div>
+          </div>
+        </div>
+
+      </div>
     </section>
   )
 }
+
+
+

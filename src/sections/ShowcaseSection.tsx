@@ -4,14 +4,14 @@ import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useTheme } from 'next-themes'
 import { useLanguage } from '@/hooks/use-language'
-import { Maximize2, X, Sparkles, Building2, Truck } from 'lucide-react'
+import { Maximize2, X, Sparkles, Building2, Truck, Radio } from 'lucide-react'
 
 const t = (en: string, ar: string) => ({ en, ar })
 
 const showcaseItems = [
   {
     id: 'global-hub',
-    image: '/images/GLOBALYASLOGIST.jpeg',
+    videoSrc: '/videos/mainlandbackground.mp4',
     badge: t('Air · Land · Oceans', 'جو · بر · بحر'),
     icon: Building2,
     title: t(
@@ -22,11 +22,12 @@ const showcaseItems = [
       'Unified logistics intelligence platform coordinating air freight, container vessels, and smart highway trucks across international trade corridors.',
       'منظومة ذكاء لوجستي موحدة لتنسيق الشحن الجوي، سفن الحاويات، وشاحنات الطرق الذكية عبر الممرات التجارية الدولية.',
     ),
-    tag: t('Command Hub', 'مركز التحكم'),
+    tag: t('Command Hub // 6G Stream', 'مركز التحكم // بث مباشر 6G'),
+    streamStatus: 'LIVE // 60 FPS 4K',
   },
   {
     id: 'smart-warehouse',
-    image: '/images/YASLOGISTWHARE.jpeg',
+    videoSrc: '/videos/FINAL.mp4',
     badge: t('Automation & Ground Fleet', 'الأتمتة والأسطول الأرضي'),
     icon: Truck,
     title: t(
@@ -37,14 +38,15 @@ const showcaseItems = [
       'Autonomous mobile robots (AMRs) for precision sortation, robotic dock loading, and AI-routed long-haul electric transport.',
       'روبوتات ذاتية القيادة (AMRs) للفرز فائق الدقة، تحميل آلي على الأرصفة، ونقل كهربائي بعيد المدى بمسارات ذكية.',
     ),
-    tag: t('Facility & Fleet', 'المنشآت والأسطول'),
+    tag: t('Facility & Fleet // Swarm Sync', 'المنشآت والأسطول // مزامنة الأسراب'),
+    streamStatus: 'TELEMETRY LOCKED // ACTIVE',
   },
 ]
 
 export default function ShowcaseSection() {
   const { language, direction } = useLanguage()
   const { resolvedTheme } = useTheme()
-  const [selectedImage, setSelectedImage] = useState<string | null>(null)
+  const [selectedVideo, setSelectedVideo] = useState<string | null>(null)
 
   const mode = resolvedTheme === 'light' ? 'light' : 'dark'
   const isRTL = direction === 'rtl'
@@ -56,7 +58,7 @@ export default function ShowcaseSection() {
       'Visual overview of YASLOGIST intelligent facilities, multimodal hubs, and connected road assets.',
       'نظرة بصرية على منشآت ياسلوجيست الذكية ومراكز الربط متعددة الوسائط والأسطول البري المتصل.',
     ),
-    viewFull: t('Expand Preview', 'عرض الصورة الكاملة'),
+    viewFull: t('Expand Preview', 'عرض البث بالحجم الكامل'),
     close: t('Close', 'إغلاق'),
   }
 
@@ -118,13 +120,21 @@ export default function ShowcaseSection() {
                     : 'border border-slate-200/90 bg-white hover:shadow-2xl hover:border-cyan-500/40'
                 }`}
               >
-                {/* Image Container with Dynamic Scale */}
+                {/* Video Viewport Container with Dynamic Scale */}
                 <div className="relative w-full aspect-[16/10] overflow-hidden bg-slate-950">
-                  <img
-                    src={item.image}
-                    alt={item.title[language]}
+                  <video
+                    src={item.videoSrc}
+                    autoPlay
+                    muted
+                    defaultMuted
+                    loop
+                    playsInline
+                    webkit-playsinline="true"
+                    preload="auto"
+                    disablePictureInPicture
+                    disableRemotePlayback
                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                    loading="lazy"
+                    style={{ transform: 'translateZ(0)' }}
                   />
                   {/* Subtle vignette */}
                   <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent opacity-80 pointer-events-none" />
@@ -143,9 +153,21 @@ export default function ShowcaseSection() {
                     </span>
                   </div>
 
+                  {/* Live Telemetry Stream Indicator */}
+                  <div
+                    className={`absolute top-3.5 z-10 ${
+                      isRTL ? 'left-3.5' : 'right-3.5'
+                    }`}
+                  >
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-[9px] font-mono font-bold bg-slate-950/85 text-emerald-400 border border-emerald-500/30 backdrop-blur-md">
+                      <Radio className="w-3 h-3 text-emerald-400 animate-pulse" />
+                      <span>{item.streamStatus}</span>
+                    </span>
+                  </div>
+
                   {/* Expand button */}
                   <button
-                    onClick={() => setSelectedImage(item.image)}
+                    onClick={() => setSelectedVideo(item.videoSrc)}
                     aria-label={sectionHeader.viewFull[language]}
                     className={`absolute bottom-3.5 z-10 flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-semibold backdrop-blur-xl transition-all duration-200 ${
                       isRTL ? 'left-3.5' : 'right-3.5'
@@ -188,14 +210,14 @@ export default function ShowcaseSection() {
         </div>
       </div>
 
-      {/* Lightbox / Modal for Expanded Image Preview */}
+      {/* Lightbox / Modal for Expanded Video Preview */}
       <AnimatePresence>
-        {selectedImage && (
+        {selectedVideo && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            onClick={() => setSelectedImage(null)}
+            onClick={() => setSelectedVideo(null)}
             className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-8 bg-slate-950/90 backdrop-blur-xl"
           >
             <motion.div
@@ -207,15 +229,23 @@ export default function ShowcaseSection() {
               className="relative max-w-5xl w-full rounded-3xl overflow-hidden border border-white/15 bg-slate-900/90 shadow-[0_0_50px_rgba(6,182,212,0.3)]"
             >
               <button
-                onClick={() => setSelectedImage(null)}
+                onClick={() => setSelectedVideo(null)}
                 aria-label={sectionHeader.close[language]}
                 className={`absolute top-4 ${isRTL ? 'left-4' : 'right-4'} z-20 p-2.5 rounded-full bg-slate-950/80 text-white hover:bg-cyan-500 hover:text-slate-950 transition-colors border border-white/10 shadow-lg`}
               >
                 <X className="w-5 h-5" />
               </button>
-              <img
-                src={selectedImage}
-                alt="Enlarged operational preview"
+              <video
+                src={selectedVideo}
+                autoPlay
+                muted
+                defaultMuted
+                loop
+                playsInline
+                webkit-playsinline="true"
+                disablePictureInPicture
+                disableRemotePlayback
+                controls
                 className="w-full h-auto max-h-[80vh] object-contain bg-slate-950"
               />
             </motion.div>
@@ -225,3 +255,4 @@ export default function ShowcaseSection() {
     </section>
   )
 }
+

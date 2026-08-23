@@ -370,10 +370,15 @@ export default function LandLogisticsSection({
         <video
           ref={lightVideoRef}
           src="/videos/FINAL.mp4"
-          muted
           playsInline
+          webkit-playsinline="true"
+          muted
+          defaultMuted
+          autoPlay
+          loop
           preload="auto"
           disablePictureInPicture
+          disableRemotePlayback
           className="pointer-events-none absolute inset-0 h-full w-full object-cover scale-[1.05] origin-center z-0"
           style={{ willChange: 'transform' }}
           aria-hidden="true"
@@ -383,10 +388,15 @@ export default function LandLogisticsSection({
         <video
           ref={darkVideoRef}
           src="/videos/FINALnight.mp4"
-          muted
           playsInline
+          webkit-playsinline="true"
+          muted
+          defaultMuted
+          autoPlay
+          loop
           preload="auto"
           disablePictureInPicture
+          disableRemotePlayback
           className={`pointer-events-none absolute inset-0 h-full w-full object-cover scale-[1.05] origin-center z-1 transition-opacity duration-1000 ease-in-out ${
             mode === 'dark' ? 'opacity-100' : 'opacity-0'
           }`}

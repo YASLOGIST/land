@@ -615,7 +615,9 @@ export default function DisruptionCommandSection() {
                 <svg
                   className="absolute inset-0 w-full h-full"
                   viewBox="0 0 1000 500"
-                  preserveAspectRatio="none"
+                  preserveAspectRatio="xMidYMid meet"
+                  shapeRendering="geometricPrecision"
+                  textRendering="geometricPrecision"
                 >
                   <defs>
                     {/* Genuine Multi-Stage Optical Neon Filter for Rose/Red */}
