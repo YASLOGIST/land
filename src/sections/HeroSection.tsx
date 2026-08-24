@@ -51,10 +51,53 @@ export default function HeroSection() {
   const targetTimeRef = useRef<number>(0)
   const [videoLoaded, setVideoLoaded] = useState(false)
   const [scrollProgress, setScrollProgress] = useState(0)
+  const [isMobile, setIsMobile] = useState(false)
 
-  /* ── 1. Precise Scroll-Driven Video Scrubbing (No Autoplay, No Loop) ── */
+  /* ── 1. Responsive Viewport & Device Detection ── */
+  useEffect(() => {
+    const checkMobile = () => {
+      const mobile =
+        window.innerWidth < 768 ||
+        'ontouchstart' in window ||
+        navigator.maxTouchPoints > 0
+      setIsMobile(mobile)
+    }
+    checkMobile()
+    window.addEventListener('resize', checkMobile, { passive: true })
+    return () => window.removeEventListener('resize', checkMobile)
+  }, [])
+
+  /* ── 2. Direct DOM Mount & Forced Video Trigger (Autoplay Failsafe) ── */
+  const handleTouchStart = useCallback(() => {
+    const video = videoRef.current
+    if (video) {
+      video.muted = true
+      video.playsInline = true
+      video.autoplay = true
+      video.play().catch((err) => console.log('Autoplay deferred:', err))
+    }
+  }, [])
+
+  useEffect(() => {
+    const video = videoRef.current
+    if (video) {
+      video.muted = true
+      video.playsInline = true
+      video.autoplay = true
+      if (isMobile) {
+        video.play().catch((err) => console.log('Autoplay deferred:', err))
+      }
+    }
+  }, [isMobile])
+
+  useEffect(() => {
+    window.addEventListener('touchstart', handleTouchStart, { passive: true })
+    return () => window.removeEventListener('touchstart', handleTouchStart)
+  }, [handleTouchStart])
+
+  /* ── 3. Desktop Scroll Scrubbing & Progress Calculation ── */
   const handleScroll = useCallback(() => {
-    if (!sectionRef.current || !videoRef.current) return
+    if (!sectionRef.current) return
 
     const rect = sectionRef.current.getBoundingClientRect()
     const totalScrollable = sectionRef.current.offsetHeight - window.innerHeight
@@ -65,18 +108,21 @@ export default function HeroSection() {
     const rawProgress = Math.min(1, Math.max(0, scrolled / totalScrollable))
     setScrollProgress(rawProgress)
 
-    const video = videoRef.current
-    if (video.duration && !isNaN(video.duration)) {
-      targetTimeRef.current = rawProgress * video.duration
+    // Only sync video currentTime on Desktop viewports
+    if (!isMobile && videoRef.current) {
+      const video = videoRef.current
+      if (video.duration && !isNaN(video.duration)) {
+        targetTimeRef.current = rawProgress * video.duration
+      }
     }
-  }, [])
+  }, [isMobile])
 
-  // Smooth lerp frame loop for silky 60fps video scrubbing
+  // Smooth lerp frame loop for desktop 60fps video scrubbing
   useEffect(() => {
     let isRunning = true
 
     const updateVideoTime = () => {
-      if (videoRef.current && videoRef.current.duration && !isNaN(videoRef.current.duration)) {
+      if (!isMobile && videoRef.current && videoRef.current.duration && !isNaN(videoRef.current.duration)) {
         const video = videoRef.current
         const diff = targetTimeRef.current - video.currentTime
 
@@ -104,13 +150,21 @@ export default function HeroSection() {
       window.removeEventListener('resize', handleScroll)
       window.removeEventListener('touchmove', handleScroll)
     }
-  }, [handleScroll])
+  }, [handleScroll, isMobile])
 
   const handleLoadedMetadata = () => {
     setVideoLoaded(true)
-    if (videoRef.current) {
-      videoRef.current.pause()
-      videoRef.current.currentTime = 0
+    const video = videoRef.current
+    if (video) {
+      video.muted = true
+      video.playsInline = true
+      video.autoplay = true
+      if (isMobile) {
+        video.play().catch((err) => console.log('Autoplay deferred:', err))
+      } else {
+        video.pause()
+        video.currentTime = 0
+      }
     }
     handleScroll()
   }
@@ -118,27 +172,28 @@ export default function HeroSection() {
   return (
     <section
       ref={sectionRef}
-      className="relative w-full bg-slate-950 text-white"
+      className="relative w-full bg-transparent text-white"
       style={{ height: '140vh' }}
       dir={direction}
+      onTouchStart={handleTouchStart}
     >
       {/* ─── STICKY VIEWPORT CONTAINER ─── */}
-      <div className="sticky top-0 h-screen w-full overflow-hidden flex flex-col justify-between pt-20 pb-6 px-4 sm:px-8 lg:px-12">
+      <div className="sticky top-0 h-screen w-full overflow-hidden flex flex-col justify-between pt-20 pb-6 px-4 sm:px-8 lg:px-12 bg-transparent">
         
-        {/* ─── SCROLL-DRIVEN BACKGROUND VIDEO (NO AUTOPLAY, NO LOOP) ─── */}
+        {/* ─── BACKGROUND VIDEO (DESKTOP SCRUB / MOBILE AUTOPLAY LOOP) ─── */}
         <video
           ref={videoRef}
-          playsInline
-          webkit-playsinline="true"
-          muted
-          defaultMuted
+          src="/videos/mainlandbackground.mp4"
           autoPlay
           loop
+          muted
+          playsInline
+          webkit-playsinline="true"
+          x5-playsinline="true"
           preload="auto"
-          disablePictureInPicture
-          disableRemotePlayback
+          controls={false}
           onLoadedMetadata={handleLoadedMetadata}
-          className="pointer-events-none absolute inset-0 h-full w-full object-cover scale-[1.02] origin-center z-0 transition-opacity duration-500"
+          className="absolute inset-0 w-full h-full object-cover z-0 pointer-events-none"
           style={{
             transform: 'translateZ(0)',
             willChange: 'transform',
@@ -146,18 +201,15 @@ export default function HeroSection() {
           }}
           aria-hidden="true"
         >
-          <source src="/assets/mainlandbackground.mp4" type="video/mp4" />
           <source src="/videos/mainlandbackground.mp4" type="video/mp4" />
+          <source src="/assets/mainlandbackground.mp4" type="video/mp4" />
           <source src="/mainlandbackground.mp4" type="video/mp4" />
         </video>
 
-        {/* ─── CLEAN, CRYSTAL-CLEAR NATIVE VIDEO TINT (NO CLUTTER) ─── */}
+        {/* ─── CLEAN TRANSLUCENT OVERLAY TINT (NO SOLID OBSCURING LAYERS) ─── */}
         <div
-          className={`absolute inset-0 z-1 pointer-events-none transition-opacity duration-500 ${
-            mode === 'dark'
-              ? 'bg-gradient-to-t from-slate-950/90 via-transparent to-slate-950/45'
-              : 'bg-gradient-to-t from-slate-950/80 via-transparent to-slate-950/35'
-          }`}
+          className="absolute inset-0 z-0 pointer-events-none bg-black/20"
+          aria-hidden="true"
         />
 
         {/* ─── ELITE CINEMATIC CENTERED YASLOGIST BRANDING & HERO BLOCK ─── */}
