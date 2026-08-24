@@ -200,11 +200,73 @@ export default function LandLogisticsSection({
     [language, direction],
   )
 
+  const [isMobile, setIsMobile] = useState(false)
+
+  /* ── 1. Responsive Viewport & Device Detection ── */
+  useEffect(() => {
+    const checkMobile = () => {
+      const mobile =
+        window.innerWidth < 768 ||
+        'ontouchstart' in window ||
+        navigator.maxTouchPoints > 0
+      setIsMobile(mobile)
+    }
+    checkMobile()
+    window.addEventListener('resize', checkMobile, { passive: true })
+    return () => window.removeEventListener('resize', checkMobile)
+  }, [])
+
+  /* ── 2. Direct DOM Mount & Forced Video Trigger (Autoplay Failsafe) ── */
+  const handleTouchStart = useCallback(() => {
+    const lightVideo = lightVideoRef.current
+    const darkVideo = darkVideoRef.current
+    if (isMobile) {
+      const activeVideo = mode === 'dark' ? darkVideo : lightVideo
+      if (activeVideo) {
+        activeVideo.muted = true
+        activeVideo.playsInline = true
+        activeVideo.autoplay = true
+        activeVideo.play().catch((err) => console.log('Autoplay deferred:', err))
+      }
+    }
+  }, [isMobile, mode])
+
+  useEffect(() => {
+    const lightVideo = lightVideoRef.current
+    const darkVideo = darkVideoRef.current
+    if (lightVideo) {
+      lightVideo.muted = true
+      lightVideo.playsInline = true
+      lightVideo.autoplay = true
+    }
+    if (darkVideo) {
+      darkVideo.muted = true
+      darkVideo.playsInline = true
+      darkVideo.autoplay = true
+    }
+    if (isMobile) {
+      const activeVideo = mode === 'dark' ? darkVideo : lightVideo
+      const inactiveVideo = mode === 'dark' ? lightVideo : darkVideo
+      if (activeVideo) {
+        activeVideo.muted = true
+        activeVideo.playsInline = true
+        activeVideo.autoplay = true
+        activeVideo.play().catch((err) => console.log('Autoplay deferred:', err))
+      }
+      inactiveVideo?.pause()
+    }
+  }, [isMobile, mode])
+
+  useEffect(() => {
+    window.addEventListener('touchstart', handleTouchStart, { passive: true })
+    return () => window.removeEventListener('touchstart', handleTouchStart)
+  }, [handleTouchStart])
+
   const updatePhase = useCallback((next: number) => {
     setActivePhase((prev) => (prev === next ? prev : next))
   }, [])
 
-  /* ── Synchronized Dual-Track Video Scrubber (Light & Dark Lockstep) ── */
+  /* ── 3. Synchronized Dual-Track Video Scrubber (Desktop) & Telemetry Tracker ── */
   useEffect(() => {
     const section = sectionRef.current
     if (!section) return
@@ -212,8 +274,15 @@ export default function LandLogisticsSection({
     const lightVideo = lightVideoRef.current
     const darkVideo = darkVideoRef.current
 
-    if (lightVideo) lightVideo.pause()
-    if (darkVideo) darkVideo.pause()
+    if (!isMobile) {
+      if (lightVideo) lightVideo.pause()
+      if (darkVideo) darkVideo.pause()
+    } else {
+      const activeVideo = mode === 'dark' ? darkVideo : lightVideo
+      const inactiveVideo = mode === 'dark' ? lightVideo : darkVideo
+      activeVideo?.play().catch(() => {})
+      inactiveVideo?.pause()
+    }
 
     gsap.registerPlugin(ScrollTrigger)
 
@@ -250,9 +319,11 @@ export default function LandLogisticsSection({
 
       const targetTime = p * dur
 
-      // Synchronize both Light and Dark tracks simultaneously in exact lockstep
-      syncVideoTime(lightVideoRef.current, targetTime)
-      syncVideoTime(darkVideoRef.current, targetTime)
+      // Synchronize both Light and Dark tracks simultaneously only on Desktop viewports
+      if (!isMobile) {
+        syncVideoTime(lightVideoRef.current, targetTime)
+        syncVideoTime(darkVideoRef.current, targetTime)
+      }
 
       const totalSeconds = p * 60 + (activePhase * 30)
       const minutes = Math.floor(totalSeconds / 60)
@@ -290,6 +361,10 @@ export default function LandLogisticsSection({
 
     const onVideoReady = () => {
       ScrollTrigger.refresh()
+      if (isMobile) {
+        const activeVideo = mode === 'dark' ? darkVideoRef.current : lightVideoRef.current
+        activeVideo?.play().catch(() => {})
+      }
     }
 
     if (lightVideo) {
@@ -327,7 +402,7 @@ export default function LandLogisticsSection({
       }
       trigger.kill()
     }
-  }, [mode, activePhase, updatePhase])
+  }, [mode, activePhase, updatePhase, isMobile])
 
   const phase = i18n.phases[activePhase]
   const PhaseIcon = phase.icon
@@ -358,28 +433,28 @@ export default function LandLogisticsSection({
       ref={sectionRef}
       id={id}
       dir={direction}
-      className="relative w-full bg-slate-950"
+      className="relative w-full bg-transparent text-white"
       style={{ height: `${scrollLength * 100}vh` }}
       aria-label={phase.title[language]}
+      onTouchStart={handleTouchStart}
     >
       {/* ─── Sticky Viewport Container ─── */}
-      <div className="sticky top-0 h-screen w-full overflow-hidden">
+      <div className="sticky top-0 h-screen w-full overflow-hidden bg-transparent">
 
         {/* ─── DOUBLE-MOUNT CINEMATIC THEME CROSS-FADE ─── */}
         {/* BASE LAYER: Daytime Video (/videos/FINAL.mp4) */}
         <video
           ref={lightVideoRef}
           src="/videos/FINAL.mp4"
-          playsInline
-          webkit-playsinline="true"
-          muted
-          defaultMuted
           autoPlay
           loop
+          muted
+          playsInline
+          webkit-playsinline="true"
+          x5-playsinline="true"
           preload="auto"
-          disablePictureInPicture
-          disableRemotePlayback
-          className="pointer-events-none absolute inset-0 h-full w-full object-cover scale-[1.05] origin-center z-0"
+          controls={false}
+          className="absolute inset-0 w-full h-full object-cover z-0 pointer-events-none"
           style={{ willChange: 'transform' }}
           aria-hidden="true"
         />
@@ -388,19 +463,24 @@ export default function LandLogisticsSection({
         <video
           ref={darkVideoRef}
           src="/videos/FINALnight.mp4"
-          playsInline
-          webkit-playsinline="true"
-          muted
-          defaultMuted
           autoPlay
           loop
+          muted
+          playsInline
+          webkit-playsinline="true"
+          x5-playsinline="true"
           preload="auto"
-          disablePictureInPicture
-          disableRemotePlayback
-          className={`pointer-events-none absolute inset-0 h-full w-full object-cover scale-[1.05] origin-center z-1 transition-opacity duration-1000 ease-in-out ${
+          controls={false}
+          className={`absolute inset-0 w-full h-full object-cover z-0 pointer-events-none transition-opacity duration-1000 ease-in-out ${
             mode === 'dark' ? 'opacity-100' : 'opacity-0'
           }`}
           style={{ willChange: 'opacity, transform' }}
+          aria-hidden="true"
+        />
+
+        {/* ─── CLEAN TRANSLUCENT OVERLAY TINT (NO SOLID OBSCURING LAYERS) ─── */}
+        <div
+          className="absolute inset-0 z-0 pointer-events-none bg-black/20"
           aria-hidden="true"
         />
 
