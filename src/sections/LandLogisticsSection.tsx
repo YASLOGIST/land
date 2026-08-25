@@ -207,8 +207,7 @@ export default function LandLogisticsSection({
     const checkMobile = () => {
       const mobile =
         window.innerWidth < 768 ||
-        'ontouchstart' in window ||
-        navigator.maxTouchPoints > 0
+        (window.innerWidth < 1024 && ('ontouchstart' in window || navigator.maxTouchPoints > 0))
       setIsMobile(mobile)
     }
     checkMobile()
@@ -457,7 +456,9 @@ export default function LandLogisticsSection({
           className="absolute inset-0 w-full h-full object-cover z-0 pointer-events-none"
           style={{ willChange: 'transform' }}
           aria-hidden="true"
-        />
+        >
+          <source src="/videos/FINAL.mp4" type="video/mp4" />
+        </video>
 
         {/* OVERLAY LAYER: Nocturnal Video (/videos/FINALnight.mp4) with 1000ms butter-smooth opacity cross-fade */}
         <video
@@ -476,7 +477,9 @@ export default function LandLogisticsSection({
           }`}
           style={{ willChange: 'opacity, transform' }}
           aria-hidden="true"
-        />
+        >
+          <source src="/videos/FINALnight.mp4" type="video/mp4" />
+        </video>
 
         {/* ─── CLEAN TRANSLUCENT OVERLAY TINT (NO SOLID OBSCURING LAYERS) ─── */}
         <div

@@ -58,8 +58,7 @@ export default function HeroSection() {
     const checkMobile = () => {
       const mobile =
         window.innerWidth < 768 ||
-        'ontouchstart' in window ||
-        navigator.maxTouchPoints > 0
+        (window.innerWidth < 1024 && ('ontouchstart' in window || navigator.maxTouchPoints > 0))
       setIsMobile(mobile)
     }
     checkMobile()
@@ -84,6 +83,9 @@ export default function HeroSection() {
       video.muted = true
       video.playsInline = true
       video.autoplay = true
+      if (video.readyState >= 1) {
+        setVideoLoaded(true)
+      }
       if (isMobile) {
         video.play().catch((err) => console.log('Autoplay deferred:', err))
       }
@@ -193,11 +195,12 @@ export default function HeroSection() {
           preload="auto"
           controls={false}
           onLoadedMetadata={handleLoadedMetadata}
+          onCanPlay={() => setVideoLoaded(true)}
           className="absolute inset-0 w-full h-full object-cover z-0 pointer-events-none"
           style={{
             transform: 'translateZ(0)',
             willChange: 'transform',
-            opacity: videoLoaded ? 1 : 0.8,
+            opacity: videoLoaded ? 1 : 0.85,
           }}
           aria-hidden="true"
         >
