@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useTheme } from 'next-themes'
 import { ThemeToggle } from '@/components/ThemeToggle'
 import { useLanguage } from '@/hooks/use-language'
-import { Menu, X } from 'lucide-react'
+import { Menu, X, Languages } from 'lucide-react'
 
 export default function Navbar() {
   const { resolvedTheme } = useTheme()
@@ -152,7 +152,7 @@ export default function Navbar() {
               {/* AR Button */}
               <button
                 onClick={() => setLanguage('ar')}
-                className={`relative z-10 px-3.5 py-1 rounded-full font-bold leading-none select-none transition-colors duration-200 ar-lang-button ${
+                className={`relative z-10 px-3.5 py-1 rounded-full font-bold leading-none select-none transition-[colors,font-weight,box-shadow] duration-300 ar-lang-button focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:ring-offset-2 focus:ring-offset-[#051336] focus:shadow-[0_0_12px_rgba(6,182,212,0.8)] hover:font-black flex items-center justify-center gap-1.5 ${
                   language === 'ar'
                     ? 'text-slate-950 font-black'
                     : 'text-slate-300 hover:text-white'
@@ -167,7 +167,8 @@ export default function Navbar() {
                     transition={{ type: 'spring', stiffness: 500, damping: 35 }}
                   />
                 )}
-                عربي
+                <Languages className="w-3.5 h-3.5 transition-transform duration-300 group-hover:scale-110" />
+                <span>عربي</span>
               </button>
             </div>
             

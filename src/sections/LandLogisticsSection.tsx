@@ -583,7 +583,21 @@ export default function LandLogisticsSection({
           className="hidden sm:block absolute bottom-4 right-4 sm:bottom-6 sm:right-6 lg:bottom-8 lg:right-8 z-20 w-[310px] sm:w-[360px] lg:w-[390px]"
           aria-label="Simulation Telemetry Monitoring Panel"
         >
-          <div className="rounded-3xl p-4 sm:p-5 border border-cyan-500/30 bg-slate-950/85 backdrop-blur-2xl shadow-[0_20px_50px_rgba(0,0,0,0.8)]">
+          <div 
+            className="rounded-3xl border border-cyan-500/30 bg-slate-950/85 backdrop-blur-2xl shadow-[0_20px_50px_rgba(0,0,0,0.8)]"
+            style={{
+              paddingRight: '9px',
+              marginLeft: '1px',
+              marginRight: '-15px',
+              marginTop: '6px',
+              marginBottom: '3px',
+              paddingTop: '23px',
+              paddingLeft: '19px',
+              paddingBottom: '23px',
+              height: '214px',
+              width: '410px'
+            }}
+          >
             {/* Top Telemetry Status Header */}
             <div className="flex items-center justify-between pb-2.5 mb-2.5 border-b border-white/10">
               <div className="flex items-center gap-2">
