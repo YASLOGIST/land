@@ -24,7 +24,6 @@ import {
   AlertTriangle,
   Zap,
   ShieldCheck,
-  Plane,
   Truck,
   RotateCw,
   ArrowRight,
@@ -38,6 +37,8 @@ import {
   Plus,
   Minus,
   RotateCcw,
+  Boxes,
+  Network,
 } from 'lucide-react'
 import { useLanguage } from '@/hooks/use-language'
 import type { BilingualText } from '@/types/land-logistics'
@@ -71,148 +72,148 @@ interface RealDisruptionScenario extends DisruptionScenarioOption {
 
 const DISRUPTION_SCENARIOS: RealDisruptionScenario[] = [
   {
-    id: 'suez-congestion',
-    code: 'INCIDENT-SUEZ-09',
-    title: t('Suez Canal Bottleneck & Port Stoppage', 'اختناق قناة السويس وتكدس الموانئ'),
-    location: t('Red Sea & Eastern Mediterranean Gateway', 'البحر الأحمر وبوابة شرق المتوسط'),
-    gisCoordinates: '29°55\'N 32°33\'E // RED SEA SECTOR 4',
-    affectedCorridor: 'CORR-DXB-RTM // MARITIME',
+    id: 'trans-eurasian-blizzard',
+    code: 'INCIDENT-ALPINE-PASS-09',
+    title: t('Alpine Mountain Pass Snowstorm & Icing', 'عاصفة ثلجية وتجمد بالممرات الجبلية السريعة'),
+    location: t('Trans-Eurasian High-Altitude Highway Pass', 'ممر طريق الألب البري فائق الارتفاع'),
+    gisCoordinates: '46°30\'N 08°34\'E // ALPINE ARTERY 09',
+    affectedCorridor: 'CORR-FRA-DXB // LAND FREIGHT',
     severity: 'CRITICAL',
     impactDescription: t(
-      'Unexpected maritime congestion causing severe vessel holding times and potential 80+ hour delivery slips for cross-continental freight.',
-      'ازدحام ملاحي مفاجئ يؤدي لتوقف السفن وتأخيرات محتملة تتجاوز 80 ساعة للشحنات العابرة للقارات.',
+      'Heavy blizzard conditions and mountain highway ice causing hazardous traction conditions for standard heavy trucks, resulting in 48+ hour holding times.',
+      'عاصفة ثلجية حادة وتجمد على الطرق الجبلية يسببان صعوبة في تماسك الشاحنات التقليدية وتأخيراً يتجاوز 48 ساعة.',
     ),
-    baseDelayHours: 84,
-    potentialLossRisk: '$520,000 / FLEET',
-    originGps: [55.3, 25.2],
-    destinationGps: [4.48, 51.92],
-    chokepointGps: [32.55, 29.93],
-    radarCoordinates: [59.04, 33.38],
-    blockedPathLabel: t('MARITIME STALL // +84H DELAY', 'توقف ملاحي // تأخير +84 ساعة'),
-    bypassPathLabel: t('LANDBRIDGE RAIL BYPASS // -76H', 'تحويل بري أخضر // توفير 76 ساعة'),
-    realBlockedSvgPath: 'M 653.6 180.0 L 620.8 215.0 L 590.4 166.9',
-    realBypassSvgPath: 'M 653.6 180.0 Q 560.0 90.0 512.4 105.8',
-    localizedMeteorology: t('Moderate 26°C // Cross-winds 18kts', 'معتدل 26°م // رياح عرضية 18 عقدة'),
-    liveHoldingDelay: '84.0 HOURS ESTIMATED',
+    baseDelayHours: 48,
+    potentialLossRisk: '$380,000 / FLEET',
+    originGps: [8.57, 50.03],
+    destinationGps: [55.3, 25.2],
+    chokepointGps: [8.34, 46.5],
+    radarCoordinates: [52.38, 12.0],
+    blockedPathLabel: t('PASS CLOSED // +48H DELAY', 'الممر مغلق // تأخير +48 ساعة'),
+    bypassPathLabel: t('HEATED ARTERIAL TUNNEL BYPASS // -42H', 'تحويل عبر النفق البري الذكي // توفير 42 ساعة'),
+    realBlockedSvgPath: 'M 523.8 111.0 L 523.1 120.8',
+    realBypassSvgPath: 'M 523.8 111.0 Q 560.0 140.0 653.6 180.0',
+    localizedMeteorology: t('Blizzard -12°C // Black Ice & 60km/h Gusts', 'عاصفة ثلجية -12°م // جليد ورياح 60 كم/س'),
+    liveHoldingDelay: '48.0 HOURS PASS CLOSURE',
     strategies: [
       {
         id: 'speed',
-        icon: Plane,
-        name: t('Autonomous Overland Rail Shift', 'تحويل المسار إلى السكك الحديدية الكهربائية البرية'),
-        tagline: t('DWC Overland High-Speed Green Corridor', 'ممر دبي البري الأخضر فائق السرعة'),
-        delayMitigationHours: 76,
-        costVariancePercent: 4.2,
-        co2OffsetKg: 3200,
-        confidenceScore: 99.6,
-        rerouteProtocol: t('PROTOCOL-ARABIAN-LANDBRIDGE-01', 'بروتوكول-الجسر-البري-العربي-01'),
+        icon: Truck,
+        name: t('Autonomous Heated Lower-Valley Artery', 'تحويل المسار إلى الطريق السفلي الساخن الذكي'),
+        tagline: t('Geothermally Heated Arterial Highway Grid', 'شبكة طرق برية مسخنة حرارياً ذاتية التشغيل'),
+        delayMitigationHours: 42,
+        costVariancePercent: 3.8,
+        co2OffsetKg: 3400,
+        confidenceScore: 99.7,
+        rerouteProtocol: t('PROTOCOL-ALPINE-BYPASS-01', 'بروتوكول-التحويل-الجبلي-01'),
       },
       {
         id: 'cost-esg',
-        icon: Truck,
-        name: t('Multi-Hub Feeder Redistribution', 'إعادة توزيع عبر شبكة المراكز الفرعية'),
-        tagline: t('Optimized Coastal Electric Truck Staging', 'تجهيز الشاحنات الكهربائية الساحلية الذكية'),
-        delayMitigationHours: 62,
-        costVariancePercent: -8.5,
-        co2OffsetKg: 4800,
-        confidenceScore: 98.9,
-        rerouteProtocol: t('PROTOCOL-FEEDER-STAGING-04', 'بروتوكول-المراكز-الفرعية-04'),
+        icon: Network,
+        name: t('Connected V2X Electric Platoon Convoy', 'قوافل الشاحنات الكهربائية المتصلة (V2X)'),
+        tagline: t('Dynamic Torque & Traction Synchronized Fleet', 'تحكم متزامن في عزم وتماسك الإطارات'),
+        delayMitigationHours: 36,
+        costVariancePercent: -7.2,
+        co2OffsetKg: 4900,
+        confidenceScore: 99.1,
+        rerouteProtocol: t('PROTOCOL-PLATOON-TRACTION-04', 'بروتوكول-القوافل-المتزامنة-04'),
       },
       {
         id: 'zero-loss-cryo',
         icon: ShieldCheck,
-        name: t('Emergency Trans-Air Airlift', 'جسر جوي طارئ للشحنات الحساسة'),
-        tagline: t('Sub-Hour Direct Air Cargo Clearance', 'تخليص ونقل جوي مباشر فائق الأولوية'),
-        delayMitigationHours: 80,
-        costVariancePercent: 12.0,
-        co2OffsetKg: 1200,
+        name: t('Auxiliary Thermal Battery Cabin Lock', 'تأمين فوري لبطاريات التدفئة وغرف الشحن'),
+        tagline: t('Active Anti-Freeze Cargo Envelope', 'غلاف عازل نشط مانع لتجمد الشحنات الحساسة'),
+        delayMitigationHours: 40,
+        costVariancePercent: 4.5,
+        co2OffsetKg: 1800,
         confidenceScore: 99.9,
-        rerouteProtocol: t('PROTOCOL-CRITICAL-AIR-09', 'بروتوكول-الشحن-الجوي-الحرج-09'),
+        rerouteProtocol: t('PROTOCOL-THERMO-SHIELD-09', 'بروتوكول-العزل-الحراري-09'),
       },
     ],
   },
   {
-    id: 'polar-storm',
-    code: 'INCIDENT-POLAR-03',
-    title: t('North Atlantic Winter Storm Jetstream', 'عاصفة شتوية وتغير التيارات النفاثة بالأطلسي'),
-    location: t('North Atlantic Flight Corridors', 'الممرات الجوية لشمال المحيط الأطلسي'),
-    gisCoordinates: '58°20\'N 35°10\'W // JETSTREAM POLAR FRONT',
-    affectedCorridor: 'CORR-FRA-ORD // AIR FREIGHT',
+    id: 'crossdock-automation-dwell',
+    code: 'INCIDENT-CROSSDOCK-04',
+    title: t('Mega-Hub Pallet Sorter High-Density Surge', 'ذروة تدفق وازدحام مصفوفة الفرز بمركز التوزيع'),
+    location: t('Central Inland Cross-Dock Logistics Park', 'مجمع الفرز والعبور اللوجستي المركزي'),
+    gisCoordinates: '24°42\'N 46°40\'E // CENTRAL CROSSDOCK 04',
+    affectedCorridor: 'CORR-RUH-JED // INLAND FREIGHT',
     severity: 'HIGH',
     impactDescription: t(
-      'Severe turbulence fronts and airspace ground stops threatening trans-continental air cargo flight paths.',
-      'مطبات هوائية عنيفة وإغلاق جزئي للأجواء يهدد مسارات الشحن الجوي العابر للقارات.',
+      'Automated high-bay pallet conveyor peak surge causing unpredicted dwell times and staging area backlog.',
+      'تكدس غير متوقع في مصفوفات الفرز الآلي يسبب تأخيراً في تحميل وتفريغ الحاويات على الأرصفة.',
     ),
-    baseDelayHours: 36,
-    potentialLossRisk: '$280,000 / CARGO',
-    originGps: [8.57, 50.03],
-    destinationGps: [-87.90, 41.98],
-    chokepointGps: [-35.0, 56.0],
-    radarCoordinates: [40.28, 18.89],
-    blockedPathLabel: t('AIRSPACE GROUND STOP // +36H', 'إغلاق جوي // تأخير +36 ساعة'),
-    bypassPathLabel: t('FL450 POLAR JETSTREAM VECTOR // -32H', 'مسار قطبي فائق الارتفاع // توفير 32 ساعة'),
-    realBlockedSvgPath: 'M 523.8 111.0 L 402.8 94.4',
-    realBypassSvgPath: 'M 523.8 111.0 Q 380.0 40.0 255.8 133.4',
-    localizedMeteorology: t('Blizzard Front // Jetstream Headwind 72kts', 'جبهة عاصفة ثلجية // رياح نفاثة 72 عقدة'),
-    liveHoldingDelay: '36.0 HOURS GROUND STOP',
+    baseDelayHours: 32,
+    potentialLossRisk: '$240,000 / CYCLE',
+    originGps: [46.67, 24.71],
+    destinationGps: [39.19, 21.54],
+    chokepointGps: [44.0, 23.5],
+    radarCoordinates: [62.96, 36.11],
+    blockedPathLabel: t('CROSS-DOCK DWELL // +32H', 'تكدس رصيف الفرز // تأخير +32 ساعة'),
+    bypassPathLabel: t('DYNAMIC LTL SATELLITE HUB // -28H', 'تحويل للمركز الفرعي الذكي // توفير 28 ساعة'),
+    realBlockedSvgPath: 'M 629.6 181.4 L 620.0 185.0',
+    realBypassSvgPath: 'M 629.6 181.4 Q 615.0 188.0 608.8 190.1',
+    localizedMeteorology: t('Clear 34°C // Bay Utilization 98.4%', 'صافٍ 34°م // نسبة إشغال الأرصفة 98.4%'),
+    liveHoldingDelay: '32.0 HOURS DWELL QUEUE',
     strategies: [
       {
         id: 'speed',
-        icon: Plane,
-        name: t('Trans-Polar Supersonic Altitude Shift', 'تعديل المسار الجوي فوق القطبي فائق الارتفاع'),
-        tagline: t('AI Dynamic Vector Jetstream Riding', 'استغلال التيارات النفاثة بالذكاء الاصطناعي'),
-        delayMitigationHours: 32,
-        costVariancePercent: 2.1,
-        co2OffsetKg: 1850,
-        confidenceScore: 99.4,
-        rerouteProtocol: t('PROTOCOL-POLAR-VECTOR-02', 'بروتوكول-المسار-القطبي-02'),
+        icon: Boxes,
+        name: t('Autonomous Satellite Cross-Dock Re-route', 'إعادة توجيه فورية للمستودع الفرعي الآلي'),
+        tagline: t('AMR Autonomous Pallet Hand-Off', 'مناولة روبوتية سريعة بالروبوتات المتنقلة الذاتية'),
+        delayMitigationHours: 28,
+        costVariancePercent: 1.8,
+        co2OffsetKg: 2100,
+        confidenceScore: 99.8,
+        rerouteProtocol: t('PROTOCOL-AMR-SATELLITE-02', 'بروتوكول-الفرز-الروبوتي-02'),
       },
       {
         id: 'cost-esg',
         icon: Truck,
-        name: t('Southern Gateway Hub Redirection', 'إعادة التوجيه عبر بوابة الجنوب'),
-        tagline: t('Halifax Intermediate AMR Cross-Dock', 'فرز وتجهيز آلي سريع في محطة هاليفاكس'),
+        name: t('Dynamic Micro-Fulfillment Staging', 'توزيع مسبق عبر مراكز الإنجاز المصغرة'),
+        tagline: t('Decentralized Urban Micro-Hub Grid', 'شبكة مراكز لوجستية حضرية لامركزية'),
         delayMitigationHours: 24,
-        costVariancePercent: -4.0,
-        co2OffsetKg: 2400,
-        confidenceScore: 98.7,
-        rerouteProtocol: t('PROTOCOL-SOUTH-GATE-07', 'بروتوكول-بوابة-الجنوب-07'),
+        costVariancePercent: -5.4,
+        co2OffsetKg: 3100,
+        confidenceScore: 98.9,
+        rerouteProtocol: t('PROTOCOL-MICRO-STAGE-07', 'بروتوكول-المراكز-المصغرة-07'),
       },
       {
         id: 'zero-loss-cryo',
         icon: ShieldCheck,
-        name: t('Preemptive Cold-Chain Storage Lock', 'تأمين فوري لسلسلة التبريد وغرف العزل'),
-        tagline: t('Automated Auxiliary Cryo Stabilization', 'تثبيت حراري تلقائي معتمد لنتروجين التبريد'),
-        delayMitigationHours: 28,
-        costVariancePercent: 3.5,
-        co2OffsetKg: 1500,
-        confidenceScore: 99.8,
-        rerouteProtocol: t('PROTOCOL-CRYO-LOCK-11', 'بروتوكول-تأمين-التبريد-11'),
+        name: t('Priority Cold-Chain Bay Insertion', 'حجز فوري لرصيف التبريد فائق الأولوية'),
+        tagline: t('Zero-Dwell Direct Reefer Transfer', 'نقل مباشر بين الشاحنات المبردة دون توقف'),
+        delayMitigationHours: 26,
+        costVariancePercent: 2.9,
+        co2OffsetKg: 1400,
+        confidenceScore: 99.9,
+        rerouteProtocol: t('PROTOCOL-REEFER-BAY-11', 'بروتوكول-أرصفة-التبريد-11'),
       },
     ],
   },
   {
     id: 'customs-surge',
     code: 'INCIDENT-BORDER-08',
-    title: t('International Border Clearance Peak Surge', 'ذروة تدفق وازدحام المنافذ الجمركية الدولية'),
-    location: t('European Union & APAC Border Terminals', 'المنافذ الحدودية للاتحاد الأوروبي وآسيا'),
-    gisCoordinates: '48°12\'N 16°22\'E // BORDER GATEWAY 08',
-    affectedCorridor: 'CORR-RUH-SIN // MULTIMODAL',
+    title: t('International Land Border Clearance Peak Surge', 'ذروة تدفق وازدحام المنفذ الجمركي البري'),
+    location: t('Sovereign International Land Border Gateway', 'البوابة الجمركية البرية الدولية السيادية'),
+    gisCoordinates: '24°15\'N 51°35\'E // BORDER GATEWAY 08',
+    affectedCorridor: 'CORR-RUH-DXB // LAND HIGHWAY',
     severity: 'HIGH',
     impactDescription: t(
-      'Physical inspection queues leading to multi-day dwell times for standard commercial manifests.',
-      'طوابير التفتيش اليدوي تؤدي لتعطل الشحنات لأيام في البيانات الورقية التقليدية.',
+      'Physical paper inspection queues leading to multi-day vehicle dwell times at traditional border inspection gates.',
+      'طوابير التفتيش الورقي التقليدي تؤدي لتعطل الشاحنات لأيام عند بوابات التفتيش الحدودية.',
     ),
     baseDelayHours: 48,
     potentialLossRisk: '$195,000 / CORRIDOR',
     originGps: [46.67, 24.71],
-    destinationGps: [103.82, 1.35],
-    chokepointGps: [70.0, 20.0],
-    radarCoordinates: [69.44, 38.89],
+    destinationGps: [55.3, 25.2],
+    chokepointGps: [50.0, 24.5],
+    radarCoordinates: [63.89, 36.38],
     blockedPathLabel: t('MANUAL CUSTOMS QUEUE // +48H', 'تفتيش يدوي معطل // تأخير +48 ساعة'),
-    bypassPathLabel: t('ZERO-TRUST GREEN LANE // -46H', 'المسار الأخضر المشفر // توفير 46 ساعة'),
-    realBlockedSvgPath: 'M 629.6 181.4 L 694.4 194.4',
-    realBypassSvgPath: 'M 629.6 181.4 Q 710.0 160.0 788.4 246.3',
-    localizedMeteorology: t('Clear 28°C // High Volume Dwell Queue', 'صافٍ 28°م // طابور انتظار كثيف'),
+    bypassPathLabel: t('ZERO-TRUST DIGITAL GREEN LANE // -46H', 'المسار الأخضر الرقمي المشفر // توفير 46 ساعة'),
+    realBlockedSvgPath: 'M 629.6 181.4 L 640.0 181.0',
+    realBypassSvgPath: 'M 629.6 181.4 Q 642.0 175.0 653.6 180.0',
+    localizedMeteorology: t('Clear 32°C // Dwell Queue 120 Vehicles', 'صافٍ 32°م // طابور انتظار 120 شاحنة'),
     liveHoldingDelay: '48.0 HOURS MANUAL QUEUE',
     strategies: [
       {
@@ -229,8 +230,8 @@ const DISRUPTION_SCENARIOS: RealDisruptionScenario[] = [
       {
         id: 'cost-esg',
         icon: Truck,
-        name: t('Secondary Automated Port Clearance', 'تخليص عبر الموانئ الثانوية المؤتمتة'),
-        tagline: t('AMR Guided Autonomous Inland Port', 'إرساء ومناولة آلية بالموانئ الجافة الذكية'),
+        name: t('Secondary Automated Dry Port Clearance', 'تخليص عبر الميناء الجاف التبادلي المؤتمت'),
+        tagline: t('AMR Guided Autonomous Inland Dry Port', 'إرساء ومناولة آلية بالموانئ الجافة الذكية'),
         delayMitigationHours: 38,
         costVariancePercent: -6.0,
         co2OffsetKg: 3400,
@@ -253,32 +254,32 @@ const DISRUPTION_SCENARIOS: RealDisruptionScenario[] = [
   {
     id: 'cryo-surge',
     code: 'INCIDENT-THERMAL-12',
-    title: t('Ambient Heatwave & Cold-Chain Alert', 'موجة حرارة شديدة وإنذار سلسلة التبريد'),
+    title: t('Ambient Desert Heatwave & Cold-Chain Alert', 'موجة حرارة صحراوية وإنذار سلسلة التبريد'),
     location: t('Gulf & Desert Overland Highway Segments', 'طرق النقل البري السريعة الصحراوية'),
     gisCoordinates: '26°30\'N 50°10\'E // HIGHWAY DESERT CORRIDOR',
-    affectedCorridor: 'CORR-SHA-LAX // INLAND FLEET',
+    affectedCorridor: 'CORR-DXB-RUH // OVERLAND FREIGHT',
     severity: 'CRITICAL',
     impactDescription: t(
-      'External ambient temperatures exceeding +48°C triggering predictive risk for ultra-sensitive biotech & medicine containers.',
-      'تجاوز درجات الحرارة الخارجية +48°م مما يهدد استقرار حاويات الأدوية والمنتجات الحيوية الحساسة.',
+      'External ambient temperatures exceeding +48°C triggering predictive risk for ultra-sensitive cold-chain cargo trailers.',
+      'تجاوز درجات الحرارة الخارجية +48°م مما يهدد استقرار مقطورات التبريد والشحنات الحساسة.',
     ),
     baseDelayHours: 24,
     potentialLossRisk: '$850,000 / CONSIGNMENT',
-    originGps: [48.0, 24.0],
-    destinationGps: [56.0, 25.0],
-    chokepointGps: [52.0, 26.0],
-    radarCoordinates: [64.44, 35.56],
+    originGps: [55.3, 25.2],
+    destinationGps: [46.67, 24.71],
+    chokepointGps: [50.5, 25.0],
+    radarCoordinates: [64.0, 36.2],
     blockedPathLabel: t('DAYTIME HEAT SURGE // +24H', 'خطر حراري نهاري // تأخير +24 ساعة'),
     bypassPathLabel: t('AUXILIARY CRYO NIGHT DISPATCH // -22H', 'نقل ليلي بتبريد ذكي // توفير 22 ساعة'),
-    realBlockedSvgPath: 'M 633.3 183.3 L 644.4 177.8',
-    realBypassSvgPath: 'M 633.3 183.3 Q 645.0 150.0 655.6 180.6',
+    realBlockedSvgPath: 'M 653.6 180.0 L 642.0 180.5',
+    realBypassSvgPath: 'M 653.6 180.0 Q 640.0 170.0 629.6 181.4',
     localizedMeteorology: t('Extreme Heatwave +49°C // High Sun Radiation', 'حرارة شديدة +49°م // إشعاع شمسي مكثف'),
     liveHoldingDelay: '24.0 HOURS HIGHWAY DWELL',
     strategies: [
       {
         id: 'zero-loss-cryo',
         icon: ShieldCheck,
-        name: t('Auxiliary IoT Cryo-Boost & Reroute', 'تفعيل التبريد الاحتياطي الذكي وتحويل المسار'),
+        name: t('Auxiliary IoT Cryo-Boost & Night Transit', 'تفعيل التبريد الاحتياطي الذكي والانطلاق الليلي'),
         tagline: t('Sub-Second Direct Thermal Stabilization', 'موازنة وتبريد لحظي مدعوم ببطاريات الأسطول المستقلة'),
         delayMitigationHours: 22,
         costVariancePercent: 1.5,
@@ -288,7 +289,7 @@ const DISRUPTION_SCENARIOS: RealDisruptionScenario[] = [
       },
       {
         id: 'speed',
-        icon: Plane,
+        icon: Truck,
         name: t('Immediate Night-Transit Highway Staging', 'جدولة النقل الليلي فائق التبريد'),
         tagline: t('Nighttime Low-Temp Dynamic Dispatch', 'انطلاق ليلي في درجات الحرارة المنخفضة'),
         delayMitigationHours: 18,
@@ -299,7 +300,7 @@ const DISRUPTION_SCENARIOS: RealDisruptionScenario[] = [
       },
       {
         id: 'cost-esg',
-        icon: Truck,
+        icon: Boxes,
         name: t('Underground Shaded Facility Docking', 'إرساء فوري في المستودعات المعزولة تحت الأرض'),
         tagline: t('Geothermal Automated High-Density Storage', 'تخزين آلي في مستودعات تبريد جوفية مستدامة'),
         delayMitigationHours: 16,
@@ -324,7 +325,7 @@ export default function DisruptionCommandSection() {
   const mode = resolvedTheme === 'light' ? 'light' : 'dark'
   const ArrowIcon = isRTL ? ArrowLeft : ArrowRight
 
-  const [selectedScenarioId, setSelectedScenarioId] = useState<string>('suez-congestion')
+  const [selectedScenarioId, setSelectedScenarioId] = useState<string>('trans-eurasian-blizzard')
   const [selectedStrategyId, setSelectedStrategyId] = useState<StrategyModeId>('speed')
   const [isFullscreen, setIsFullscreen] = useState<boolean>(false)
   const [authModalOpen, setAuthModalOpen] = useState<boolean>(false)
@@ -568,12 +569,12 @@ export default function DisruptionCommandSection() {
             <div>
               <div className="flex items-center justify-between pb-3.5 mb-4 border-b border-white/[0.08] dark:border-white/[0.08]">
                 <div className="flex items-center gap-2.5">
-                  <div className="w-8 h-8 rounded-xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400 shadow-[0_0_12px_rgba(16,185,129,0.3)]">
-                    <Zap className="w-4 h-4" />
+                  <div className="w-8 h-8 rounded-full bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center text-emerald-400 shadow-[0_0_12px_rgba(16,185,129,0.25)]">
+                    <Zap className="w-3.5 h-3.5" />
                   </div>
                   <div>
-                    <span className="font-mono font-bold text-[9.5px] text-emerald-400 block leading-tight">
-                      6G_INCIDENT_INTERVENTION
+                    <span className="font-mono font-bold text-[10px] text-emerald-400 block leading-tight tracking-wider">
+                      6G INCIDENT INTERVENTION
                     </span>
                     <span className={`text-sm font-extrabold ${mode === 'dark' ? 'text-white' : 'text-slate-950'}`}>
                       {activeScenario.location[language]}
@@ -684,6 +685,49 @@ export default function DisruptionCommandSection() {
                       className="pointer-events-none"
                     />
 
+                    {/* Crisis Geofence Exclusion Zone Ring */}
+                    <g className="pointer-events-none">
+                      <circle
+                        cx={chokepointPixels[0]}
+                        cy={chokepointPixels[1]}
+                        r="32"
+                        fill="rgba(244,63,94,0.08)"
+                        stroke="rgba(244,63,94,0.5)"
+                        strokeWidth="1.2"
+                        strokeDasharray="4 4"
+                      />
+                      <circle
+                        cx={chokepointPixels[0]}
+                        cy={chokepointPixels[1]}
+                        r="48"
+                        fill="none"
+                        stroke="rgba(244,63,94,0.25)"
+                        strokeWidth="0.8"
+                        strokeDasharray="2 3"
+                      />
+                    </g>
+
+                    {/* Tactical Radar Sweep Beam around Epicenter */}
+                    <g className="pointer-events-none" transform={`translate(${chokepointPixels[0]}, ${chokepointPixels[1]})`}>
+                      <motion.circle
+                        r="42"
+                        fill="none"
+                        stroke="#f43f5e"
+                        strokeWidth="1"
+                        initial={{ opacity: 0.8, scale: 0.2 }}
+                        animate={{ opacity: 0, scale: 1.2 }}
+                        transition={{ duration: 2.2, repeat: Infinity, ease: 'easeOut' }}
+                      />
+                    </g>
+
+                    {/* Stalled / Queued Freight Particles (AIS Stoppage Cluster) */}
+                    <g className="pointer-events-none opacity-85">
+                      <circle cx={chokepointPixels[0] - 14} cy={chokepointPixels[1] + 8} r="2.5" fill="#f43f5e" />
+                      <circle cx={chokepointPixels[0] - 22} cy={chokepointPixels[1] + 16} r="2.2" fill="#fb7185" />
+                      <circle cx={chokepointPixels[0] - 10} cy={chokepointPixels[1] + 20} r="2.2" fill="#f43f5e" />
+                      <circle cx={chokepointPixels[0] - 28} cy={chokepointPixels[1] + 24} r="1.8" fill="#fda4af" />
+                    </g>
+
                     {/* 3. Luminous Red Disrupted Track (Terminating at blocked chokepoint) */}
                     <path
                       d={activeScenario.realBlockedSvgPath}
@@ -709,9 +753,16 @@ export default function DisruptionCommandSection() {
                       className="pointer-events-none"
                     />
 
-                    {/* 5. Origin & Destination Nodes */}
-                    <circle cx={originPixels[0]} cy={originPixels[1]} r="7" fill="#22d3ee" filter="url(#crisis-real-emerald)" />
-                    <circle cx={destinationPixels[0]} cy={destinationPixels[1]} r="8" fill="#10b981" filter="url(#crisis-real-emerald)" />
+                    {/* 5. Origin & Destination Strategic Nodes */}
+                    <g className="pointer-events-none">
+                      <circle cx={originPixels[0]} cy={originPixels[1]} r="9" fill="rgba(34,211,238,0.3)" filter="url(#crisis-real-emerald)" />
+                      <circle cx={originPixels[0]} cy={originPixels[1]} r="5" fill="#22d3ee" />
+                      <circle cx={originPixels[0]} cy={originPixels[1]} r="2" fill="#ffffff" />
+                      
+                      <circle cx={destinationPixels[0]} cy={destinationPixels[1]} r="10" fill="rgba(16,185,129,0.3)" filter="url(#crisis-real-emerald)" />
+                      <circle cx={destinationPixels[0]} cy={destinationPixels[1]} r="6" fill="#10b981" />
+                      <circle cx={destinationPixels[0]} cy={destinationPixels[1]} r="2.5" fill="#ffffff" />
+                    </g>
 
                     {/* 6. Disrupted Chokepoint Emergency Node with Interactive Center-on-Click */}
                     <g
@@ -721,7 +772,7 @@ export default function DisruptionCommandSection() {
                       }}
                       className="cursor-pointer"
                     >
-                      <circle cx={chokepointPixels[0]} cy={chokepointPixels[1]} r="16" fill="rgba(244,63,94,0.45)" filter="url(#crisis-real-red)" />
+                      <circle cx={chokepointPixels[0]} cy={chokepointPixels[1]} r="18" fill="rgba(244,63,94,0.45)" filter="url(#crisis-real-red)" />
                       <circle cx={chokepointPixels[0]} cy={chokepointPixels[1]} r="8" fill="#f43f5e" />
                       <circle cx={chokepointPixels[0]} cy={chokepointPixels[1]} r="3" fill="#ffffff" />
                     </g>

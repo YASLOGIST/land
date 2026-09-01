@@ -1,20 +1,5 @@
 'use client'
 
-/**
- * CapabilitiesSection — YASLOGIST Next-Gen Platform Capabilities
- *
- * Directive 2: Zero-Color Optical Glassmorphism
- * - Strips all opaque/solid color backgrounds
- * - Applies true physical clear diamond / optical glass aesthetic
- * - (backdrop-filter: blur(24px), subtle sub-pixel metallic borders, specular top highlight reflection line)
- *
- * Directive 3: Dynamic Physics-Based Number Counters
- * - Seamless integration of <DynamicCounter /> across capability specs
- *
- * Directive 5: High-Fidelity Micro-Interactions
- * - Upgraded, physics-based interactive micro-visuals for all 6 capability cards
- */
-
 import { motion } from 'framer-motion'
 import { useTheme } from 'next-themes'
 import {
@@ -22,14 +7,11 @@ import {
   Radio,
   ShieldCheck,
   Zap,
-  Globe2,
+  Truck,
   TrendingUp,
-  ArrowRight,
-  ArrowLeft,
   Sparkles,
   Lock,
   Boxes,
-  Compass,
 } from 'lucide-react'
 import { useLanguage } from '@/hooks/use-language'
 import DynamicCounter from '@/components/DynamicCounter'
@@ -221,8 +203,8 @@ function RoboticsMicroVisual({ mode }: { mode: 'dark' | 'light' }) {
   )
 }
 
-// 5. Tri-Modal Logistics Grid Micro-Visual (Card 5)
-function GlobeMicroVisual({ mode }: { mode: 'dark' | 'light' }) {
+// 5. Bi-Modal Land Freight & Warehousing Grid Micro-Visual (Card 5)
+function BiModalMicroVisual({ mode }: { mode: 'dark' | 'light' }) {
   return (
     <div
       className={`relative w-full h-16 rounded-2xl overflow-hidden flex items-center justify-between px-3.5 transition-colors duration-300 ${
@@ -232,20 +214,19 @@ function GlobeMicroVisual({ mode }: { mode: 'dark' | 'light' }) {
       }`}
     >
       <div className="flex items-center gap-2">
-        <Compass
-          className={`w-5 h-5 animate-spin ${mode === 'dark' ? 'text-cyan-400' : 'text-cyan-800'}`}
-          style={{ animationDuration: '8s' }}
-        />
+        <div className={`p-1.5 rounded-lg ${mode === 'dark' ? 'bg-cyan-500/10 text-cyan-400' : 'bg-cyan-100 text-cyan-800'}`}>
+          <Truck className="w-4 h-4" />
+        </div>
         <span
           className={`text-[10px] font-mono font-bold ${
             mode === 'dark' ? 'text-slate-300' : 'text-slate-700'
           }`}
         >
-          TRI-MODAL: AIR · LAND · SEA
+          BI-MODAL: ROAD FREIGHT & WAREHOUSING
         </span>
       </div>
       <span className="text-[9px] font-mono font-extrabold text-cyan-400 bg-cyan-500/10 px-2 py-0.5 rounded border border-cyan-500/20">
-        SYNCED
+        V2X SYNCED
       </span>
     </div>
   )
@@ -297,16 +278,16 @@ const CAPABILITY_CARDS: CapabilityCardItem[] = [
     id: 'ai-routing',
     indexNumber: '01',
     icon: Brain,
-    kicker: t('Intelligent Pathfinding', 'توجيه المسارات الذكي'),
-    title: t('Autonomous Route Intelligence', 'ذكاء المسارات المستقل'),
-    tagline: t('Sub-second dynamic transit re-optimization', 'إعادة تحسين لحظية لمسارات النقل'),
+    kicker: t('Intelligent Highway Pathfinding', 'توجيه المسارات السريعة الذكي'),
+    title: t('Autonomous Route Intelligence', 'ذكاء المسارات البرية المستقل'),
+    tagline: t('Sub-second dynamic transit re-optimization', 'إعادة تحسين لحظية لمسارات النقل البري'),
     description: t(
-      'Proprietary machine learning models calculate real-time environmental variables, traffic flows, and customs queues to dynamically reroute multimodal freight with zero human friction.',
-      'خوارزميات تعلم آلي متقدمة تحلل المتغيرات البيئية وحركة المرور وطوابير الجمارك لإعادة توجيه الشحنات متعددة الوسائط فورياً وبدون تدخل بشري.',
+      'Proprietary machine learning models calculate real-time environmental variables, arterial traffic flows, and inland customs queues to dynamically reroute FTL and LTL freight with zero friction.',
+      'خوارزميات تعلم آلي متقدمة تحلل المتغيرات البيئية وحركة المرور الشريانية وطوابير المنافذ الجافة لإعادة توجيه شحنات FTL و LTL فورياً وبدون أي تأخير.',
     ),
     specs: [
       { label: t('Reroute Latency', 'زمن استجابة المسار'), value: '< 50ms', numValue: 50, prefix: '< ', suffix: 'ms' },
-      { label: t('Fuel Saved', 'توفير استهلاك الوقود'), value: '+18.4%', numValue: 18.4, decimals: 1, prefix: '+', suffix: '%' },
+      { label: t('Fuel Saved', 'توفير استهلاك الوقود'), value: '+22.4%', numValue: 22.4, decimals: 1, prefix: '+', suffix: '%' },
     ],
     interactiveType: 'route',
   },
@@ -323,7 +304,7 @@ const CAPABILITY_CARDS: CapabilityCardItem[] = [
     ),
     specs: [
       { label: t('Mesh Sync Ping', 'زمن استجابة الشبكة'), value: '0.4ms', numValue: 0.4, decimals: 1, suffix: 'ms' },
-      { label: t('Global Uptime', 'جاهزية المنظومة العالمية'), value: '99.99%', numValue: 99.99, decimals: 2, suffix: '%' },
+      { label: t('Highway Uptime', 'جاهزية الطرق والأسطول'), value: '99.99%', numValue: 99.99, decimals: 2, suffix: '%' },
     ],
     interactiveType: 'radar',
   },
@@ -362,19 +343,19 @@ const CAPABILITY_CARDS: CapabilityCardItem[] = [
     interactiveType: 'robotics',
   },
   {
-    id: 'tri-modal',
+    id: 'bi-modal',
     indexNumber: '05',
-    icon: Globe2,
-    kicker: t('Multimodal Infrastructure', 'البنية التحتية متعددة الوسائط'),
-    title: t('Tri-Modal Logistics Grid', 'شبكة الخدمات الثلاثية (بر · جو · بحر)'),
-    tagline: t('Integrated Air, Land, and Oceanic execution', 'تكامل تشغيلي بين البر والجو والمحيطات'),
+    icon: Truck,
+    kicker: t('Bi-Modal Infrastructure', 'البنية التحتية الثنائية المتكاملة'),
+    title: t('Bi-Modal: Road Freight & Automated Warehousing', 'الشبكة الثنائية: الشحن البري والمستودعات الذكية'),
+    tagline: t('Seamless synchronization between highways and smart cross-docks', 'تكامل فوري بين الشاحنات وأرصفة التفريغ المؤتمتة'),
     description: t(
-      'Unified logistics orchestration spanning supersonic air cargo, long-haul highway platoons, and zero-emission container ships for end-to-end global supply chain velocity.',
-      'منظومة موحدة تربط الشحن الجوي السريع، قوافل الشاحنات البرية ذاتية القيادة، وسفن الحاويات منعدمة الانبعاثات لتحقيق أقصى سرعة توريد عالمية.',
+      'Unified terrestrial logistics orchestration connecting autonomous electric truck fleets directly into automated cross-dock sortation matrices and high-bay fulfillment hubs with zero dwell time.',
+      'منظومة لوجستية برية موحدة تربط أساطيل الشاحنات الكهربائية المستقلة مباشرة بمصفوفات الفرز الآلي ومراكز التوزيع الذكية بزمن توقف صفري.',
     ),
     specs: [
-      { label: t('Active Corridors', 'الممرات اللوجستية النشطة'), value: '140+', numValue: 140, suffix: '+' },
-      { label: t('Carbon Offset', 'خفض الانبعاثات الكربونية'), value: '-38%', numValue: 38, prefix: '-', suffix: '%' },
+      { label: t('Arterial Corridors', 'الممرات الشريانية النشطة'), value: '40+', numValue: 40, suffix: '+' },
+      { label: t('Carbon Offset', 'خفض الانبعاثات الكربونية'), value: '-42%', numValue: 42, prefix: '-', suffix: '%' },
     ],
     interactiveType: 'globe',
   },
@@ -408,7 +389,6 @@ export default function CapabilitiesSection() {
   const isRtl = direction === 'rtl'
   const isAr = language === 'ar'
   const mode = resolvedTheme === 'light' ? 'light' : 'dark'
-  const ArrowIcon = isRtl ? ArrowLeft : ArrowRight
 
   const cardVariants = {
     hidden: { opacity: 0, y: 30, scale: 0.98 },
@@ -435,7 +415,7 @@ export default function CapabilitiesSection() {
       case 'robotics':
         return <RoboticsMicroVisual mode={mode} />
       case 'globe':
-        return <GlobeMicroVisual mode={mode} />
+        return <BiModalMicroVisual mode={mode} />
       case 'predictive':
         return <PredictiveMicroVisual mode={mode} />
       default:
@@ -448,207 +428,119 @@ export default function CapabilitiesSection() {
       id="capabilities"
       dir={direction}
       className={`relative py-32 overflow-hidden transition-colors duration-500 ${
-        mode === 'dark' ? 'bg-slate-950 border-t border-white/[0.08]' : 'bg-slate-100/60 border-t border-slate-200'
+        mode === 'dark' ? 'bg-slate-950 text-white' : 'bg-slate-50 text-slate-900'
       }`}
     >
-      {/* Dynamic Ambient Background Aura */}
+      {/* Ambient background glow */}
       <div
-        className={`pointer-events-none absolute inset-0 ${
-          mode === 'dark'
-            ? 'bg-[radial-gradient(ellipse_80%_50%_at_50%_15%,rgba(6,182,212,0.06),transparent)]'
-            : 'bg-[radial-gradient(ellipse_80%_50%_at_50%_15%,rgba(6,182,212,0.1),transparent)]'
-        }`}
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_20%,rgba(6,182,212,0.06),transparent)]"
         aria-hidden="true"
       />
 
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10 max-w-7xl">
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto mb-20">
-          <div
-            className={`inline-flex items-center gap-2 px-4 py-1.5 rounded-full border mb-4 backdrop-blur-xl ${
-              mode === 'dark'
-                ? 'bg-cyan-500/10 border-cyan-500/30 text-cyan-400 shadow-[0_0_20px_rgba(6,182,212,0.15)]'
-                : 'bg-cyan-500/15 border-cyan-500/40 text-cyan-800 shadow-sm'
-            }`}
-          >
-            <Sparkles className={`w-3.5 h-3.5 ${mode === 'dark' ? 'text-cyan-400' : 'text-cyan-700'}`} />
-            <span
-              className={`font-bold ${
-                isAr ? 'text-xs tracking-normal' : 'text-xs uppercase tracking-widest'
-              }`}
-            >
-              {t('PLATFORM ARCHITECTURE & CAPABILITIES', 'بنية المنصة والقدرات التشغيلية الذكية')[language]}
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border mb-4 backdrop-blur-xl bg-cyan-500/10 border-cyan-500/30 text-cyan-400 shadow-[0_0_20px_rgba(6,182,212,0.15)]">
+            <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
+            <span className={`font-bold ${isAr ? 'text-xs tracking-normal' : 'text-xs uppercase tracking-widest'}`}>
+              {t('Autonomous Land Platform Architecture', 'بنية منصة النقل البري المستقلة')[language]}
             </span>
           </div>
-          <h2
-            className={`text-3xl sm:text-5xl font-extrabold tracking-tight mb-5 leading-tight ${
-              mode === 'dark' ? 'text-white' : 'text-slate-900'
-            }`}
-          >
-            {t('Engineered for Autonomous Scale', 'مُهندسة للتوسع والتشغيل المستقل')[language]}
+
+          <h2 className="text-3xl sm:text-5xl font-black tracking-tight mb-4">
+            {t('Engineered for Absolute Precision', 'هندسة فائقة الدقة والاعتمادية')[language]}
           </h2>
-          <p
-            className={`text-base sm:text-lg leading-relaxed ${
-              mode === 'dark' ? 'text-slate-300' : 'text-slate-700'
-            }`}
-          >
-            {
-              t(
-                'Six purpose-built intelligence pillars powering end-to-end supply chain orchestration with unprecedented precision, zero data lag, and verified physical execution.',
-                'ست ركائز تقنية ذكية متخصصة تقود سلاسل التوريد المتكاملة بأقصى درجات الدقة، بدون تأخير بيانات، مع تنفيذ ميداني موثوق.',
-              )[language]
-            }
+
+          <p className="text-base sm:text-lg text-slate-400 leading-relaxed">
+            {t(
+              'A unified operating system combining real-time arterial highway routing, zero-trust telemetry, and robotic warehouse fulfillment into a continuous digital twin.',
+              'نظام تشغيل لوجستي موحد يجمع التوجيه الشرياني الآني، مستشعرات الأمان المشفرة، والتجهيز الآلي للمستودعات في توأم رقمي مستمر.',
+            )[language]}
           </p>
         </div>
 
-        {/* 6-Card Zero-Color Optical Diamond Glassmorphism Grid */}
+        {/* 6 Capabilities Cards Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-          {CAPABILITY_CARDS.map((card, i) => {
+          {CAPABILITY_CARDS.map((card, idx) => {
             const Icon = card.icon
             return (
               <motion.div
                 key={card.id}
-                custom={i}
+                custom={idx}
+                variants={cardVariants}
                 initial="hidden"
                 whileInView="visible"
-                viewport={{ once: true, margin: '-60px' }}
-                variants={cardVariants}
-                whileHover={{ y: -6, scale: 1.012 }}
-                transition={{ duration: 0.3, ease: 'easeOut' }}
-                className={`group relative rounded-3xl p-7 flex flex-col justify-between overflow-hidden transition-all duration-400 ${
+                viewport={{ once: true, margin: '-50px' }}
+                className={`group relative rounded-3xl p-6 sm:p-7 flex flex-col justify-between transition-all duration-300 border backdrop-blur-2xl ${
                   mode === 'dark'
-                    ? 'border border-white/10 hover:border-cyan-400/50 bg-white/[0.025] backdrop-blur-2xl shadow-[0_8px_32px_0_rgba(0,0,0,0.37),inset_0_1px_1px_0_rgba(255,255,255,0.1)]'
-                    : 'border border-slate-300/80 hover:border-cyan-500/60 bg-white/75 backdrop-blur-2xl shadow-[0_8px_32px_0_rgba(15,23,42,0.06),inset_0_1px_1px_0_rgba(255,255,255,0.9)]'
+                    ? 'bg-white/[0.025] border-white/10 hover:border-cyan-400/40 shadow-[0_8px_32px_0_rgba(0,0,0,0.37)] hover:shadow-[0_0_30px_rgba(6,182,212,0.15)]'
+                    : 'bg-white/80 border-slate-200 shadow-lg hover:border-cyan-500/40 hover:shadow-xl'
                 }`}
               >
-                {/* Specular Top Reflection Line */}
+                {/* Specular Top Reflection */}
                 <div
-                  className="absolute inset-x-0 top-0 h-[1.5px] bg-gradient-to-r from-transparent via-white/40 dark:via-cyan-400/40 to-transparent pointer-events-none"
+                  className="absolute inset-x-0 top-0 h-[1.5px] bg-gradient-to-r from-transparent via-cyan-400/40 to-transparent pointer-events-none"
                   aria-hidden="true"
                 />
 
-                {/* Card Header */}
                 <div>
+                  {/* Card Top: Number & Icon */}
                   <div className="flex items-center justify-between mb-5">
-                    <div
-                      className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-transform duration-300 group-hover:scale-110 ${
-                        mode === 'dark'
-                          ? 'bg-white/[0.04] text-cyan-300 border border-white/15 shadow-[0_0_15px_rgba(6,182,212,0.2)]'
-                          : 'bg-cyan-50 text-cyan-800 border border-cyan-200/80 shadow-xs'
-                      }`}
-                    >
-                      <Icon className="w-6 h-6" />
-                    </div>
-                    <span
-                      className={`font-mono text-xs font-extrabold px-3 py-1 rounded-full border ${
-                        mode === 'dark'
-                          ? 'bg-white/[0.03] border-white/10 text-cyan-400'
-                          : 'bg-slate-100 border-slate-200 text-cyan-900'
-                      }`}
-                    >
+                    <span className="font-mono text-2xl font-black text-cyan-400/40 group-hover:text-cyan-400 transition-colors duration-300">
                       {card.indexNumber}
                     </span>
+                    <div className="w-10 h-10 rounded-2xl bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                      <Icon className="w-5 h-5" />
+                    </div>
                   </div>
 
-                  {/* Eyebrow / Kicker */}
-                  <span
-                    className={`block font-bold mb-1.5 uppercase ${
-                      isAr ? 'text-xs tracking-normal' : 'text-xs tracking-wider'
-                    } ${mode === 'dark' ? 'text-cyan-400' : 'text-cyan-800'}`}
-                  >
+                  {/* Kicker & Title */}
+                  <span className="font-mono text-xs font-bold uppercase tracking-wider text-[#D3EE22] block mb-1">
                     {card.kicker[language]}
                   </span>
-
-                  {/* Title */}
-                  <h3
-                    className={`text-xl font-bold mb-2 tracking-tight ${
-                      mode === 'dark' ? 'text-white' : 'text-slate-900'
-                    }`}
-                  >
+                  <h3 className="text-xl font-bold tracking-tight mb-2 text-white">
                     {card.title[language]}
                   </h3>
-
-                  {/* Tagline */}
-                  <p
-                    className={`text-xs font-semibold mb-3 ${
-                      mode === 'dark' ? 'text-slate-400' : 'text-slate-600'
-                    }`}
-                  >
+                  <p className="text-xs font-semibold text-cyan-300/90 mb-3">
                     {card.tagline[language]}
                   </p>
-
-                  {/* Body Description */}
-                  <p
-                    className={`text-xs sm:text-sm leading-relaxed mb-6 ${
-                      mode === 'dark' ? 'text-slate-300' : 'text-slate-700'
-                    }`}
-                  >
+                  <p className="text-xs sm:text-sm text-slate-300 leading-relaxed mb-6">
                     {card.description[language]}
                   </p>
                 </div>
 
-                {/* Micro-Visual Interactive HUD & Specs Matrix */}
-                <div className="space-y-4 pt-4 border-t border-white/[0.08] dark:border-white/[0.08]">
-                  {/* Interactive Visual Graphic */}
-                  {renderMicroVisual(card.interactiveType)}
+                <div>
+                  {/* Micro Visual */}
+                  <div className="mb-6">
+                    {renderMicroVisual(card.interactiveType)}
+                  </div>
 
-                  {/* Specification Chips with Physics Rolling Numbers */}
-                  <div className="grid grid-cols-2 gap-2.5">
-                    {card.specs.map((spec, specIdx) => (
-                      <div
-                        key={specIdx}
-                        className={`p-2.5 rounded-xl border backdrop-blur-xl ${
-                          mode === 'dark'
-                            ? 'bg-white/[0.02] border-white/10'
-                            : 'bg-white/60 border-slate-200'
-                        }`}
-                      >
-                        <span
-                          className={`block text-[10px] font-semibold uppercase mb-0.5 ${
-                            mode === 'dark' ? 'text-slate-400' : 'text-slate-600'
-                          }`}
-                        >
+                  {/* Specs Counters Grid */}
+                  <div className="grid grid-cols-2 gap-3 pt-4 border-t border-white/10">
+                    {card.specs.map((spec, sIdx) => (
+                      <div key={sIdx} className="flex flex-col">
+                        <span className="text-[10px] font-mono text-slate-400 mb-0.5">
                           {spec.label[language]}
                         </span>
-                        <div
-                          dir="ltr"
-                          className={`font-mono text-xs font-extrabold ${
-                            mode === 'dark' ? 'text-cyan-300' : 'text-cyan-900'
-                          }`}
-                        >
-                          {typeof spec.numValue === 'number' ? (
-                            <DynamicCounter
-                              value={spec.numValue}
-                              decimals={spec.decimals}
-                              prefix={spec.prefix}
-                              suffix={spec.suffix}
-                            />
-                          ) : (
-                            spec.value
-                          )}
+                        <div className="text-base sm:text-lg font-mono font-black text-white">
+                          <DynamicCounter
+                            value={spec.numValue || 0}
+                            decimals={spec.decimals || 0}
+                            prefix={spec.prefix || ''}
+                            suffix={spec.suffix || ''}
+                          />
                         </div>
                       </div>
                     ))}
                   </div>
-
-                  {/* Action Link */}
-                  <div className="flex items-center justify-between pt-1">
-                    <span
-                      className={`text-xs font-bold transition-colors flex items-center gap-1.5 ${
-                        mode === 'dark'
-                          ? 'text-slate-400 group-hover:text-cyan-300'
-                          : 'text-slate-600 group-hover:text-cyan-800'
-                      }`}
-                    >
-                      {t('Explore Capability Architecture', 'استكشف البنية التقنية')[language]}
-                      <ArrowIcon className="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" />
-                    </span>
-                  </div>
                 </div>
+
               </motion.div>
             )
           })}
         </div>
+
       </div>
     </section>
   )
