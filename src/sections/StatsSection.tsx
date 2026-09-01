@@ -56,9 +56,9 @@ export default function StatsSection() {
       suffix: '+',
       unit: 'HUBS',
       icon: Globe,
-      status: t('GLOBAL COMMAND', 'قيادة لوجستية عالمية'),
-      label: t('International Trade Corridors', 'الممرات اللوجستية الدولية'),
-      description: t('Unified multimodal air, ocean, and overland hubs', 'مراكز موحدة متعددة الوسائط جوياً وبحرياً وبرياً'),
+      status: t('HIGHWAY COMMAND', 'قيادة الطرق والشحن'),
+      label: t('Arterial Highway Corridors & Inland Hubs', 'الممرات الشريانية والمراكز اللوجستية الجافة'),
+      description: t('Unified terrestrial freight highways and smart cross-dock logistics networks', 'شبكات الطرق السريعة للشحن البري ومراكز الفرز الذكية'),
     },
     {
       numValue: 1.2,
@@ -149,7 +149,10 @@ export default function StatsSection() {
                         {stat.status[language]}
                       </span>
                     </div>
-                    <Icon className="w-4 h-4 text-slate-400 group-hover:text-cyan-400 transition-colors" />
+                    <Icon 
+                      className="w-4 h-4 transition-colors" 
+                      style={{ color: ['#e7ca00', '#53fffc', '#2ee46a', '#0054d0'][index] }}
+                    />
                   </div>
 
                   {/* Physics-Based Rolling Metric Counter */}

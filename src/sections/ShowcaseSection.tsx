@@ -11,16 +11,16 @@ const t = (en: string, ar: string) => ({ en, ar })
 const showcaseItems = [
   {
     id: 'global-hub',
-    videoSrc: '/videos/mainlandbackground.mp4',
-    badge: t('Air · Land · Oceans', 'جو · بر · بحر'),
+    videoSrc: '/assets/mainlandbackground.mp4',
+    badge: t('Arterial Highways & Inland Hubs', 'الشحن الشرياني والمراكز الجافة'),
     icon: Building2,
     title: t(
-      'Global Multimodal Command Center',
-      'مركز القيادة والتحكم متعدد الوسائط العالمي',
+      'Autonomous Land Logistics Command Center',
+      'مركز التحكم والقيادة للشحن البري المستقل',
     ),
     description: t(
-      'Unified logistics intelligence platform coordinating air freight, container vessels, and smart highway trucks across international trade corridors.',
-      'منظومة ذكاء لوجستي موحدة لتنسيق الشحن الجوي، سفن الحاويات، وشاحنات الطرق الذكية عبر الممرات التجارية الدولية.',
+      'Unified terrestrial intelligence platform coordinating autonomous truck fleets, automated cross-dock terminals, and smart warehousing matrices across regional freight corridors.',
+      'منظومة ذكاء لوجستي بري موحدة لتنسيق أساطيل الشاحنات المستقلة وأرصفة التفريغ المؤتمتة ومراكز التوزيع الذكية عبر ممرات الشحن الإقليمية.',
     ),
     tag: t('Command Hub // 6G Stream', 'مركز التحكم // بث مباشر 6G'),
     streamStatus: 'LIVE // 60 FPS 4K',
@@ -55,8 +55,8 @@ export default function ShowcaseSection() {
     kicker: t('Field Deployments & Infrastructure', 'الانتشار الميداني والبنية التحتية'),
     title: t('Operational Architecture in Action', 'الهندسة التشغيلية في الميدان'),
     subtitle: t(
-      'Visual overview of YASLOGIST intelligent facilities, multimodal hubs, and connected road assets.',
-      'نظرة بصرية على منشآت ياسلوجيست الذكية ومراكز الربط متعددة الوسائط والأسطول البري المتصل.',
+      'Visual overview of YASLOGIST intelligent fulfillment facilities, inland logistics hubs, and connected road assets.',
+      'نظرة بصرية على منشآت ياسلوجيست الذكية ومراكز الربط والخدمات اللوجستية الجافة والأسطول البري المتصل.',
     ),
     viewFull: t('Expand Preview', 'عرض البث بالحجم الكامل'),
     close: t('Close', 'إغلاق'),
@@ -126,7 +126,6 @@ export default function ShowcaseSection() {
                     src={item.videoSrc}
                     autoPlay
                     muted
-                    defaultMuted
                     loop
                     playsInline
                     webkit-playsinline="true"
@@ -239,7 +238,6 @@ export default function ShowcaseSection() {
                 src={selectedVideo}
                 autoPlay
                 muted
-                defaultMuted
                 loop
                 playsInline
                 webkit-playsinline="true"

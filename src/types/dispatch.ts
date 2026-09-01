@@ -1,7 +1,11 @@
 import type { LucideIcon } from 'lucide-react'
 import type { BilingualText } from './land-logistics'
 
-export type TransportModeId = 'electric-truck' | 'supersonic-air' | 'ocean-vessel'
+export type TransportModeId =
+  | 'electric-truck'
+  | 'electric-platoon'
+  | 'ltl-crossdock'
+  | 'heavy-haul-ftl'
 
 export interface TransportModeOption {
   id: TransportModeId
@@ -14,7 +18,12 @@ export interface TransportModeOption {
   emissionsFactor: number // kg CO2 per ton-km
 }
 
-export type CargoClassId = 'pharma-cryo' | 'high-tech' | 'heavy-industrial' | 'perishable'
+export type CargoClassId =
+  | 'pharma-coldchain'
+  | 'high-tech-sealed'
+  | 'heavy-industrial'
+  | 'fast-fmcg'
+  | 'hazardous-hazmat'
 
 export interface CargoClassOption {
   id: CargoClassId
@@ -37,7 +46,7 @@ export interface TradeCorridorOption {
   customsManifestType: BilingualText
   waypoints: {
     name: string
-    coordinates: [number, number] // Percentage coordinates for SVG digital twin map [x%, y%]
+    coordinates: [number, number]
     status: 'clear' | 'active' | 'synced'
   }[]
 }

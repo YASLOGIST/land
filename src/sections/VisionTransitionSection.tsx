@@ -3,47 +3,65 @@
 import { motion } from 'framer-motion'
 import { useTheme } from 'next-themes'
 import { useLanguage } from '@/hooks/use-language'
-import { Plane, Truck, Anchor, ArrowDown, Shield, Cpu, Globe2 } from 'lucide-react'
+import { Truck, Network, Warehouse, ArrowDown, ShieldCheck, Cpu, Building2 } from 'lucide-react'
 
 const t = (en: string, ar: string) => ({ en, ar })
 
 const visionCopy = {
   kicker: t(
-    'THE MONOCHROME ARCHITECTURE // MULTIMODAL HORIZON',
-    'الهندسة الأحادية // أفق النقل متعدد الوسائط'
+    'SOVEREIGN TERRESTRIAL ARCHITECTURE // ROAD FREIGHT & WAREHOUSING',
+    'الهندسة الأرضية السيادية // الشحن البري والتخزين الذكي'
   ),
   headline: t(
-    'Bridging Continents Through Sovereign Supply Chain Networks',
-    'ربط القارات عبر شبكات إمداد سيادية ذكية فائقة الدقة'
+    'Engineering Sovereign Ground Logistics & Smart Fulfillment',
+    'هندسة اللوجستيات البرية السيادية وحلول التخزين والتوزيع الذكية'
   ),
   subheadline: t(
-    'Unifying supersonic air corridors, deepwater maritime fairways, and autonomous electric highway fleets into one synchronized, zero-loss digital twin.',
-    'توحيد الممرات الجوية فائقة السرعة، المسارات البحرية العميقة، والأساطيل البرية الكهربائية المستقلة في توأم رقمي متزامن وخالٍ من الفقدان.'
+    'Unifying autonomous heavy haulage, high-density cross-dock networks, and AI-orchestrated fulfillment hubs into one synchronized, zero-loss digital twin.',
+    'توحيد النقل البري الثقيل المستقل، شبكات التفريغ المباشر فائقة الكثافة، ومراكز التوزيع المؤتمتة بالذكاء الاصطناعي في توأم رقمي متزامن وخالٍ من الفقدان.'
   ),
   pillars: [
     {
-      icon: Plane,
-      code: 'AIR-01',
-      title: t('Skyward Velocity', 'السرعة الجوية'),
-      desc: t('FL280–FL410 jetstream routing with real-time cryogenic cargo clearance.', 'توجيه نفاث عبر مستويات الطيران مع تخليص فوري للشحنات الحساسة.'),
-    },
-    {
       icon: Truck,
-      code: 'LAND-02',
-      title: t('Autonomous Ground Grid', 'الشبكة البرية الذكية'),
-      desc: t('Platooned electric heavy freight with automated robotic dock synchronization.', 'قوافل نقل ثقيل كهربائية مع مزامنة روبوتية مؤتمتة على الأرصفة.'),
+      code: 'FLEET-01',
+      title: t(
+        'Autonomous Heavy Haulage (FTL & LTL Dedicated)',
+        'النقل الثقيل الذكي والمستقل (شاحنات كاملة FTL ومجزأة LTL)'
+      ),
+      desc: t(
+        'AI-orchestrated long-haul arterial convoys, dynamic capacity allocation, and connected V2X highway platoons.',
+        'قوافل برية ذكية للمسافات الطويلة، تخصيص ديناميكي للحمولات، ومجموعات شاحنات متصلة بنظام V2X عبر الطرق السريعة.'
+      ),
     },
     {
-      icon: Anchor,
-      code: 'SEA-03',
-      title: t('Deepwater Mastery', 'الريادة البحرية'),
-      desc: t('Bathymetry-optimized fairways bypassing global choke points with zero dwell.', 'مسارات بحرية محسنة تتجاوز الاختناقات الملاحية بزمن توقف صفري.'),
+      icon: Network,
+      code: 'GRID-02',
+      title: t(
+        'Autonomous Ground & Cross-Dock Mesh',
+        'الشبكة البرية المستقلة ومصفوفة التفريغ المباشر Cross-Dock'
+      ),
+      desc: t(
+        'Sub-minute automated pallet sortation, dynamic bypass routing, and zero-dwell inland dry port customs clearance.',
+        'فرز آلي للمنصات في أجزاء من الدقيقة، توجيه ذكي لتجاوز الازدحام، وتخليص جمركي فوري بالموانئ الجافة.'
+      ),
+    },
+    {
+      icon: Warehouse,
+      code: 'WH-03',
+      title: t(
+        'Smart Distribution Hubs & Cold-Chain Warehousing',
+        'مراكز التوزيع الذكية ومستودعات التبريد الفائق Cold-Chain'
+      ),
+      desc: t(
+        'Autonomous mobile robot (AMR) high-bay fulfillment, cryptographic seal tracking, and active cryogenic temperature locks.',
+        'تخزين وتجهيز آلي بروبوتات AMR، أقفال مشفرة للحاويات، وتثبيت حراري متقدم لسلاسل التبريد الحساسة.'
+      ),
     },
   ],
   metricBadges: [
-    { label: t('ZERO-LOSS SLA', 'صفر فقدان معتمد'), val: '99.99%', icon: Shield },
+    { label: t('ZERO-LOSS SLA', 'صفر فقدان معتمد'), val: '99.99%', icon: ShieldCheck },
     { label: t('TELEMETRY MESH', 'شبكة القياس اللحظي'), val: '6G SYNC', icon: Cpu },
-    { label: t('GLOBAL REACH', 'الانتشار العالمي'), val: '120+ HUBS', icon: Globe2 },
+    { label: t('LOGISTICS REACH', 'الانتشار اللوجستي'), val: '40+ CORRIDORS', icon: Building2 },
   ],
   scrollDown: t('Proceed to 3-Phase Operational Simulation', 'انتقل إلى محاكاة العمليات ثلاثية المراحل'),
 }
@@ -63,41 +81,17 @@ export default function VisionTransitionSection() {
           : 'bg-white text-slate-950 border-slate-200'
       }`}
     >
-      {/* Subtle Monochrome Vignette */}
+      {/* Subtle Vignette */}
       <div
         className={`absolute inset-0 pointer-events-none transition-opacity duration-500 ${
           mode === 'dark'
-            ? 'bg-[radial-gradient(ellipse_70%_50%_at_50%_50%,rgba(255,255,255,0.04),transparent)]'
+            ? 'bg-[radial-gradient(ellipse_70%_50%_at_50%_50%,rgba(6,182,212,0.05),transparent)]'
             : 'bg-[radial-gradient(ellipse_70%_50%_at_50%_50%,rgba(6,182,212,0.04),transparent)]'
         }`}
       />
 
       <div className="relative z-10 container mx-auto max-w-6xl flex flex-col items-center text-center">
         
-        {/* Section Kicker */}
-        <motion.div
-          initial={{ opacity: 0, y: 15 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5 }}
-          className="mb-3"
-        >
-          <span
-            className={`inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-mono font-bold tracking-[0.25em] uppercase border ${
-              mode === 'dark'
-                ? 'bg-white/[0.06] border-white/20 text-zinc-300'
-                : 'bg-slate-100 border-slate-300 text-slate-700'
-            }`}
-          >
-            <span
-              className={`w-2 h-2 rounded-full animate-pulse ${
-                mode === 'dark' ? 'bg-white' : 'bg-cyan-600'
-              }`}
-            />
-            {visionCopy.kicker[language]}
-          </span>
-        </motion.div>
-
         {/* Headline */}
         <motion.h2
           initial={{ opacity: 0, y: 20 }}
@@ -118,13 +112,13 @@ export default function VisionTransitionSection() {
           viewport={{ once: true }}
           transition={{ duration: 0.65, delay: 0.2 }}
           className={`text-sm sm:text-base md:text-lg font-normal max-w-3xl leading-relaxed mb-10 ${
-            mode === 'dark' ? 'text-zinc-400' : 'text-slate-600'
+            mode === 'dark' ? 'text-slate-300' : 'text-slate-600'
           }`}
         >
           {visionCopy.subheadline[language]}
         </motion.p>
 
-        {/* 3 Multimodal Transport Capability Pillars */}
+        {/* 3 Core Capability Pillars (Refactored Triad) */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5 w-full max-w-5xl mb-10 text-start">
           {visionCopy.pillars.map((pillar, idx) => {
             const Icon = pillar.icon
@@ -137,49 +131,45 @@ export default function VisionTransitionSection() {
                 transition={{ duration: 0.5, delay: 0.2 + idx * 0.08 }}
                 className={`relative rounded-3xl p-5 sm:p-6 border backdrop-blur-2xl transition-all duration-300 group flex flex-col justify-between ${
                   mode === 'dark'
-                    ? 'bg-zinc-950/80 border-white/15 hover:border-white/40 shadow-[0_10px_30px_rgba(0,0,0,0.8)]'
-                    : 'bg-slate-50 border-slate-200/90 hover:border-slate-300 shadow-sm'
+                    ? 'bg-slate-950/80 border-white/15 hover:border-cyan-400/40 shadow-[0_10px_30px_rgba(0,0,0,0.8)] hover:shadow-[0_0_30px_rgba(6,182,212,0.15)]'
+                    : 'bg-slate-50 border-slate-200/90 hover:border-cyan-500/40 shadow-sm'
                 }`}
               >
                 {/* Specular Top Reflection */}
                 <div
                   className={`absolute inset-x-0 top-0 h-[1px] pointer-events-none ${
                     mode === 'dark'
-                      ? 'bg-gradient-to-r from-transparent via-white/30 to-transparent'
-                      : 'bg-gradient-to-r from-transparent via-slate-300 to-transparent'
+                      ? 'bg-gradient-to-r from-transparent via-cyan-400/30 to-transparent'
+                      : 'bg-gradient-to-r from-transparent via-cyan-500/20 to-transparent'
                   }`}
                 />
 
                 <div>
                   <div className="flex items-center justify-between mb-3.5">
                     <div
-                      className={`w-9 h-9 rounded-2xl border flex items-center justify-center transition-colors duration-300 ${
+                      className={`w-10 h-10 rounded-2xl border flex items-center justify-center transition-all duration-300 ${
                         mode === 'dark'
-                          ? 'bg-white/10 border-white/20 text-white group-hover:bg-white group-hover:text-black'
-                          : 'bg-slate-200/80 border-slate-300 text-slate-900 group-hover:bg-slate-900 group-hover:text-white'
+                          ? 'bg-cyan-500/10 border-cyan-500/30 text-cyan-300 group-hover:bg-cyan-500 group-hover:text-slate-950'
+                          : 'bg-cyan-50 border-cyan-200 text-cyan-700 group-hover:bg-cyan-600 group-hover:text-white'
                       }`}
                     >
-                      <Icon className="w-4.5 h-4.5" />
+                      <Icon className="w-5 h-5" />
                     </div>
-                    <span
-                      className={`font-mono text-xs font-bold tracking-widest ${
-                        mode === 'dark' ? 'text-zinc-500' : 'text-slate-400'
-                      }`}
-                    >
+                    <span className="font-mono text-xs font-bold tracking-widest text-[#D3EE22]">
                       {pillar.code}
                     </span>
                   </div>
 
                   <h3
-                    className={`text-base font-bold mb-1.5 ${
+                    className={`text-base sm:text-lg font-bold mb-2 ${
                       mode === 'dark' ? 'text-white' : 'text-slate-950'
                     }`}
                   >
                     {pillar.title[language]}
                   </h3>
                   <p
-                    className={`text-xs leading-relaxed ${
-                      mode === 'dark' ? 'text-zinc-400' : 'text-slate-600'
+                    className={`text-xs sm:text-sm leading-relaxed ${
+                      mode === 'dark' ? 'text-slate-300' : 'text-slate-600'
                     }`}
                   >
                     {pillar.desc[language]}
@@ -187,15 +177,16 @@ export default function VisionTransitionSection() {
                 </div>
 
                 <div
-                  className={`mt-4 pt-2.5 border-t flex items-center justify-between text-[10px] font-mono ${
+                  className={`mt-5 pt-3 border-t flex items-center justify-between text-[11px] font-mono ${
                     mode === 'dark'
-                      ? 'border-white/10 text-zinc-500'
+                      ? 'border-white/10 text-slate-400'
                       : 'border-slate-200 text-slate-500'
                   }`}
                 >
-                  <span>6G LINK ACTIVE</span>
-                  <span className={`font-bold ${mode === 'dark' ? 'text-white' : 'text-slate-900'}`}>
-                    100% READY
+                  <span>6G TELEMETRY</span>
+                  <span className="font-bold text-emerald-400 flex items-center gap-1">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                    100% OPERATIONAL
                   </span>
                 </div>
               </motion.div>
@@ -209,9 +200,9 @@ export default function VisionTransitionSection() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5, delay: 0.35 }}
-          className={`flex flex-wrap items-center justify-center gap-4 sm:gap-8 p-3.5 rounded-2xl border backdrop-blur-xl mb-8 ${
+          className={`flex flex-wrap items-center justify-center gap-4 sm:gap-8 p-3.5 sm:p-4 rounded-2xl border backdrop-blur-xl mb-8 ${
             mode === 'dark'
-              ? 'bg-zinc-950/90 border-white/15'
+              ? 'bg-slate-900/90 border-white/15'
               : 'bg-slate-100 border-slate-200'
           }`}
         >
@@ -221,13 +212,13 @@ export default function VisionTransitionSection() {
               <div key={i} className="flex items-center gap-2.5 px-3 py-1">
                 <BadgeIcon
                   className={`w-4 h-4 ${
-                    mode === 'dark' ? 'text-zinc-400' : 'text-slate-500'
+                    mode === 'dark' ? 'text-cyan-400' : 'text-cyan-600'
                   }`}
                 />
                 <div className="text-start font-mono">
                   <span
-                    className={`text-[9.5px] block leading-tight ${
-                      mode === 'dark' ? 'text-zinc-500' : 'text-slate-500'
+                    className={`text-[10px] block leading-tight ${
+                      mode === 'dark' ? 'text-slate-400' : 'text-slate-500'
                     }`}
                   >
                     {badge.label[language]}
@@ -254,14 +245,14 @@ export default function VisionTransitionSection() {
           transition={{ duration: 0.5, delay: 0.4 }}
           className={`group inline-flex items-center gap-2 text-xs font-mono font-bold transition-colors ${
             mode === 'dark'
-              ? 'text-zinc-400 hover:text-white'
+              ? 'text-slate-300 hover:text-white'
               : 'text-slate-600 hover:text-slate-900'
           }`}
         >
           <span>{visionCopy.scrollDown[language]}</span>
           <ArrowDown
             className={`w-3.5 h-3.5 animate-bounce ${
-              mode === 'dark' ? 'text-white' : 'text-slate-900'
+              mode === 'dark' ? 'text-[#D3EE22]' : 'text-cyan-600'
             }`}
           />
         </motion.a>
@@ -270,4 +261,3 @@ export default function VisionTransitionSection() {
     </section>
   )
 }
-
