@@ -8,6 +8,7 @@ import Footer from '@/components/Footer'
 // Dynamic lazy imports for heavy GIS simulation components and secondary modules
 const CapabilitiesSection = lazy(() => import('@/sections/CapabilitiesSection'))
 const StatsSection = lazy(() => import('@/sections/StatsSection'))
+const DashboardOverviewSection = lazy(() => import('@/sections/DashboardOverviewSection'))
 const CorridorDispatchSection = lazy(() => import('@/sections/CorridorDispatchSection'))
 const DisruptionCommandSection = lazy(() => import('@/sections/DisruptionCommandSection'))
 const ShowcaseSection = lazy(() => import('@/sections/ShowcaseSection'))
@@ -33,6 +34,7 @@ export default function Home() {
       <Suspense fallback={<SectionLoadingFallback />}>
         <CapabilitiesSection />
         <StatsSection />
+        <DashboardOverviewSection />
         <CorridorDispatchSection />
         <DisruptionCommandSection />
         <ShowcaseSection />
