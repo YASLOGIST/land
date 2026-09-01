@@ -69,6 +69,7 @@ export default function HeroSection() {
     video.pause()
 
     let isMounted = true
+    const isLoopingRef = { current: false }
 
     // Smooth RAF loop: strictly interpolates progress and seeks video.currentTime
     const renderLoop = () => {
@@ -78,9 +79,12 @@ export default function HeroSection() {
       const curP = currentProgressRef.current
       const diff = targetP - curP
 
+      let continueLoop = false
+
       // Fluid lerp for forward and reverse scrubbing
       if (Math.abs(diff) > 0.0002) {
-        currentProgressRef.current += diff * 0.28
+        currentProgressRef.current += diff * 0.22 // Softer, ultra-smooth interpolation rate
+        continueLoop = true
       } else {
         currentProgressRef.current = targetP
       }
@@ -106,10 +110,22 @@ export default function HeroSection() {
         timelineBarRef.current.style.width = `${pct}%`
       }
 
-      animFrameIdRef.current = requestAnimationFrame(renderLoop)
+      if (continueLoop) {
+        animFrameIdRef.current = requestAnimationFrame(renderLoop)
+      } else {
+        isLoopingRef.current = false
+      }
     }
 
-    animFrameIdRef.current = requestAnimationFrame(renderLoop)
+    const startLoop = () => {
+      if (!isLoopingRef.current) {
+        isLoopingRef.current = true
+        animFrameIdRef.current = requestAnimationFrame(renderLoop)
+      }
+    }
+
+    // Initial trigger
+    startLoop()
 
     // Robust GSAP ScrollTrigger with true pinning and pinSpacing
     const trigger = ScrollTrigger.create({
@@ -122,6 +138,7 @@ export default function HeroSection() {
       scrub: 0.5,
       onUpdate: (self) => {
         targetProgressRef.current = self.progress
+        startLoop()
       },
     })
     scrollTriggerRef.current = trigger
@@ -309,7 +326,18 @@ export default function HeroSection() {
             initial={{ opacity: 0, scale: 0.94, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.35, ease: [0.22, 1, 0.36, 1] }}
-            className="h-[137px] w-auto min-w-[280px] max-w-xs p-3.5 sm:p-4 rounded-2xl border border-cyan-500/20 bg-slate-950/80 backdrop-blur-2xl transition-all duration-300 shadow-[0_16px_40px_rgba(0,0,0,0.7),inset_0_1px_1.5px_rgba(255,255,255,0.15)] hover:border-cyan-400/40"
+            className="w-auto min-w-[280px] max-w-xs p-3.5 sm:p-4 rounded-2xl border border-cyan-500/20 bg-slate-950/80 backdrop-blur-2xl transition-all duration-300 shadow-[0_16px_40px_rgba(0,0,0,0.7),inset_0_1px_1.5px_rgba(255,255,255,0.15)] hover:border-cyan-400/40"
+            style={{
+              width: '312.234375px',
+              height: '136px',
+              paddingLeft: '25px',
+              paddingRight: '12px',
+              paddingBottom: '28px',
+              marginLeft: '7px',
+              marginBottom: '13px',
+              marginRight: '-16px',
+              marginTop: '-2px'
+            }}
           >
             {/* Specular Top Reflection Line */}
             <div
@@ -340,7 +368,13 @@ export default function HeroSection() {
                 {/* Name: Ahmed Yasser Ali */}
                 <h3 
                   className="font-extrabold text-white tracking-tight leading-tight mt-0.5"
-                  style={{ fontFamily: 'Aref Ruqaa', fontStyle: 'normal', fontSize: '19px' }}
+                  style={{
+                    fontFamily: 'Aref Ruqaa',
+                    fontStyle: 'normal',
+                    fontSize: '17px',
+                    fontWeight: 'normal',
+                    lineHeight: '30.75px'
+                  }}
                 >
                   {content.founder.name[language]}
                 </h3>

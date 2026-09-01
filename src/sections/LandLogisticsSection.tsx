@@ -181,6 +181,7 @@ export default function LandLogisticsSection({
     gsap.registerPlugin(ScrollTrigger)
 
     let isRunning = true
+    const isLoopingRef = { current: false }
 
     const renderLoop = () => {
       if (!isRunning) return
@@ -189,9 +190,12 @@ export default function LandLogisticsSection({
       const curP = currentProgressRef.current
       const diff = targetP - curP
 
+      let continueLoop = false
+
       // Snappy & responsive lerp interpolation for forward & reverse scrolling
       if (Math.abs(diff) > 0.0002) {
-        currentProgressRef.current += diff * 0.28
+        currentProgressRef.current += diff * 0.22 // Smoother, lighter lerping weight
+        continueLoop = true
       } else {
         currentProgressRef.current = targetP
       }
@@ -221,10 +225,22 @@ export default function LandLogisticsSection({
         telemetryTimeSpanRef.current.textContent = `T+${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}.${millis.toString().padStart(2, '0')}`
       }
 
-      animFrameIdRef.current = requestAnimationFrame(renderLoop)
+      if (continueLoop) {
+        animFrameIdRef.current = requestAnimationFrame(renderLoop)
+      } else {
+        isLoopingRef.current = false
+      }
     }
 
-    animFrameIdRef.current = requestAnimationFrame(renderLoop)
+    const startLoop = () => {
+      if (!isLoopingRef.current) {
+        isLoopingRef.current = true
+        animFrameIdRef.current = requestAnimationFrame(renderLoop)
+      }
+    }
+
+    // Initial trigger
+    startLoop()
 
     const trigger = ScrollTrigger.create({
       trigger: section,
@@ -247,6 +263,7 @@ export default function LandLogisticsSection({
           idx = 0
         }
         updatePhase(idx)
+        startLoop()
       },
     })
     scrollTriggerRef.current = trigger
