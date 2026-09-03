@@ -76,7 +76,7 @@
   body {
     @apply bg-background text-foreground;
     font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
-    font-family: 'Space Grotesk', 'Outfit', system-ui, sans-serif;
+    font-family: 'IBM Plex Sans', system-ui, sans-serif;
   }
 
   /* Universal Arabic Font & Normal Letter-Spacing Rule */
@@ -94,19 +94,19 @@
   [dir="rtl"] button,
   [dir="rtl"] input,
   [dir="rtl"] textarea {
-    font-family: 'Cairo', 'Tajawal', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+    font-family: 'IBM Plex Sans Arabic', 'IBM Plex Sans', system-ui, sans-serif !important;
     letter-spacing: normal !important;
   }
 
   [dir="ltr"],
   [dir="ltr"] body {
-    font-family: 'Space Grotesk', 'Outfit', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-family: 'IBM Plex Sans', system-ui, sans-serif;
   }
 }
 
 /* Monospace Numerals for Technical Figures */
 .font-mono-numbers {
-  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
   font-variant-numeric: tabular-nums;
 }
 
@@ -132,7 +132,11 @@
   font-size: 14px !important;
 }
 
-/* Company Logo Name Brand Font */
+/* Company Logo Name Brand Font — Archivo at main's wordmark width (78%).
+   Tracking is deliberately not set here: the wordmark spans already carry
+   Tailwind's `tracking-tight`, and adding a competing letter-spacing would
+   make the result depend on which rule the cascade happens to emit last. */
 .brand-logo-font {
-  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+  font-family: 'Archivo', system-ui, sans-serif !important;
+  font-stretch: 78%;
 }

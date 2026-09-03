@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useMemo } from 'react'
+import { useState, useMemo } from 'react'
 import { useTheme } from 'next-themes'
 import {
   ResponsiveContainer,
@@ -16,6 +16,7 @@ import {
 } from 'recharts'
 import { useLanguage } from '@/hooks/use-language'
 import { Activity, Cpu, Sliders, RefreshCw } from 'lucide-react'
+import ModelBadge from '@/components/ModelBadge'
 
 // Styled Custom Tooltip for Recharts
 interface CustomTooltipProps {
@@ -171,6 +172,12 @@ export default function DashboardOverviewSection() {
           >
             {ui.subtitle[language]}
           </p>
+
+          {/* The throughput and fleet series plotted below are a generated
+              24-hour profile, not a recorded one. */}
+          <div className="flex justify-center mt-5">
+            <ModelBadge />
+          </div>
         </div>
 
         {/* Command Dashboard Grid */}

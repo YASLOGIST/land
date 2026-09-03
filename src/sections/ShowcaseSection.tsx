@@ -22,7 +22,7 @@ const showcaseItems = [
       'Unified terrestrial intelligence platform coordinating autonomous truck fleets, automated cross-dock terminals, and smart warehousing matrices across regional freight corridors.',
       'منظومة ذكاء لوجستي بري موحدة لتنسيق أساطيل الشاحنات المستقلة وأرصفة التفريغ المؤتمتة ومراكز التوزيع الذكية عبر ممرات الشحن الإقليمية.',
     ),
-    tag: t('Command Hub // 6G Stream', 'مركز التحكم // بث مباشر 6G'),
+    tag: t('Command Hub // Live Stream', 'مركز التحكم // بث مباشر'),
     streamStatus: 'LIVE // 60 FPS 4K',
   },
   {
