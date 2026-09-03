@@ -59,12 +59,12 @@ export interface HighQualityRealMapProps {
   meshNodePingMs?: number
 }
 
-// 6G LEO Satellites Constellation Simulation Coordinates
+// LEO satellite constellation simulation coordinates
 const LEO_SATELLITES = [
-  { id: 'leo-alpha-1', name: '6G-LEO-01 (GEO-SYNC)', lat: 34.0, lon: 45.0, alt: '540 KM', band: 'THz LEO' },
-  { id: 'leo-alpha-2', name: '6G-LEO-02 (POLAR-APEX)', lat: 58.0, lon: -20.0, alt: '560 KM', band: 'Optical Mesh' },
-  { id: 'leo-alpha-3', name: '6G-LEO-03 (PACIFIC-RELAY)', lat: 18.0, lon: 140.0, alt: '530 KM', band: 'THz LEO' },
-  { id: 'leo-alpha-4', name: '6G-LEO-04 (INDIAN-OCEAN)', lat: -5.0, lon: 75.0, alt: '550 KM', band: 'Laser ISL' },
+  { id: 'leo-alpha-1', name: 'LEO-01 (GEO-SYNC)', lat: 34.0, lon: 45.0, alt: '540 KM', band: 'Ka-band LEO' },
+  { id: 'leo-alpha-2', name: 'LEO-02 (POLAR-APEX)', lat: 58.0, lon: -20.0, alt: '560 KM', band: 'Optical Mesh' },
+  { id: 'leo-alpha-3', name: 'LEO-03 (PACIFIC-RELAY)', lat: 18.0, lon: 140.0, alt: '530 KM', band: 'Ka-band LEO' },
+  { id: 'leo-alpha-4', name: 'LEO-04 (INDIAN-OCEAN)', lat: -5.0, lon: 75.0, alt: '550 KM', band: 'Laser ISL' },
 ]
 
 export function HighQualityRealMap({
@@ -171,7 +171,7 @@ export function HighQualityRealMap({
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75" />
               <span className="relative inline-flex rounded-full h-2 w-2 bg-cyan-400 shadow-[0_0_8px_#06b6d4]" />
             </span>
-            <span>6G LAND DIGITAL TWIN // {activeCorridor.code}</span>
+            <span>LAND DIGITAL TWIN // {activeCorridor.code}</span>
           </div>
 
           <span className="hidden md:inline-flex text-[11px] font-mono text-slate-400 items-center gap-1">
@@ -204,7 +204,7 @@ export function HighQualityRealMap({
             }`}
           >
             <Layers className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">6G CYBER VECTOR</span>
+            <span className="hidden sm:inline">CYBER VECTOR</span>
             <span className="sm:hidden">CYBER</span>
           </button>
 
@@ -240,7 +240,7 @@ export function HighQualityRealMap({
           {/* LEO Satellite Overlay Toggle */}
           <button
             onClick={() => setShowSatellites(!showSatellites)}
-            title="Toggle 6G LEO Satellites"
+            title="Toggle LEO Satellites"
             className={`p-2 rounded-xl text-xs font-mono border transition-all flex items-center gap-1 ${
               showSatellites
                 ? 'bg-purple-500/20 text-purple-300 border-purple-500/40'
@@ -266,7 +266,7 @@ export function HighQualityRealMap({
           {/* Heatmap Toggle */}
           <button
             onClick={() => setShowHeatmap(!showHeatmap)}
-            title="Toggle 6G Density Heatmap"
+            title="Toggle Density Heatmap"
             className={`p-2 rounded-xl text-xs font-mono border transition-all flex items-center gap-1 ${
               showHeatmap
                 ? 'bg-rose-500/20 text-rose-300 border-rose-500/40'
@@ -463,7 +463,7 @@ export function HighQualityRealMap({
               </g>
             )}
 
-            {/* 6. Quantitative 6G Data Heatmap Overlay */}
+            {/* 6. Quantitative Data Heatmap Overlay */}
             {showHeatmap && (
               <g className="pointer-events-none transition-opacity duration-500">
                 <circle cx="653.6" cy="180.0" r="65" fill="url(#hq-heatmap-hot)" />
@@ -571,7 +571,7 @@ export function HighQualityRealMap({
                 )
               })}
 
-            {/* 9. 6G LEO Satellites Constellation */}
+            {/* 9. LEO Satellite Constellation */}
             {showSatellites &&
               LEO_SATELLITES.map((sat) => {
                 const [sx, sy] = projectGeo([sat.lon, sat.lat])
@@ -793,7 +793,7 @@ export function HighQualityRealMap({
               <div className="space-y-1.5 text-[11px] text-slate-300 border-t border-white/10 pt-2">
                 <div className="flex justify-between">
                   <span className="text-slate-400">STATUS:</span>
-                  <span className="text-emerald-400 font-bold">ONLINE (6G SYNC)</span>
+                  <span className="text-emerald-400 font-bold">ONLINE (LIVE SYNC)</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-slate-400">THROUGHPUT:</span>

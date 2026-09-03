@@ -3,7 +3,7 @@ import type { BilingualText } from './land-logistics'
 
 export type DisruptionSeverity = 'CRITICAL' | 'HIGH' | 'MODERATE'
 
-export type StrategyModeId = 'speed' | 'cost-esg' | 'zero-loss-cryo'
+export type StrategyModeId = 'speed' | 'cost-esg' | 'cold-chain-reefer'
 
 export interface ContingencyStrategyOption {
   id: StrategyModeId

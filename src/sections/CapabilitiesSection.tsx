@@ -15,6 +15,7 @@ import {
 } from 'lucide-react'
 import { useLanguage } from '@/hooks/use-language'
 import DynamicCounter from '@/components/DynamicCounter'
+import ModelBadge from '@/components/ModelBadge'
 import type { CapabilityCardItem } from '@/types/land-logistics'
 
 const t = (en: string, ar: string) => ({ en, ar })
@@ -140,7 +141,7 @@ function SecurityMicroVisual({ mode }: { mode: 'dark' | 'light' }) {
             mode === 'dark' ? 'text-slate-300' : 'text-slate-700'
           }`}
         >
-          ZERO-LOSS PROTOCOL
+          SEAL + GPS TRACKED
         </span>
       </div>
       <motion.div
@@ -295,33 +296,33 @@ const CAPABILITY_CARDS: CapabilityCardItem[] = [
     id: 'fleet-telemetry',
     indexNumber: '02',
     icon: Radio,
-    kicker: t('Fleet Telemetry', 'القياس عن بُعد للأسطول'),
-    title: t('Omnipresent Fleet Telemetry', 'مستشعرات الأسطول الشاملة'),
-    tagline: t('Continuous sub-meter GPS & sensor mesh', 'تتبع دقيق وشبكة مستشعرات لحظية'),
+    kicker: t('Cold-Chain Precision', 'دقة سلسلة التبريد'),
+    title: t('Cold-Chain Pharma & Perishables Precision', 'دقة سلسلة التبريد للأدوية والمنتجات سريعة التلف'),
+    tagline: t('Continuous temperature & humidity telemetry', 'قياس مستمر للحرارة والرطوبة'),
     description: t(
-      'Direct satellite and 5G IoT links stream temperature, humidity, shock metrics, and fuel consumption across 10,000+ autonomous trucks and smart containers simultaneously.',
-      'روابط مباشرة عبر الأقمار الصناعية وشبكات 5G تبث درجات الحرارة والرطوبة والاهتزازات ومعدلات الوقود لأكثر من 10,000 شاحنة وحاوية ذكية في آن واحد.',
+      'Continuous temperature and humidity telemetry at ±0.2°C sensor precision, with an excursion alert raised the moment a reefer leaves its band — on the leg where no carrier system reports anything.',
+      'قياس مستمر لدرجة الحرارة والرطوبة بدقة ±0.2°م، مع تنبيه فوري بمجرد خروج الشاحنة المبردة عن النطاق المحدد — في المرحلة التي لا يبلّغ عنها أي نظام ناقل.',
     ),
     specs: [
-      { label: t('Mesh Sync Ping', 'زمن استجابة الشبكة'), value: '0.4ms', numValue: 0.4, decimals: 1, suffix: 'ms' },
-      { label: t('Highway Uptime', 'جاهزية الطرق والأسطول'), value: '99.99%', numValue: 99.99, decimals: 2, suffix: '%' },
+      { label: t('Sensor Precision', 'دقة المستشعر'), value: '±0.2°C', numValue: 0.2, decimals: 1, prefix: '±', suffix: '°C' },
+      { label: t('Excursion Alert', 'زمن تنبيه الانحراف'), value: '60s', numValue: 60, suffix: 's' },
     ],
     interactiveType: 'radar',
   },
   {
-    id: 'zero-loss',
+    id: 'customs-acid',
     indexNumber: '03',
     icon: ShieldCheck,
-    kicker: t('Cryptographic Compliance', 'الأمان والامتثال الرقمي'),
-    title: t('Zero-Trust Security & Compliance', 'أمان وانعدام الفقدان (Zero-Trust)'),
-    tagline: t('Hardware-sealed cryptographic chain of custody', 'سلسلة حيازة مشفرة ومحكمة العتاد'),
+    kicker: t('Customs Integration', 'التكامل الجمركي'),
+    title: t('Digital Pre-Clearance & ACID Integration', 'التخليص المسبق والتكامل مع رقم ACID'),
+    tagline: t('Nafeza single-window synchronisation', 'المزامنة مع منظومة نافذة'),
     description: t(
-      'Automated smart locks and biometric seals generate immutable cryptographic verification tokens at every handover checkpoint, eliminating asset tampering and cargo shrinkage completely.',
-      'أقفال ذكية وأختام بيومترية تنشئ رموز تحقق مشفرة غير قابلة للتغيير عند كل نقطة تسليم، مما يمنع التلاعب بالشحنات وفقدان الأصول نهائياً.',
+      'The ACID issued on the Nafeza single window is carried on the shipment record from booking onward, so a declaration still open when the truck reaches the gate is visible before the truck is dispatched, not after it queues.',
+      'رقم ACID الصادر عن منظومة نافذة يُحمل على سجل الشحنة منذ الحجز، فيظهر أي إقرار جمركي ما زال مفتوحاً قبل إرسال الشاحنة إلى البوابة، لا بعد وقوفها في الطابور.',
     ),
     specs: [
-      { label: t('Loss Rate SLA', 'معدل ضمان الفقدان'), value: '0.00%', numValue: 0, decimals: 2, suffix: '%' },
-      { label: t('Digital Pre-clearance', 'تخليص جمركي مسبق'), value: '100%', numValue: 100, suffix: '%' },
+      { label: t('Declaration Check', 'فحص الإقرار'), value: 'Pre-gate', numValue: 0, suffix: '' },
+      { label: t('Reference Types Stitched', 'أنواع المراجع المرتبطة'), value: '7', numValue: 7, suffix: '' },
     ],
     interactiveType: 'security',
   },
@@ -333,12 +334,12 @@ const CAPABILITY_CARDS: CapabilityCardItem[] = [
     title: t('Autonomous Warehouse Robotics', 'أسراب الروبوتات الذاتية (AMR)'),
     tagline: t('High-density AMR swarm automation', 'أتمتة فائقة الكثافة بأسراب الروبوتات'),
     description: t(
-      'Autonomous Mobile Robots (AMRs) seamlessly orchestrate high-density palletizing, picking, batch sorting, and automated dock loading without bottlenecks or operational downtime.',
-      'روبوتات متنقلة ذاتية القيادة تنسق ترتيب المنصات، الفرز السريع، والتعبئة الآلية على الأرصفة بكفاءة تشغيلية مستمرة دون توقف.',
+      'Autonomous mobile robots handle palletising, picking and dock induction in the high-bay area. Throughput is bounded by charging cycles and by how fast the dock can absorb what the robots stage.',
+      'روبوتات متنقلة ذاتية القيادة تتولى ترتيب المنصات والانتقاء والتلقيم على الأرصفة داخل منطقة التخزين العالي. وتتحدد الطاقة الإنتاجية بدورات الشحن وبسرعة استيعاب الرصيف لما تجهزه الروبوتات.',
     ),
     specs: [
-      { label: t('Pick Precision', 'دقة فرز الشحنات'), value: '99.98%', numValue: 99.98, decimals: 2, suffix: '%' },
-      { label: t('Cycle Speed Boost', 'تسريع دورة التحميل'), value: '3.4x', numValue: 3.4, decimals: 1, suffix: 'x' },
+      { label: t('Mis-pick Rate', 'معدل الانتقاء الخاطئ'), value: '1 in 2,500', numValue: 2500, suffix: '' },
+      { label: t('Robot Uptime', 'جاهزية الروبوتات'), value: '92%', numValue: 92, suffix: '%' },
     ],
     interactiveType: 'robotics',
   },
@@ -350,12 +351,12 @@ const CAPABILITY_CARDS: CapabilityCardItem[] = [
     title: t('Bi-Modal: Road Freight & Automated Warehousing', 'الشبكة الثنائية: الشحن البري والمستودعات الذكية'),
     tagline: t('Seamless synchronization between highways and smart cross-docks', 'تكامل فوري بين الشاحنات وأرصفة التفريغ المؤتمتة'),
     description: t(
-      'Unified terrestrial logistics orchestration connecting autonomous electric truck fleets directly into automated cross-dock sortation matrices and high-bay fulfillment hubs with zero dwell time.',
-      'منظومة لوجستية برية موحدة تربط أساطيل الشاحنات الكهربائية المستقلة مباشرة بمصفوفات الفرز الآلي ومراكز التوزيع الذكية بزمن توقف صفري.',
+      'Line-haul trucks arrive against a booked cross-dock slot rather than a queue position, so the yard knows what is coming and the dwell it cannot avoid is at least planned for.',
+      'تصل شاحنات النقل الرئيسي وفق موعد محجوز بمركز التفريغ المباشر بدلاً من ترتيب في طابور، فتعرف الساحة ما هو قادم إليها، ويصبح زمن الانتظار الذي لا يمكن تفاديه مخططاً له على الأقل.',
     ),
     specs: [
-      { label: t('Arterial Corridors', 'الممرات الشريانية النشطة'), value: '40+', numValue: 40, suffix: '+' },
-      { label: t('Carbon Offset', 'خفض الانبعاثات الكربونية'), value: '-42%', numValue: 42, prefix: '-', suffix: '%' },
+      { label: t('Active Corridors', 'الممرات النشطة'), value: '4', numValue: 4, suffix: '' },
+      { label: t('Slot Adherence', 'الالتزام بالمواعيد'), value: '87%', numValue: 87, suffix: '%' },
     ],
     interactiveType: 'globe',
   },
@@ -458,6 +459,12 @@ export default function CapabilitiesSection() {
               'نظام تشغيل لوجستي موحد يجمع التوجيه الشرياني الآني، مستشعرات الأمان المشفرة، والتجهيز الآلي للمستودعات في توأم رقمي مستمر.',
             )[language]}
           </p>
+
+          {/* Every metric in the cards below (uptime, loss SLA, pick precision,
+              fleet counts) is a benchmark model figure. */}
+          <div className="flex justify-center mt-5">
+            <ModelBadge />
+          </div>
         </div>
 
         {/* 6 Capabilities Cards Grid */}

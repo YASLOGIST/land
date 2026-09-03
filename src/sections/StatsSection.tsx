@@ -1,17 +1,42 @@
 'use client'
 
 /**
- * StatsSection — Real-Time System Telemetry & Operational Metrics
+ * StatsSection — four headline figures for the land network, carried by
+ * rolling <DynamicCounter /> tiles under a shared ModelBadge.
  *
- * Directive 2: Zero-Color Optical Glassmorphism
- * Directive 3: Physics-based smooth rolling Dynamic Counters (<DynamicCounter />)
+ * Each figure has to be one an operator could be asked to produce a report
+ * for. That rules out anything ending in a run of nines, and it rules out
+ * any count larger than what LAND_TRADE_CORRIDORS and INLAND_LOGISTICS_HUBS
+ * actually hold.
  */
 
 import { motion } from 'framer-motion'
 import { useTheme } from 'next-themes'
 import { Activity, ShieldCheck, Zap, Globe } from 'lucide-react'
+import type { LucideIcon } from 'lucide-react'
 import { useLanguage } from '@/hooks/use-language'
+import type { BilingualText } from '@/types/land-logistics'
+import { INLAND_LOGISTICS_HUBS, LAND_TRADE_CORRIDORS } from '@/data/landCorridors'
 import DynamicCounter from '@/components/DynamicCounter'
+import ModelBadge from '@/components/ModelBadge'
+
+interface StatTile {
+  /** Target the counter rolls to. */
+  numValue: number
+  decimals: number
+  /** Rendered ahead of the number, e.g. the tolerance sign on ETA variance. */
+  prefix?: string
+  suffix: string
+  icon: LucideIcon
+  status: BilingualText
+  label: BilingualText
+  description: BilingualText
+}
+
+/* Counted from the data rather than typed in, so a fifth corridor cannot
+   ship while the tile still says four. */
+const NODE_COUNT = INLAND_LOGISTICS_HUBS.length
+const CORRIDOR_COUNT = LAND_TRADE_CORRIDORS.length
 
 export default function StatsSection() {
   const { resolvedTheme } = useTheme()
@@ -25,51 +50,59 @@ export default function StatsSection() {
   const kicker = t('SYSTEM TELEMETRY & PERFORMANCE', 'القياس عن بعد والأداء التشغيلي')
   const title = t('Operational Excellence in Numbers', 'التميز التشغيلي بالأرقام والبيانات')
   const subtitle = t(
-    'Real-time aggregated telemetry validating system-wide accuracy, speed, and cross-border scale.',
-    'بيانات قياس موثوقة في الوقت الفعلي تؤكد دقة النظام وسرعته ونطاقه العالمي.',
+    `Modelled figures for the ${CORRIDOR_COUNT} active corridors and the yards along them, at the intervals a standard telematics unit and a monthly cycle count actually report.`,
+    `أرقام محاكاة لعدد ${CORRIDOR_COUNT} ممرات نشطة والساحات الواقعة عليها، بالفترات التي يبلّغ بها فعلياً جهاز التتبع القياسي والجرد الدوري الشهري.`,
   )
 
-  const stats = [
+  const stats: StatTile[] = [
     {
-      numValue: 99.9,
+      numValue: 99.4,
       decimals: 1,
       suffix: '%',
-      unit: 'ACCURACY',
       icon: ShieldCheck,
-      status: t('SORT PRECISION', 'دقة التصنيف والفرز'),
-      label: t('AMR Sort & Staging Precision', 'دقة فرز وتجهيز الروبوتات'),
-      description: t('Zero sorting discrepancies across high-density facilities', 'انعدام أخطاء الفرز في المستودعات عالية الكثافة'),
+      status: t('INVENTORY MATCH', 'مطابقة المخزون'),
+      label: t('Cycle-Count Inventory Match Rate', 'معدل مطابقة المخزون بالجرد الدوري'),
+      description: t(
+        'System record against physical count, reconciled monthly. The gap is where a pallet moved without a scan.',
+        'مطابقة سجل النظام بالجرد الفعلي شهرياً. والفارق هو المكان الذي تحركت فيه منصة دون تسجيل مسح.',
+      ),
     },
     {
-      numValue: 12,
+      numValue: 30,
       decimals: 0,
-      suffix: 'ms',
-      unit: 'LATENCY',
+      suffix: 's',
       icon: Zap,
-      status: t('MESH SYNCHRONIZED', 'مزامنة فورية للشبكة'),
-      label: t('AMR Swarm Mesh Sync Latency', 'زمن استجابة شبكة أسراب الروبوتات'),
-      description: t('Ultra-low latency hardware communications protocol', 'بروتوكول اتصالات فائق السرعة منخفض الاستجابة'),
+      status: t('TELEMETRY SYNC', 'مزامنة التتبع'),
+      label: t('Fleet Telematics Ping Interval', 'تردد إشارة تتبع الأسطول'),
+      description: t(
+        'Position, speed and reefer temperature reported every 30 seconds over the mobile network, with gaps buffered on the unit.',
+        'يُبلّغ عن الموقع والسرعة ودرجة حرارة التبريد كل 30 ثانية عبر شبكة المحمول، مع تخزين البيانات على الجهاز عند انقطاع التغطية.',
+      ),
     },
     {
-      numValue: 40,
+      numValue: NODE_COUNT,
       decimals: 0,
-      suffix: '+',
-      unit: 'HUBS',
+      suffix: '',
       icon: Globe,
-      status: t('HIGHWAY COMMAND', 'قيادة الطرق والشحن'),
-      label: t('Arterial Highway Corridors & Inland Hubs', 'الممرات الشريانية والمراكز اللوجستية الجافة'),
-      description: t('Unified terrestrial freight highways and smart cross-dock logistics networks', 'شبكات الطرق السريعة للشحن البري ومراكز الفرز الذكية'),
+      status: t('NETWORK NODES', 'عقد الشبكة'),
+      label: t('Dry Ports, Port Gates & Border Crossings', 'الموانئ الجافة وبوابات الموانئ والمعابر الحدودية'),
+      description: t(
+        `${NODE_COUNT} nodes across ${CORRIDOR_COUNT} corridors. YASLOGIST books capacity at them; the facilities belong to their port and zone authorities.`,
+        `${NODE_COUNT} عقد على ${CORRIDOR_COUNT} ممرات. تحجز ياسلوجيست طاقة تشغيلية بها، والمنشآت مملوكة لهيئات الموانئ والمناطق التابعة لها.`,
+      ),
     },
     {
-      numValue: 1.2,
-      decimals: 1,
-      prefix: '< ',
+      numValue: 25,
+      decimals: 0,
+      prefix: '± ',
       suffix: 'min',
-      unit: 'VARIANCE',
       icon: Activity,
-      status: t('DYNAMIC ETA', 'تنبؤ لحظي بالوصول'),
-      label: t('Long-Haul Freight ETA Variance', 'هامش انحراف وقت وصول الشحنات'),
-      description: t('Machine learning traffic and waypoint prediction', 'تنبؤ دقيق بالمسارات وحركة المرور بالذكاء الاصطناعي'),
+      status: t('ETA VARIANCE', 'انحراف زمن الوصول'),
+      label: t('Line-Haul ETA Variance', 'هامش انحراف زمن وصول النقل الرئيسي'),
+      description: t(
+        'Typical spread on a same-day corridor run. Gate queues and checkpoint holds are the two terms the model cannot pin down.',
+        'المدى المعتاد على رحلة ممر في نفس اليوم. وطوابير البوابات وتوقفات نقاط التفتيش هما العنصران اللذان يتعذر على النموذج تحديدهما بدقة.',
+      ),
     },
   ]
 
@@ -115,6 +148,12 @@ export default function StatsSection() {
           >
             {subtitle[language]}
           </p>
+
+          {/* The four tiles below read as measured production telemetry. They
+              are model outputs; the label travels with them. */}
+          <div className="flex justify-center mt-5">
+            <ModelBadge />
+          </div>
         </motion.div>
 
         {/* 4 Numerical Stat Optical Glass Cards */}

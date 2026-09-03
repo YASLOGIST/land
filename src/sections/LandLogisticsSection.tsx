@@ -51,12 +51,12 @@ const PHASES: (PhaseProps & {
       'Autonomous mobile robots (AMRs) coordinate real-time high-density parcel sortation, dynamic pallet staging, and automated dock induction.',
       'توجيه أسراب الروبوتات المستقلة (AMRs) لتصنيف وتجميع وتجهيز الشحنات بدقة فائقة وتدفق مستمر على أرصفة التحميل.',
     ),
-    floatingProjection: t('6G AMR Swarm Mesh // Active Node', 'شبكة أسراب الروبوتات 6G // عقدة نشطة'),
-    projectedStatus: '12ms LATENCY // 99.9% SYNC',
+    floatingProjection: t('AMR Fleet Mesh // Active Node', 'شبكة أسراب الروبوتات // عقدة نشطة'),
+    projectedStatus: 'AMR FLEET // STAGING ACTIVE',
     metrics: [
-      { id: 'amr-sync', icon: Cpu, label: t('AMR Mesh', 'مزامنة الروبوتات'), value: '12ms LATENCY' },
+      { id: 'amr-sync', icon: Cpu, label: t('Robots On Task', 'الروبوتات قيد التشغيل'), value: '18 / 20' },
       { id: 'iot', icon: Activity, label: t('IoT Telemetry', 'مستشعرات IoT'), value: 'CALIBRATED' },
-      { id: 'sort', icon: ShieldCheck, label: t('Sort SLA', 'كفاءة الفرز'), value: '99.9% OPTIMAL' },
+      { id: 'sort', icon: ShieldCheck, label: t('Sort Backlog', 'المتأخر من الفرز'), value: '2 PALLETS' },
     ],
   },
   {
@@ -65,14 +65,14 @@ const PHASES: (PhaseProps & {
     icon: Forklift,
     kicker: t('Phase 02 // Dock Operations', 'المرحلة 02 // عمليات الأرصفة'),
     title: t(
-      'Automated Dock Loading & Cryptographic Sealing',
-      'التحميل الآلي والأقفال المشفرة Zero-Loss',
+      'Automated Dock Loading & Sealing',
+      'التحميل الآلي وختم الحاويات',
     ),
     subtitle: t(
-      'Precision forklift synchronization and optical scanner verification ensure tamper-proof electronic seals and Zero-Loss cargo compliance.',
-      'مزامنة معدات التحميل الآلية والمسح الضوئي الذكي لضمان الأختام الإلكترونية المشفرة والامتثال الكامل الخالي من الفقدان.',
+      'Forklift movements and optical scans are logged against the seal number, so a seal broken between the dock and the gate is traceable to a shift and a bay.',
+      'تُسجل حركات معدات التحميل وعمليات المسح الضوئي مقابل رقم الختم، بحيث يمكن تتبع أي ختم يُكسر بين الرصيف والبوابة إلى وردية ورصيف محددين.',
     ),
-    floatingProjection: t('Robotic Retraction & Seal // Zero-Loss', 'تراجع آلي وقفل أمني // خالي من الفقدان'),
+    floatingProjection: t('Robotic Retraction & Seal // Logged', 'تراجع آلي وختم // مُسجّل'),
     projectedStatus: 'TELEMETRY LOCKED // SECURED',
     metrics: [
       { id: 'load-cycle', icon: Forklift, label: t('Dock Cycle', 'دورة الرصيف'), value: '02:14 MIN' },
@@ -104,8 +104,8 @@ const PHASES: (PhaseProps & {
 ]
 
 const DISCLAIMER: BilingualText = t(
-  '6G High-Fidelity Telemetry Simulation — Digital twin model illustrating YASLOGIST autonomous land freight mechanics.',
-  'نموذج محاكاة للقياس عن بُعد 6G عالي الدقة — يوضح الآلية التشغيلية للشحن البري الذكي لمنظومة ياسلوجيست.',
+  'High-fidelity telemetry simulation — a digital-twin model illustrating YASLOGIST road freight mechanics.',
+  'نموذج محاكاة عالي الدقة للقياس عن بُعد — يوضح الآلية التشغيلية للشحن البري لمنظومة ياسلوجيست.',
 )
 
 type Mode = 'dark' | 'light'
@@ -144,7 +144,7 @@ export default function LandLogisticsSection({
       ui: {
         scrollHint: language === 'ar' ? 'مرّر للاستكشاف' : 'Scroll to explore',
         phaseCounter: language === 'ar' ? 'المرحلة' : 'Phase',
-        simulationBadge: language === 'ar' ? 'محرك المحاكاة 6G' : '6G SIM ENGINE',
+        simulationBadge: language === 'ar' ? 'محرك المحاكاة' : 'SIM ENGINE',
         themeToggle: language === 'ar' ? 'تبديل المظهر' : 'Toggle theme',
         languageToggle: language === 'ar' ? 'English' : 'العربية',
       },
@@ -317,12 +317,12 @@ export default function LandLogisticsSection({
   const simPhaseDetails = [
     {
       badge: t('PHASE 01: SMART WAREHOUSING', 'المرحلة 01: المستودعات الذكية'),
-      sub: t('6G AMR Fleet Mesh & Staging', 'أسراب الروبوتات والتجهيز الذكي 6G'),
-      status: t('ACTIVE // 12ms', 'نشط // 12ms'),
+      sub: t('AMR Fleet Mesh & Staging', 'أسراب الروبوتات والتجهيز الذكي'),
+      status: t('ACTIVE // 18 ROBOTS', 'نشط // 18 روبوت'),
     },
     {
       badge: t('PHASE 02: DOCK LOADING & SEAL', 'المرحلة 02: التحميل والختم'),
-      sub: t('Robotic Retraction & Zero-Loss Lock', 'تراجع آلي وقفل أمني خالي من الفقدان'),
+      sub: t('Robotic Retraction & Seal Logging', 'تراجع آلي وتسجيل الأختام'),
       status: t('CALIBRATED // SECURE', 'معاير // مؤمّن'),
     },
     {
@@ -368,7 +368,7 @@ export default function LandLogisticsSection({
           <source src="/videos/FINAL.mp4" type="video/mp4" />
         </video>
 
-        {/* ─── NOCTURNAL 6G SIMULATION VIDEO (OPACITY SMOOTH CROSSFADE) ─── */}
+        {/* ─── NOCTURNAL SIMULATION VIDEO (OPACITY SMOOTH CROSSFADE) ─── */}
         <video
           ref={nightVideoRef}
           src="/videos/FINALnight.mp4"

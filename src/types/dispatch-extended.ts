@@ -24,40 +24,32 @@ export interface RealTradeCorridor {
   destinationGps: [number, number]
   distanceKm: number
   supportedModes: TransportModeId[]
+  /** Corridor status band. The dispatch UI keys off the words MONITORED,
+   *  YELLOW, HIGH and RED, so keep one of those in the string when the
+   *  corridor should not render green. */
   riskScore: string
-  flightLevel: string
-  flightLevelRange: string
-  headwindKts: number
-  outsideAirTempC: number
-  bathymetryDepthM: number
-  surfaceCurrentsKts: string
-  seaIceCoverage: string
+  /** Egyptian road classification, e.g. the Cairo-Alexandria Desert Road. */
+  roadClass: BilingualText
+  /** Governing surface and lane description for the trunk section. */
+  roadSurface: BilingualText
+  /** Legal axle load under Egyptian Roads & Bridges Law 84/1968 and its
+   *  amendments, as enforced at the corridor's weighbridges. */
   axleLoadLimitT: number
   clearanceHeightM: number
+  /** Booked departure slot out of the origin yard. */
   railSlotTime: string
   chokepointName: BilingualText
   chokepointGps: [number, number]
-  catTurbulenceGps: [number, number]
-  piracyZoneGps: [number, number]
-  seaIceZoneGps: [number, number]
+  /** Weighbridge the corridor's overload risk concentrates on. */
+  weighbridgeGps: [number, number]
+  /** Where the corridor most often loses time: gate queue, checkpoint, ferry. */
+  dwellHotspotGps: [number, number]
   customsManifestType: BilingualText
-  // Aviation Layer Vectors
-  aviationOptimalNavyPath: string
-  aviationAltCyanPath: string
-  aviationWarningRedPath: string
-  aviationLimeFuelSavePath: string
-  // Maritime Layer Vectors
-  maritimeTealSafePath: string
-  maritimeAmberCongestionPath: string
-  maritimeSeaIcePath: string
-  // Land Layer Vectors
+  // Land route vectors on the 1000x500 equirectangular canvas
   landBurntOrangeHighwayPath: string
   landOliveRuralPath: string
   landForestGreenRailPath: string
   landCharcoalClosedPath: string
-  // Legacy paths
-  realAirPath: string
-  realOceanPath: string
   realLandPath: string
   predictivePath: string
   goldBypassPath: string
@@ -73,8 +65,11 @@ export interface GlobalHubPin {
   id: string
   name: BilingualText
   gps: [number, number]
-  type: 'air' | 'sea' | 'multimodal'
+  type: 'dry-port' | 'seaport-gate' | 'industrial-zone' | 'border-crossing'
   country: BilingualText
+  /** Who runs the facility. YASLOGIST books capacity at these nodes; it does
+   *  not own them, and the copy must not imply otherwise. */
+  operator: BilingualText
   stats: string
   throughput: string
   clearanceTime: string
