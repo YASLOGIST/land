@@ -19,14 +19,14 @@ const t = (en: string, ar: string) => ({ en, ar })
 
 const content = {
   kicker: t(
-    'SOVEREIGN 6G AUTONOMOUS LAND FREIGHT & WAREHOUSING INFRASTRUCTURE',
-    'البنية التحتية السيادية للشحن البري والتخزين الذكي 6G',
+    'ROAD FREIGHT VISIBILITY · NAFEZA / ACID INTEGRATED · GATE TO GATE',
+    'تتبّع الشحن البري · متكامل مع نافذة ورقم ACID · من بوابة إلى بوابة',
   ),
   title: t('YASLOGIST', 'YASLOGIST'),
   subtitle: t('ROAD FREIGHT · FTL/LTL · SMART WAREHOUSING', 'شحن بري · حمولات كاملة ومجزأة · تخزين ذكي'),
   description: t(
-    'Redefining terrestrial logistics through AI telemetry orchestration, predictive routing, and autonomous infrastructure across sovereign highway corridors, automated cross-docks, and intelligent fulfillment hubs.',
-    'إعادة ابتكار اللوجستيات البرية عبر تنسيق القياس الآني بالذكاء الاصطناعي، والتوجيه التنبؤي، والبنية التحتية المستقلة عبر ممرات الطرق السريعة السيادية وأرصفة التفريغ المباشر ومراكز التوزيع الذكية.',
+    'One shipment record across the Egyptian road network — booking, bill of lading, container, truck plate, gate pass and ACID resolved to a single identity, with turn times tracked on the Sokhna–Alexandria, 30th of June Axis and Regional Ring Road corridors.',
+    'سجل واحد للشحنة عبر شبكة الطرق المصرية — الحجز وبوليصة الشحن والحاوية ولوحة الشاحنة وإذن البوابة ورقم ACID تُربط في هوية واحدة، مع قياس أزمنة الدوران على محاور السخنة–الإسكندرية، ومحور 30 يونيو، والطريق الدائري الإقليمي.',
   ),
   cta: t('Explore Operations', 'استكشف العمليات'),
   scrollPrompt: t('Scroll to Advance Video', 'مرّر للتحكم بالفيديو'),
@@ -34,7 +34,7 @@ const content = {
     category: t('PLATFORM FOUNDER', 'مؤسس المنصة'),
     name: t('Ahmed Yasser Ali', 'أحمد ياسر علي'),
     role: t('Supply Chain & Logistics Specialist', 'أخصائي سلاسل الإمداد واللوجستيات'),
-    subfooter: t('YASLOGIST · DOKKI, CAIRO', 'ياسلوجيست · الدقي، القاهرة'),
+    subfooter: t('YASLOGIST · NEW CAIRO, CAIRO', 'ياسلوجيست · القاهرة الجديدة، القاهرة'),
   },
 }
 
@@ -292,7 +292,7 @@ export default function HeroSection() {
             {content.description[language]}
           </motion.p>
 
-          {/* Centered CTA & Live 6G Telemetry Beacon */}
+          {/* Centered CTA & Live Telemetry Beacon */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -384,7 +384,7 @@ export default function HeroSection() {
                   {content.founder.role[language]}
                 </p>
 
-                {/* Sub-footer: YASLOGIST · DOKKI, CAIRO */}
+                {/* Sub-footer: YASLOGIST · NEW CAIRO, CAIRO */}
                 <span className="text-[9px] font-mono font-bold tracking-wider uppercase text-cyan-400/90 mt-1">
                   {content.founder.subfooter[language]}
                 </span>

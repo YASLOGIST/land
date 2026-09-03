@@ -19,6 +19,7 @@ import {
   Scale,
 } from 'lucide-react'
 import { useLanguage } from '@/hooks/use-language'
+import ModelBadge from '@/components/ModelBadge'
 import type { BilingualText } from '@/types/land-logistics'
 import type {
   TransportModeOption,
@@ -42,7 +43,7 @@ const TRANSPORT_MODES: TransportModeOption[] = [
     id: 'heavy-haul-ftl',
     icon: Truck,
     name: t('Autonomous Heavy Haulage (FTL Dedicated)', 'شحن الحمولات الكاملة المستقل (FTL)'),
-    speedDescriptor: t('Direct Sovereign Highway Corridor', 'ممر طريق سريع سيادي مباشر'),
+    speedDescriptor: t('Direct Trunk Highway Corridor', 'ممر طريق سريع رئيسي مباشر'),
     efficiencyRating: '99.8% Uptime',
     baseCostPerTonKm: 0.14,
     baseSpeedKmh: 85,
@@ -91,7 +92,7 @@ const CARGO_CLASSES: CargoClassOption[] = [
   {
     id: 'high-tech-sealed',
     name: t('High-Value Sealed Electronic & Automotive Cargo', 'شحنات إلكترونية وقطع غيار مشفرة عالية القيمة'),
-    securityLevel: 'ZERO-LOSS TAMPER-SEALED',
+    securityLevel: 'TAMPER-EVIDENT SEAL + GPS',
     tempClass: t('Shock & Humidity Monitored', 'مراقبة الصدمات والرطوبة'),
     riskFactor: 1.15,
   },
@@ -273,7 +274,7 @@ export function CorridorDispatchSection() {
 
   // i18n Matrix
   const ui = {
-    kicker: t('6G PREDICTIVE LAND LOGISTICS DIGITAL TWIN', 'التوأم الرقمي اللوجستي التنبؤي للنقل البري 6G'),
+    kicker: t('PREDICTIVE LAND LOGISTICS DIGITAL TWIN', 'التوأم الرقمي اللوجستي التنبؤي للنقل البري'),
     title: t('Autonomous Route & Highway Corridor Simulation', 'محاكاة مسارات الطرق السريعة والشحن البري في الوقت الفعلي'),
     subtitle: t(
       'Configure terrestrial trade corridors, monitor autonomous heavy haulage and electric platooning, and inspect cross-dock facilities with sub-second telemetry precision.',
@@ -322,6 +323,12 @@ export function CorridorDispatchSection() {
           <p className="text-base sm:text-lg text-slate-400 leading-relaxed font-sans">
             {ui.subtitle[language]}
           </p>
+
+          {/* Dispatch outputs, ETAs and the manifest hash are computed from the
+              controls on this page — a digital twin, not a live corridor. */}
+          <div className="mt-5">
+            <ModelBadge />
+          </div>
         </div>
 
         {/* Main Dashboard Layout Grid */}
@@ -614,7 +621,7 @@ export function CorridorDispatchSection() {
               <div className="flex items-center justify-between pb-4 border-b border-white/10">
                 <div className="flex items-center gap-2">
                   <ShieldCheck className="w-5 h-5 text-emerald-400" />
-                  <h3 className="text-lg font-black tracking-tight">YASLOGIST 6G CRYPTOGRAPHIC MANIFEST</h3>
+                  <h3 className="text-lg font-black tracking-tight">YASLOGIST SHIPMENT MANIFEST HASH</h3>
                 </div>
                 <button
                   onClick={() => setManifestModalOpen(false)}

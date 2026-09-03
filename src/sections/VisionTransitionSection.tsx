@@ -9,16 +9,16 @@ const t = (en: string, ar: string) => ({ en, ar })
 
 const visionCopy = {
   kicker: t(
-    'SOVEREIGN TERRESTRIAL ARCHITECTURE // ROAD FREIGHT & WAREHOUSING',
-    'الهندسة الأرضية السيادية // الشحن البري والتخزين الذكي'
+    'TERRESTRIAL ARCHITECTURE // ROAD FREIGHT & WAREHOUSING',
+    'الهندسة الأرضية // الشحن البري والتخزين الذكي'
   ),
   headline: t(
-    'Engineering Sovereign Ground Logistics & Smart Fulfillment',
-    'هندسة اللوجستيات البرية السيادية وحلول التخزين والتوزيع الذكية'
+    'Engineering Ground Logistics & Smart Fulfillment',
+    'هندسة اللوجستيات البرية وحلول التخزين والتوزيع الذكية'
   ),
   subheadline: t(
-    'Unifying autonomous heavy haulage, high-density cross-dock networks, and AI-orchestrated fulfillment hubs into one synchronized, zero-loss digital twin.',
-    'توحيد النقل البري الثقيل المستقل، شبكات التفريغ المباشر فائقة الكثافة، ومراكز التوزيع المؤتمتة بالذكاء الاصطناعي في توأم رقمي متزامن وخالٍ من الفقدان.'
+    'Line-haul fleets, cross-dock yards and dry port slots held in one shipment record, so a delay at any of the three shows up against the same ETA.',
+    'أساطيل النقل الرئيسية وساحات التفريغ ومواعيد الموانئ الجافة داخل سجل شحنة واحد، بحيث يظهر أي تأخير في أيٍّ منها على نفس زمن الوصول المتوقع.'
   ),
   pillars: [
     {
@@ -41,8 +41,8 @@ const visionCopy = {
         'الشبكة البرية المستقلة ومصفوفة التفريغ المباشر Cross-Dock'
       ),
       desc: t(
-        'Sub-minute automated pallet sortation, dynamic bypass routing, and zero-dwell inland dry port customs clearance.',
-        'فرز آلي للمنصات في أجزاء من الدقيقة، توجيه ذكي لتجاوز الازدحام، وتخليص جمركي فوري بالموانئ الجافة.'
+        'Pallet sortation at the cross-dock, bypass routing when a chokepoint backs up, and NAFEZA pre-arrival filing so clearance starts before the truck reaches the gate.',
+        'فرز المنصات بمراكز التفريغ المباشر، وتوجيه بديل عند تكدس أي نقطة اختناق، وتقديم الإقرار المسبق عبر نافذة ليبدأ التخليص قبل وصول الشاحنة إلى البوابة.'
       ),
     },
     {
@@ -58,10 +58,14 @@ const visionCopy = {
       ),
     },
   ],
+  /* Three claims we can actually stand behind: the corridor count is the
+     length of LAND_TRADE_CORRIDORS, the tracking interval is what a standard
+     telematics unit reports, and the customs line names the system we file
+     through rather than promising a clearance time. */
   metricBadges: [
-    { label: t('ZERO-LOSS SLA', 'صفر فقدان معتمد'), val: '99.99%', icon: ShieldCheck },
-    { label: t('TELEMETRY MESH', 'شبكة القياس اللحظي'), val: '6G SYNC', icon: Cpu },
-    { label: t('LOGISTICS REACH', 'الانتشار اللوجستي'), val: '40+ CORRIDORS', icon: Building2 },
+    { label: t('ACTIVE CORRIDORS', 'الممرات النشطة'), val: '4', icon: Building2 },
+    { label: t('GPS PING INTERVAL', 'تردد إشارة التتبع'), val: '30 SEC', icon: Cpu },
+    { label: t('CUSTOMS FILING', 'التخليص الجمركي'), val: 'NAFEZA / ACID', icon: ShieldCheck },
   ],
   scrollDown: t('Proceed to 3-Phase Operational Simulation', 'انتقل إلى محاكاة العمليات ثلاثية المراحل'),
 }
@@ -183,10 +187,12 @@ export default function VisionTransitionSection() {
                       : 'border-slate-200 text-slate-500'
                   }`}
                 >
-                  <span>6G TELEMETRY</span>
-                  <span className="font-bold text-emerald-400 flex items-center gap-1">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-                    100% OPERATIONAL
+                  <span>TELEMETRY</span>
+                  {/* Amber, matching ModelBadge, because this card reads from
+                      the simulator and not from a truck. */}
+                  <span className="font-bold text-amber-300 flex items-center gap-1">
+                    <span className="w-1.5 h-1.5 rounded-full bg-amber-300" />
+                    SIMULATED FEED
                   </span>
                 </div>
               </motion.div>

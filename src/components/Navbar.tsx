@@ -6,6 +6,7 @@ import { useTheme } from 'next-themes'
 import { ThemeToggle } from '@/components/ThemeToggle'
 import { useLanguage } from '@/hooks/use-language'
 import { Menu, X, Languages } from 'lucide-react'
+import SuiteSwitcher from '@/components/SuiteSwitcher'
 
 export default function Navbar() {
   const { resolvedTheme } = useTheme()
@@ -63,18 +64,35 @@ export default function Navbar() {
               isRTL ? 'flex-row-reverse text-right' : 'flex-row text-left'
             }`}
           >
-            {/* Circular Badge with Logo Mark */}
-            <div 
-              className="relative w-9 h-9 sm:w-10 sm:h-10 rounded-full p-1 bg-gradient-to-tr from-cyan-600/40 via-blue-600/30 to-slate-900 border border-cyan-400/60 shadow-[0_0_20px_rgba(6,182,212,0.55)] flex items-center justify-center shrink-0"
-              style={{ borderColor: '#c4df12' }}
+            {/* Canonical YASLOGIST monogram — the same vector mark as
+                main/media/logo.svg and ocean's BrandMark. This replaced a
+                192×192 raster PNG in a badge whose border was hardcoded to
+                #c4df12, a colour that appears nowhere else in the brand and on
+                neither of the other two surfaces. Drawn with currentColor so it
+                inherits the header's theme instead of fighting it. */}
+            <svg
+              viewBox="0 0 64 64"
+              className={`w-9 h-9 sm:w-10 sm:h-10 shrink-0 ${
+                mode === 'dark' ? 'text-white' : 'text-slate-900'
+              }`}
+              fill="none"
+              stroke="currentColor"
+              strokeLinecap="butt"
+              strokeLinejoin="miter"
+              role="img"
+              aria-label="YASLOGIST"
             >
-              <img
-                src="/assets/yaslogist-logo-mark.png"
-                alt="YASLOGIST"
-                className="w-full h-full object-contain filter drop-shadow-[0_0_6px_rgba(6,182,212,0.7)]"
-                referrerPolicy="no-referrer"
-              />
-            </div>
+              <g strokeWidth="1.6" opacity="0.55">
+                <ellipse cx="32" cy="32" rx="12.5" ry="29" />
+                <path d="M3 32h58M8 17.5h48M8 46.5h48" />
+              </g>
+              <circle cx="32" cy="32" r="29" strokeWidth="2.2" />
+              <g strokeWidth="5" strokeLinecap="square">
+                <path d="M16 16 L27.5 31.5 L27.5 49" />
+                <path d="M39 16 L30 28" />
+                <path d="M40.5 20 L40.5 48 L53 48" />
+              </g>
+            </svg>
 
             <div className="flex flex-col justify-center">
               {/* Top Brand Name */}
@@ -84,9 +102,7 @@ export default function Navbar() {
                     mode === 'dark' ? 'text-white' : 'text-slate-900'
                   }`}
                   style={{
-                    fontFamily: 'Plus Jakarta Sans',
                     fontSize: '18px',
-                    width: '120px'
                   }}
                 >
                   YASLOGIST
@@ -121,8 +137,14 @@ export default function Navbar() {
             ))}
           </nav>
 
-          {/* Global Controls: High-Tech Language Pill & Theme */}
+          {/* Global Controls: Suite Switcher, High-Tech Language Pill & Theme */}
           <div className="hidden md:flex items-center gap-3">
+            {/* `lg` and up: at `md` this row already carries the wordmark, a
+                two-line tagline, three nav links, the language pill and the
+                theme toggle, so the switcher waits for the wider breakpoint.
+                Phones get the grid in the drawer below. */}
+            <SuiteSwitcher current="land" className="hidden lg:flex" />
+
             {/* Language Toggle Switch */}
             <div
               dir="ltr"
@@ -222,6 +244,16 @@ export default function Navbar() {
             }`}
             dir={direction}
           >
+            {/* Suite grid first: a visitor who opened this menu to leave for
+                another surface should not have to read past the section links
+                to find the way out. */}
+            <SuiteSwitcher
+              current="land"
+              variant="grid"
+              onNavigate={() => setMobileMenuOpen(false)}
+              className={`pb-5 border-b ${mode === 'dark' ? 'border-white/[0.06]' : 'border-slate-200'}`}
+            />
+
             <nav className="flex flex-col gap-4">
               {navLinks.map((link) => (
                 <a

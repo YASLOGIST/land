@@ -110,8 +110,8 @@ export function RouteComparisonModal({
       reliabilityPercent: 99.6,
       recommendedForEn: 'High-density inter-city freight, zero-emission supply chains, long-haul highway platoons',
       recommendedForAr: 'الشحن عالي الكثافة بين المدن، سلاسل التوريد منعدمة الانبعاثات، والقوافل السريعة',
-      prosEn: ['Aerodynamic draft efficiency (-42% CO2)', 'Coordinated 6G V2X braking & safety', 'Continuous waypoint telemetry'],
-      prosAr: ['ديناميكية هوائية موفرة للطاقة', 'فرملة ذكية متزامنة بـ 6G', 'تتبع آني للمسار'],
+      prosEn: ['Aerodynamic draft efficiency (-42% CO2)', 'Coordinated V2X braking & safety', 'Continuous waypoint telemetry'],
+      prosAr: ['ديناميكية هوائية موفرة للطاقة', 'فرملة ذكية متزامنة عبر V2X', 'تتبع آني للمسار'],
       isGreenest: true,
     },
   ]
@@ -253,7 +253,7 @@ export function RouteComparisonModal({
 
             {/* Bottom Footer Information */}
             <div className="mt-6 pt-4 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-400 font-mono">
-              <span>YASLOGIST 6G ARTERIAL INTELLIGENCE MATRIX</span>
+              <span>YASLOGIST ARTERIAL INTELLIGENCE MATRIX</span>
               <button
                 onClick={onClose}
                 className="px-5 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold transition-all"

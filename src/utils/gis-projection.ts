@@ -1,5 +1,5 @@
 /**
- * 6G GIS Geographic Projection & Route Interpolation Matrix
+ * GIS geographic projection & route interpolation matrix
  * Converts real-world GPS WGS-84 Coordinates [longitude, latitude] into 
  * exact cartographic SVG coordinates on a 1000x500 Equirectangular canvas.
  */
