@@ -234,6 +234,7 @@ export default function HeroSection() {
         <video
           ref={videoRef}
           src="/assets/mainlandbackground.mp4"
+          poster="/assets/mainlandbackground-poster.jpg"
           muted
           playsInline
           webkit-playsinline="true"
@@ -293,10 +294,10 @@ export default function HeroSection() {
             transition={{ duration: 0.65, delay: 0.16 }}
             className="mb-4"
           >
-            <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-900/80 border border-white/15 backdrop-blur-xl text-xs font-mono tracking-widest uppercase text-cyan-300">
-              <Truck className="w-3.5 h-3.5 text-[#D3EE22]" />
+            <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-900/80 border border-white/15 backdrop-blur-xl text-xs font-mono tracking-widest uppercase text-gold-300">
+              <Truck className="w-3.5 h-3.5 text-[#E8B317]" />
               <span className="text-slate-200 font-bold">{content.subtitle[language]}</span>
-              <Warehouse className="w-3.5 h-3.5 text-cyan-400" />
+              <Warehouse className="w-3.5 h-3.5 text-gold-400" />
             </span>
           </motion.div>
 
@@ -319,10 +320,10 @@ export default function HeroSection() {
           >
             <a
               href="#vision-transition"
-              className="group relative overflow-hidden inline-flex items-center gap-2.5 px-7 py-3.5 rounded-2xl text-sm sm:text-base font-bold transition-all duration-300 bg-cyan-600 hover:bg-cyan-500 text-white shadow-[0_0_25px_rgba(6,182,212,0.4)] border border-cyan-400/40"
+              className="group relative overflow-hidden inline-flex items-center gap-2.5 px-7 py-3.5 rounded-2xl text-sm sm:text-base font-bold transition-all duration-300 bg-gold-500 hover:bg-gold-400 text-slate-950 shadow-[0_0_25px_rgba(232,179,23,0.4)] border border-gold-400/40"
             >
               <div
-                className="absolute inset-x-0 top-0 h-[1.5px] bg-gradient-to-r from-transparent via-cyan-300 to-transparent pointer-events-none"
+                className="absolute inset-x-0 top-0 h-[1.5px] bg-gradient-to-r from-transparent via-gold-300 to-transparent pointer-events-none"
                 aria-hidden="true"
               />
               <span className="text-slate-950 font-black">{content.cta[language]}</span>
@@ -344,7 +345,7 @@ export default function HeroSection() {
             initial={{ opacity: 0, scale: 0.94, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.35, ease: [0.22, 1, 0.36, 1] }}
-            className="w-auto min-w-[280px] max-w-xs p-3.5 sm:p-4 rounded-2xl border border-cyan-500/20 bg-slate-950/80 backdrop-blur-2xl transition-all duration-300 shadow-[0_16px_40px_rgba(0,0,0,0.7),inset_0_1px_1.5px_rgba(255,255,255,0.15)] hover:border-cyan-400/40"
+            className="w-auto min-w-[280px] max-w-xs p-3.5 sm:p-4 rounded-2xl border border-gold-500/20 bg-slate-950/80 backdrop-blur-2xl transition-all duration-300 shadow-[0_16px_40px_rgba(0,0,0,0.7),inset_0_1px_1.5px_rgba(255,255,255,0.15)] hover:border-gold-400/40"
             style={{
               width: '312.234375px',
               height: '136px',
@@ -359,13 +360,13 @@ export default function HeroSection() {
           >
             {/* Specular Top Reflection Line */}
             <div
-              className="absolute inset-x-0 top-0 h-[1px] bg-gradient-to-r from-transparent via-cyan-400/60 to-transparent pointer-events-none"
+              className="absolute inset-x-0 top-0 h-[1px] bg-gradient-to-r from-transparent via-gold-400/60 to-transparent pointer-events-none"
               aria-hidden="true"
             />
 
             <div className="flex items-center gap-3.5">
-              {/* Circular Portrait Frame with Subtle Cyan Glow */}
-              <div className="relative shrink-0 w-12 h-12 sm:w-14 sm:h-14 rounded-full p-[2px] bg-gradient-to-tr from-cyan-400 via-sky-300 to-blue-500 shadow-[0_0_14px_rgba(6,182,212,0.45)]">
+              {/* Circular Portrait Frame with Subtle Gold Glow */}
+              <div className="relative shrink-0 w-12 h-12 sm:w-14 sm:h-14 rounded-full p-[2px] bg-gradient-to-tr from-gold-400 via-amber-300 to-yellow-500 shadow-[0_0_14px_rgba(232,179,23,0.45)]">
                 <div className="w-full h-full rounded-full overflow-hidden bg-slate-950 flex items-center justify-center">
                   <img
                     src="/assets/founder-original.png"
@@ -377,7 +378,7 @@ export default function HeroSection() {
               </div>
 
               {/* Founder Information Structure */}
-              <div className="flex flex-col text-left">
+              <div className="flex flex-col text-left justify-center flex-1 min-w-0">
                 {/* Category Header: PLATFORM FOUNDER */}
                 <span className="text-[10px] font-mono font-bold tracking-widest uppercase text-[#D3EE22]">
                   {content.founder.category[language]}
@@ -385,7 +386,7 @@ export default function HeroSection() {
 
                 {/* Name: Ahmed Yasser Ali */}
                 <h3 
-                  className="font-extrabold text-white tracking-tight leading-tight mt-0.5"
+                  className="text-white truncate font-arabic font-normal tracking-wide"
                   style={{
                     fontFamily: 'Aref Ruqaa',
                     fontStyle: 'normal',
@@ -403,7 +404,7 @@ export default function HeroSection() {
                 </p>
 
                 {/* Sub-footer: YASLOGIST · NEW CAIRO, CAIRO */}
-                <span className="text-[9px] font-mono font-bold tracking-wider uppercase text-cyan-400/90 mt-1">
+                <span className="text-[9px] font-mono font-bold tracking-wider uppercase text-gold-400/90 mt-1">
                   {content.founder.subfooter[language]}
                 </span>
               </div>
@@ -414,13 +415,13 @@ export default function HeroSection() {
         {/* ─── BOTTOM SCRUBBING HINT & PROGRESS HUD ─── */}
         <div className="relative z-10 flex items-center justify-between pt-3 border-t border-white/10 text-xs font-mono text-slate-400">
           <div className="flex items-center gap-2">
-            <ChevronDown className="w-4 h-4 text-[#D3EE22] animate-bounce" />
+            <ChevronDown className="w-4 h-4 text-[#E8B317] animate-bounce" />
             <span className="font-bold text-slate-300 text-[11px] sm:text-xs tracking-wider">{content.scrollPrompt[language]}</span>
           </div>
 
           {/* Interactive Clickable Scrub Timeline Indicator */}
           <div className="flex items-center gap-2.5">
-            <span ref={timelineTextRef} className="text-[10px] sm:text-xs text-cyan-400 font-bold tracking-wider">
+            <span ref={timelineTextRef} className="text-[10px] sm:text-xs text-gold-400 font-bold tracking-wider">
               TIMELINE: 0%
             </span>
             <div
@@ -430,7 +431,7 @@ export default function HeroSection() {
             >
               <div
                 ref={timelineBarRef}
-                className="h-full bg-gradient-to-r from-cyan-400 via-teal-300 to-[#D3EE22] rounded-full transition-all duration-75"
+                className="h-full bg-gradient-to-r from-gold-500 via-amber-400 to-[#E8B317] rounded-full transition-all duration-75"
                 style={{ width: '0%' }}
               />
             </div>

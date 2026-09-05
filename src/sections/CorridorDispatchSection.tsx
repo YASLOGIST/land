@@ -305,10 +305,10 @@ export function CorridorDispatchSection() {
       }
     }
     return {
-      cardBorder: 'border-cyan-500/40',
-      glow: 'shadow-[0_0_50px_rgba(6,182,212,0.2)]',
-      accentText: 'text-cyan-300',
-      accentBg: 'bg-cyan-500/10',
+      cardBorder: 'border-gold-500/40',
+      glow: 'shadow-[0_0_50px_rgba(232,179,23,0.2)]',
+      accentText: 'text-gold-300',
+      accentBg: 'bg-gold-500/10',
     }
   }, [trafficLightState, selectedModeId])
 
@@ -333,31 +333,31 @@ export function CorridorDispatchSection() {
       'Deterministic arithmetic from declared corridor figures. Drive + declared holds = total.',
       'حساب جبري محدد من أرقام الممر المعلنة. القيادة + التوقفات المعلنة = الإجمالي.',
     ),
-    co2Saved: t('CO2 Emissions Offset', 'وفر انبعاثات الكربون'),
-    fuelSaved: t('Energy Efficiency Gain', 'تحسين كفاءة الطاقة'),
-    estCost: t('Estimated Transit Cost', 'التكلفة التشغيلية التقديرية'),
-    manifestHash: t('SHA-256 Audit Seal', 'ختم التدقيق المشفر SHA-256'),
-    genManifestBtn: t('Generate Digital Manifest', 'إصدار البيان الرقمي المعتمد'),
-    compareBtn: t('Compare Land Modes', 'مقارنة أنماط الشحن البري'),
+    co2Saved: t('CO₂ Emissions Saved', 'انبعاثات الكربون المتفادية'),
+    fuelSaved: t('Fleet Fuel Optimization', 'تحسين استهلاك الوقود'),
+    estCost: t('Estimated Operational Cost', 'التكلفة التشغيلية التقديرية'),
+    manifestHash: t('SHA-256 Shipment Manifest', 'بوليصة الشحن المشفرة SHA-256'),
+    genManifestBtn: t('Generate Cryptographic Manifest', 'إصدار مانيفست شحن رقمي مشفر'),
+    compareBtn: t('Compare Route Modalities', 'مقارنة أنماط الشحن البري'),
     close: t('Close', 'إغلاق'),
   }
 
   return (
     <section
-      id="dispatch-optimizer"
+      id="corridor-dispatch"
       dir={direction}
-      className={`relative py-24 sm:py-32 px-4 sm:px-6 lg:px-8 transition-colors duration-500 overflow-hidden ${
+      className={`relative py-28 transition-colors duration-300 overflow-hidden ${
         mode === 'dark' ? 'bg-slate-950 text-white' : 'bg-slate-900 text-white'
       }`}
     >
       {/* Background Subtle Ambient Glow */}
-      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[800px] h-[450px] bg-gradient-to-tr from-cyan-600/10 via-blue-600/10 to-transparent blur-[140px] pointer-events-none rounded-full" />
+      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[800px] h-[450px] bg-gradient-to-tr from-gold-600/10 via-amber-600/10 to-transparent blur-[140px] pointer-events-none rounded-full" />
 
       <div className="max-w-7xl mx-auto relative z-10">
         
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto mb-16 sm:mb-20">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-cyan-500/30 bg-cyan-500/10 text-cyan-300 font-mono text-xs font-semibold uppercase tracking-wider mb-4 shadow-[0_0_20px_rgba(6,182,212,0.15)]">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-gold-500/30 bg-gold-500/10 text-gold-300 font-mono text-xs font-semibold uppercase tracking-wider mb-4 shadow-[0_0_20px_rgba(232,179,23,0.15)]">
             <Sparkles className="w-3.5 h-3.5" />
             <span>{ui.kicker[language]}</span>
           </div>
@@ -387,7 +387,7 @@ export function CorridorDispatchSection() {
             {/* Control Header & Live Status */}
             <div className="flex items-center justify-between pb-4 border-b border-white/10">
               <div className="flex items-center gap-2.5">
-                <div className="p-2 rounded-xl bg-cyan-500/10 border border-cyan-500/30 text-cyan-300">
+                <div className="p-2 rounded-xl bg-gold-500/10 border border-gold-500/30 text-gold-300">
                   <Truck className="w-5 h-5" />
                 </div>
                 <div>
@@ -417,7 +417,7 @@ export function CorridorDispatchSection() {
                     onClick={() => setSelectedCorridorId(corridor.id)}
                     className={`w-full text-left p-3 rounded-2xl font-mono text-xs transition-all flex items-center justify-between border ${
                       selectedCorridorId === corridor.id
-                        ? 'bg-cyan-500/20 border-cyan-400 text-white shadow-[0_0_20px_rgba(6,182,212,0.2)]'
+                        ? 'bg-gold-500/20 border-gold-400 text-white shadow-[0_0_20px_rgba(232,179,23,0.2)]'
                         : 'bg-black/30 border-white/5 text-slate-400 hover:text-slate-200 hover:border-white/15'
                     }`}
                   >
@@ -429,7 +429,7 @@ export function CorridorDispatchSection() {
                         {corridor.code} · {corridor.distanceKm} km · {corridor.axleLoadLimitT}T Axle
                       </span>
                     </div>
-                    <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-white/10 text-cyan-300">
+                    <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-white/10 text-gold-300">
                       {corridor.railSlotTime.split('//')[0]}
                     </span>
                   </button>
@@ -452,12 +452,12 @@ export function CorridorDispatchSection() {
                       onClick={() => setSelectedModeId(modeItem.id)}
                       className={`p-3 rounded-2xl font-mono text-xs transition-all border flex items-center justify-between text-left ${
                         isSelected
-                          ? 'bg-gradient-to-r from-cyan-950/60 to-blue-950/60 border-cyan-400 text-white shadow-[0_0_20px_rgba(6,182,212,0.2)]'
+                          ? 'bg-gradient-to-r from-gold-950/60 to-amber-950/60 border-gold-400 text-white shadow-[0_0_20px_rgba(232,179,23,0.2)]'
                           : 'bg-black/30 border-white/5 text-slate-400 hover:text-slate-200 hover:border-white/15'
                       }`}
                     >
                       <div className="flex items-center gap-3">
-                        <div className={`p-2 rounded-xl ${isSelected ? 'bg-cyan-500 text-slate-950' : 'bg-white/5 text-slate-400'}`}>
+                        <div className={`p-2 rounded-xl ${isSelected ? 'bg-gold-500 text-slate-950' : 'bg-white/5 text-slate-400'}`}>
                           <Icon className="w-4 h-4" />
                         </div>
                         <div>
@@ -487,7 +487,7 @@ export function CorridorDispatchSection() {
                 value={selectedCargoId}
                 onChange={(e) => setSelectedCargoId(e.target.value as CargoClassId)}
                 aria-label={ui.cargoLabel[language]}
-                className="w-full p-3 rounded-2xl bg-black/40 border border-white/10 text-white font-mono text-xs focus:outline-none focus:border-cyan-400 transition-colors"
+                className="w-full p-3 rounded-2xl bg-black/40 border border-white/10 text-white font-mono text-xs focus:outline-none focus:border-gold-400 transition-colors"
               >
                 {CARGO_CLASSES.map((cargo) => (
                   <option key={cargo.id} value={cargo.id} className="bg-slate-900 text-white">
@@ -501,7 +501,7 @@ export function CorridorDispatchSection() {
             <div className="space-y-2">
               <div className="flex justify-between items-center text-xs font-mono">
                 <span className="text-slate-300 font-bold uppercase">{ui.payloadLabel[language]}</span>
-                <span className="text-cyan-300 font-bold text-sm">
+                <span className="text-gold-300 font-bold text-sm">
                   {payloadTons} {ui.tonUnit[language]}
                 </span>
               </div>
@@ -512,7 +512,7 @@ export function CorridorDispatchSection() {
                 value={payloadTons}
                 onChange={handlePayloadChange}
                 aria-label={ui.payloadLabel[language]}
-                className="w-full h-2 bg-black/50 rounded-lg appearance-none cursor-pointer accent-cyan-400"
+                className="w-full h-2 bg-black/50 rounded-lg appearance-none cursor-pointer accent-gold-400"
               />
             </div>
 
@@ -520,7 +520,7 @@ export function CorridorDispatchSection() {
             <div className="grid grid-cols-2 gap-3 p-4 rounded-2xl bg-black/40 border border-white/10 font-mono text-xs">
               <div>
                 <span className="text-[10px] text-slate-400 block">{ui.estTime[language]}</span>
-                <span className="text-lg font-black text-cyan-300">{calculation.estimatedTimeFormatted}</span>
+                <span className="text-lg font-black text-gold-300">{calculation.estimatedTimeFormatted}</span>
                 <span className="text-[9px] text-emerald-400 block">
                   {ui.arrivalTime[language]} {calculation.arrivalTimeFormatted} (MODELLED)
                 </span>
@@ -540,14 +540,14 @@ export function CorridorDispatchSection() {
 
               <div>
                 <span className="text-[10px] text-slate-400 block">{ui.fuelSaved[language]}</span>
-                <span className="text-sm font-bold text-cyan-300">+{calculation.fuelReductionPercent}% ESG GAIN</span>
+                <span className="text-sm font-bold text-gold-300">+{calculation.fuelReductionPercent}% ESG GAIN</span>
               </div>
             </div>
 
             {/* 5b. ETA breakdown — where the hours go (MODELLED) */}
-            <div className="p-4 rounded-2xl bg-black/40 border border-cyan-500/15 font-mono text-xs">
+            <div className="p-4 rounded-2xl bg-black/40 border border-gold-500/15 font-mono text-xs">
               <div className="flex items-center justify-between gap-2 mb-1">
-                <span className="text-[10px] font-bold text-cyan-300 uppercase tracking-wider">
+                <span className="text-[10px] font-bold text-gold-300 uppercase tracking-wider">
                   {ui.etaSegmentsTitle[language]}
                 </span>
                 <span className="px-1.5 py-0.5 rounded bg-amber-400/10 border border-amber-400/30 text-amber-200/90 text-[8px] font-bold">
@@ -573,8 +573,8 @@ export function CorridorDispatchSection() {
                   </div>
                 ))}
                 <div className="flex items-center justify-between gap-2 pt-1.5">
-                  <span className="text-[10px] font-bold text-cyan-300">TOTAL (MODELLED)</span>
-                  <span className="text-[12px] font-black text-cyan-300">
+                  <span className="text-[10px] font-bold text-gold-300">TOTAL (MODELLED)</span>
+                  <span className="text-[12px] font-black text-gold-300">
                     {formatSegmentMinutes(calculation.eta.totalMinutes)}
                   </span>
                 </div>
@@ -582,10 +582,10 @@ export function CorridorDispatchSection() {
             </div>
 
             {/* 6. Cryptographic Manifest Hash Box */}
-            <div className="p-3.5 rounded-2xl bg-slate-950/80 border border-cyan-500/20 flex items-center justify-between gap-2 font-mono text-xs">
+            <div className="p-3.5 rounded-2xl bg-slate-950/80 border border-gold-500/20 flex items-center justify-between gap-2 font-mono text-xs">
               <div className="overflow-hidden">
                 <span className="text-[9px] text-slate-400 uppercase block">{ui.manifestHash[language]}</span>
-                <span className="text-[11px] text-cyan-300 font-bold truncate block">
+                <span className="text-[11px] text-gold-300 font-bold truncate block">
                   {calculation.cryptographicManifestHash}
                 </span>
               </div>
@@ -603,7 +603,7 @@ export function CorridorDispatchSection() {
             <div className="flex flex-col gap-2.5 pt-2">
               <button
                 onClick={() => setManifestModalOpen(true)}
-                className="w-full py-3.5 px-6 rounded-2xl font-mono text-xs font-bold uppercase tracking-wider bg-gradient-to-r from-cyan-500 to-blue-600 text-slate-950 hover:from-cyan-400 hover:to-blue-500 transition-all shadow-[0_0_25px_rgba(6,182,212,0.4)] flex items-center justify-center gap-2 group"
+                className="w-full py-3.5 px-6 rounded-2xl font-mono text-xs font-bold uppercase tracking-wider bg-gradient-to-r from-gold-500 to-amber-600 text-slate-950 hover:from-gold-400 hover:to-amber-500 transition-all shadow-[0_0_25px_rgba(232,179,23,0.4)] flex items-center justify-center gap-2 group"
               >
                 <Lock className="w-4 h-4" />
                 <span>{ui.genManifestBtn[language]}</span>
@@ -612,9 +612,9 @@ export function CorridorDispatchSection() {
 
               <button
                 onClick={() => setCompareModalOpen(true)}
-                className="w-full py-3 px-5 rounded-2xl font-mono text-xs font-bold border border-white/10 bg-slate-900/90 text-cyan-300 hover:bg-slate-800 hover:border-cyan-400/40 transition-all flex items-center justify-center gap-2"
+                className="w-full py-3 px-5 rounded-2xl font-mono text-xs font-bold border border-white/10 bg-slate-900/90 text-gold-300 hover:bg-slate-800 hover:border-gold-400/40 transition-all flex items-center justify-center gap-2"
               >
-                <Scale className="w-4 h-4 text-cyan-400" />
+                <Scale className="w-4 h-4 text-gold-400" />
                 <span>{ui.compareBtn[language]}</span>
               </button>
             </div>
@@ -661,11 +661,11 @@ export function CorridorDispatchSection() {
                   onClick={() => setSelectedWaypointNode(wp)}
                   className={`p-3 rounded-2xl border text-left font-mono text-xs transition-all backdrop-blur-xl ${
                     selectedWaypointNode?.name === wp.name
-                      ? 'bg-cyan-500/20 border-cyan-400 text-white shadow-lg'
+                      ? 'bg-gold-500/20 border-gold-400 text-white shadow-lg'
                       : 'bg-slate-900/80 border-white/10 text-slate-400 hover:text-white hover:border-white/20'
                   }`}
                 >
-                  <span className="text-[9px] text-cyan-400 font-bold block">{wp.status}</span>
+                  <span className="text-[9px] text-gold-400 font-bold block">{wp.status}</span>
                   <span className="font-bold text-white text-[11px] truncate block">{wp.name}</span>
                   <span className="text-[9px] text-slate-400 block truncate">{wp.throughputIndex}</span>
                 </button>
@@ -703,7 +703,7 @@ export function CorridorDispatchSection() {
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.95, opacity: 0, y: 20 }}
               onClick={(e) => e.stopPropagation()}
-              className="relative max-w-2xl w-full rounded-3xl p-6 sm:p-8 border border-cyan-500/40 bg-slate-900/95 shadow-[0_0_80px_rgba(6,182,212,0.35)] text-white"
+              className="relative max-w-2xl w-full rounded-3xl p-6 sm:p-8 border border-gold-500/40 bg-slate-900/95 shadow-[0_0_80px_rgba(232,179,23,0.25)] text-white"
             >
               <div className="flex items-center justify-between pb-4 border-b border-white/10">
                 <div className="flex items-center gap-2">
@@ -726,7 +726,7 @@ export function CorridorDispatchSection() {
                   </div>
                   <div>
                     <span className="text-slate-400 block text-[10px]">ROUTING:</span>
-                    <strong className="text-cyan-300">{activeCorridor.originCity[language]} → {activeCorridor.destinationCity[language]}</strong>
+                    <strong className="text-gold-300">{activeCorridor.originCity[language]} → {activeCorridor.destinationCity[language]}</strong>
                   </div>
                   <div>
                     <span className="text-slate-400 block text-[10px]">TRANSPORT MODE:</span>
@@ -738,8 +738,8 @@ export function CorridorDispatchSection() {
                   </div>
                 </div>
 
-                <div className="p-4 rounded-2xl bg-cyan-950/30 border border-cyan-500/30">
-                  <span className="text-[10px] text-cyan-400 font-bold block mb-1">SHA-256 DIGITAL AUDIT SEAL:</span>
+                <div className="p-4 rounded-2xl bg-gold-950/30 border border-gold-500/30">
+                  <span className="text-[10px] text-gold-400 font-bold block mb-1">SHA-256 DIGITAL AUDIT SEAL:</span>
                   <p className="font-mono text-xs text-white break-all">{calculation.cryptographicManifestHash}</p>
                 </div>
               </div>
@@ -747,7 +747,7 @@ export function CorridorDispatchSection() {
               <div className="pt-4 border-t border-white/10 flex justify-end">
                 <button
                   onClick={() => setManifestModalOpen(false)}
-                  className="px-6 py-2.5 rounded-xl bg-cyan-500 text-slate-950 font-bold text-xs hover:bg-cyan-400 transition-colors"
+                  className="px-6 py-2.5 rounded-xl bg-gold-500 text-slate-950 font-bold text-xs hover:bg-gold-400 transition-colors"
                 >
                   {ui.close[language]}
                 </button>

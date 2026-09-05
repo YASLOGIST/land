@@ -57,12 +57,12 @@ function RouteMicroVisual({ mode, isRtl }: { mode: 'dark' | 'light'; isRtl: bool
           </linearGradient>
         </defs>
         <circle cx="12" cy="22" r="3.5" fill="#0891b2" />
-        <circle cx="110" cy="22" r="3" fill="#22d3ee" />
-        <circle cx="208" cy="22" r="3.5" fill="#0284c7" />
+        <circle cx="110" cy="22" r="3" fill="#E8B317" />
+        <circle cx="208" cy="22" r="3.5" fill="#f0be24" />
       </svg>
       <div
         className={`absolute top-1.5 ${isRtl ? 'left-2.5' : 'right-2.5'} text-[9px] font-mono font-bold ${
-          mode === 'dark' ? 'text-cyan-400' : 'text-cyan-800'
+          mode === 'dark' ? 'text-gold-400' : 'text-gold-800'
         }`}
       >
         AI REROUTE: &lt;50ms
@@ -84,12 +84,12 @@ function RadarMicroVisual({ mode }: { mode: 'dark' | 'light' }) {
       <div className="relative w-9 h-9 flex items-center justify-center">
         <div
           className={`absolute inset-0 rounded-full border ${
-            mode === 'dark' ? 'border-cyan-500/30' : 'border-cyan-600/30'
+            mode === 'dark' ? 'border-gold-500/30' : 'border-gold-600/30'
           }`}
         />
         <div
           className={`absolute inset-2 rounded-full border ${
-            mode === 'dark' ? 'border-cyan-400/20' : 'border-cyan-500/20'
+            mode === 'dark' ? 'border-gold-400/20' : 'border-gold-500/20'
           }`}
         />
         <motion.div
@@ -97,11 +97,11 @@ function RadarMicroVisual({ mode }: { mode: 'dark' | 'light' }) {
           transition={{ duration: 3, repeat: Infinity, ease: 'linear' }}
           className={`absolute inset-0 origin-center rounded-full ${
             mode === 'dark'
-              ? 'bg-gradient-to-tr from-cyan-400/40 via-transparent to-transparent'
-              : 'bg-gradient-to-tr from-cyan-600/35 via-transparent to-transparent'
+              ? 'bg-gradient-to-tr from-gold-400/40 via-transparent to-transparent'
+              : 'bg-gradient-to-tr from-gold-600/35 via-transparent to-transparent'
           }`}
         />
-        <div className="w-2 h-2 rounded-full bg-cyan-500 shadow-[0_0_8px_rgba(6,182,212,1)]" />
+        <div className="w-2 h-2 rounded-full bg-gold-500 shadow-[0_0_8px_rgba(232,179,23,1)]" />
       </div>
       <div className="flex items-center gap-2.5">
         <span className="inline-block w-2 h-2 rounded-full bg-emerald-500 animate-ping" />
@@ -111,7 +111,7 @@ function RadarMicroVisual({ mode }: { mode: 'dark' | 'light' }) {
           }`}
         >
           MESH PING:{' '}
-          <span className={mode === 'dark' ? 'text-cyan-400' : 'text-cyan-800'}>0.4ms</span>
+          <span className={mode === 'dark' ? 'text-gold-400' : 'text-gold-800'}>0.4ms</span>
         </span>
       </div>
     </div>
@@ -131,7 +131,7 @@ function SecurityMicroVisual({ mode }: { mode: 'dark' | 'light' }) {
       <div className="flex items-center gap-2">
         <div
           className={`p-1.5 rounded-lg ${
-            mode === 'dark' ? 'bg-cyan-500/10 text-cyan-400' : 'bg-cyan-100 text-cyan-800'
+            mode === 'dark' ? 'bg-gold-500/10 text-gold-400' : 'bg-gold-100 text-gold-800'
           }`}
         >
           <Lock className="w-4 h-4" />
@@ -147,7 +147,7 @@ function SecurityMicroVisual({ mode }: { mode: 'dark' | 'light' }) {
       <motion.div
         animate={{ x: ['-100%', '200%'] }}
         transition={{ duration: 2.2, repeat: Infinity, ease: 'easeInOut' }}
-        className="absolute inset-y-0 w-8 bg-gradient-to-r from-transparent via-cyan-400/25 to-transparent pointer-events-none"
+        className="absolute inset-y-0 w-8 bg-gradient-to-r from-transparent via-gold-400/25 to-transparent pointer-events-none"
       />
       <div className="flex items-center gap-1">
         <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_6px_rgba(16,185,129,1)]" />
@@ -170,7 +170,7 @@ function RoboticsMicroVisual({ mode }: { mode: 'dark' | 'light' }) {
       <div className="flex items-center gap-2">
         <div
           className={`p-1.5 rounded-lg ${
-            mode === 'dark' ? 'bg-cyan-500/10 text-cyan-400' : 'bg-cyan-100 text-cyan-800'
+            mode === 'dark' ? 'bg-gold-500/10 text-gold-400' : 'bg-gold-100 text-gold-800'
           }`}
         >
           <Boxes className="w-4 h-4" />
@@ -187,7 +187,7 @@ function RoboticsMicroVisual({ mode }: { mode: 'dark' | 'light' }) {
         <motion.span
           animate={{ scale: [1, 1.4, 1], opacity: [0.4, 1, 0.4] }}
           transition={{ duration: 1.2, repeat: Infinity, delay: 0 }}
-          className="w-2 h-2 rounded-full bg-cyan-400"
+          className="w-2 h-2 rounded-full bg-gold-400"
         />
         <motion.span
           animate={{ scale: [1, 1.4, 1], opacity: [0.4, 1, 0.4] }}
@@ -215,7 +215,7 @@ function BiModalMicroVisual({ mode }: { mode: 'dark' | 'light' }) {
       }`}
     >
       <div className="flex items-center gap-2">
-        <div className={`p-1.5 rounded-lg ${mode === 'dark' ? 'bg-cyan-500/10 text-cyan-400' : 'bg-cyan-100 text-cyan-800'}`}>
+        <div className={`p-1.5 rounded-lg ${mode === 'dark' ? 'bg-gold-500/10 text-gold-400' : 'bg-gold-100 text-gold-800'}`}>
           <Truck className="w-4 h-4" />
         </div>
         <span
@@ -226,7 +226,7 @@ function BiModalMicroVisual({ mode }: { mode: 'dark' | 'light' }) {
           BI-MODAL: ROAD FREIGHT & WAREHOUSING
         </span>
       </div>
-      <span className="text-[9px] font-mono font-extrabold text-cyan-400 bg-cyan-500/10 px-2 py-0.5 rounded border border-cyan-500/20">
+      <span className="text-[9px] font-mono font-extrabold text-gold-400 bg-gold-500/10 px-2 py-0.5 rounded border border-gold-500/20">
         V2X SYNCED
       </span>
     </div>
@@ -442,8 +442,8 @@ export default function CapabilitiesSection() {
         
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto mb-20">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border mb-4 backdrop-blur-xl bg-cyan-500/10 border-cyan-500/30 text-cyan-400 shadow-[0_0_20px_rgba(6,182,212,0.15)]">
-            <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border mb-4 backdrop-blur-xl bg-gold-500/10 border-gold-500/30 text-gold-400 shadow-[0_0_20px_rgba(232,179,23,0.15)]">
+            <Sparkles className="w-3.5 h-3.5 text-gold-400" />
             <span className={`font-bold ${isAr ? 'text-xs tracking-normal' : 'text-xs uppercase tracking-widest'}`}>
               {t('Autonomous Land Platform Architecture', 'بنية منصة النقل البري المستقلة')[language]}
             </span>
@@ -481,23 +481,23 @@ export default function CapabilitiesSection() {
                 viewport={{ once: true, margin: '-50px' }}
                 className={`group relative rounded-3xl p-6 sm:p-7 flex flex-col justify-between transition-all duration-300 border backdrop-blur-2xl ${
                   mode === 'dark'
-                    ? 'bg-white/[0.025] border-white/10 hover:border-cyan-400/40 shadow-[0_8px_32px_0_rgba(0,0,0,0.37)] hover:shadow-[0_0_30px_rgba(6,182,212,0.15)]'
-                    : 'bg-white/80 border-slate-200 shadow-lg hover:border-cyan-500/40 hover:shadow-xl'
+                    ? 'bg-white/[0.025] border-white/10 hover:border-gold-400/40 shadow-[0_8px_32px_0_rgba(0,0,0,0.37)] hover:shadow-[0_0_30px_rgba(232,179,23,0.15)]'
+                    : 'bg-white/80 border-slate-200 shadow-lg hover:border-gold-500/40 hover:shadow-xl'
                 }`}
               >
                 {/* Specular Top Reflection */}
                 <div
-                  className="absolute inset-x-0 top-0 h-[1.5px] bg-gradient-to-r from-transparent via-cyan-400/40 to-transparent pointer-events-none"
+                  className="absolute inset-x-0 top-0 h-[1.5px] bg-gradient-to-r from-transparent via-gold-400/40 to-transparent pointer-events-none"
                   aria-hidden="true"
                 />
 
                 <div>
                   {/* Card Top: Number & Icon */}
                   <div className="flex items-center justify-between mb-5">
-                    <span className="font-mono text-2xl font-black text-cyan-400/40 group-hover:text-cyan-400 transition-colors duration-300">
+                    <span className="font-mono text-2xl font-black text-gold-400/40 group-hover:text-gold-400 transition-colors duration-300">
                       {card.indexNumber}
                     </span>
-                    <div className="w-10 h-10 rounded-2xl bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                    <div className="w-10 h-10 rounded-2xl bg-gold-500/10 border border-gold-500/20 text-gold-400 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
                       <Icon className="w-5 h-5" />
                     </div>
                   </div>
@@ -509,7 +509,7 @@ export default function CapabilitiesSection() {
                   <h3 className="text-xl font-bold tracking-tight mb-2 text-white">
                     {card.title[language]}
                   </h3>
-                  <p className="text-xs font-semibold text-cyan-300/90 mb-3">
+                  <p className="text-xs font-semibold text-gold-300/90 mb-3">
                     {card.tagline[language]}
                   </p>
                   <p className="text-xs sm:text-sm text-slate-300 leading-relaxed mb-6">

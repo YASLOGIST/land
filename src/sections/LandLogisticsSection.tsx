@@ -382,7 +382,7 @@ export default function LandLogisticsSection({
           playsInline
           webkit-playsinline="true"
           x5-playsinline="true"
-          preload="auto"
+          preload="none"
           controls={false}
           autoPlay={false}
           loop={false}
@@ -402,7 +402,7 @@ export default function LandLogisticsSection({
           playsInline
           webkit-playsinline="true"
           x5-playsinline="true"
-          preload="auto"
+          preload="none"
           controls={false}
           autoPlay={false}
           loop={false}
@@ -450,11 +450,11 @@ export default function LandLogisticsSection({
                   }}
                   className={`min-h-[36px] flex items-center justify-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-mono font-bold transition-all duration-300 cursor-pointer ${
                     isActive
-                      ? 'bg-cyan-500/25 text-cyan-300 border border-cyan-400/80 shadow-[0_0_20px_rgba(6,182,212,0.4)] scale-105'
-                      : 'bg-slate-950/80 text-slate-400 border border-white/10 hover:border-cyan-400/40 hover:text-slate-200'
+                      ? 'bg-gold-500/25 text-gold-300 border border-gold-400/80 shadow-[0_0_20px_rgba(232,179,23,0.4)] scale-105'
+                      : 'bg-slate-950/80 text-slate-400 border border-white/10 hover:border-gold-400/40 hover:text-slate-200'
                   }`}
                 >
-                  <span className={`w-2 h-2 rounded-full ${isActive ? 'bg-[#D3EE22] shadow-[0_0_8px_#D3EE22] animate-pulse' : 'bg-slate-600'}`} />
+                  <span className={`w-2 h-2 rounded-full ${isActive ? 'bg-[#E8B317] shadow-[0_0_8px_#E8B317] animate-pulse' : 'bg-slate-600'}`} />
                   <span>0{p.index + 1} // {language === 'ar' ? (p.index === 0 ? 'المستودعات' : p.index === 1 ? 'الأرصفة' : 'النقل الشرياني') : (p.index === 0 ? 'WAREHOUSING' : p.index === 1 ? 'DOCK' : 'HAULAGE')}</span>
                 </button>
               )
@@ -468,11 +468,11 @@ export default function LandLogisticsSection({
               animate={{ opacity: 1, x: 0, scale: 1 }}
               exit={{ opacity: 0, x: -12, scale: 0.98 }}
               transition={{ duration: 0.35, ease: EASE_CURVE }}
-              className="relative rounded-3xl p-5 sm:p-6 border border-cyan-500/30 bg-slate-950/80 backdrop-blur-2xl shadow-[0_20px_50px_rgba(0,0,0,0.8)]"
+              className="relative rounded-3xl p-5 sm:p-6 border border-gold-500/30 bg-slate-950/80 backdrop-blur-2xl shadow-[0_20px_50px_rgba(0,0,0,0.8)]"
             >
               {/* Specular Top Reflection Line */}
               <div
-                className="absolute inset-x-0 top-0 h-[1.5px] bg-gradient-to-r from-transparent via-cyan-400/50 to-transparent pointer-events-none"
+                className="absolute inset-x-0 top-0 h-[1.5px] bg-gradient-to-r from-transparent via-gold-400/50 to-transparent pointer-events-none"
                 aria-hidden="true"
               />
 
@@ -482,11 +482,11 @@ export default function LandLogisticsSection({
                   isRTL ? 'flex-row-reverse justify-end' : 'flex-row'
                 }`}
               >
-                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-cyan-500/15 text-cyan-300 border border-cyan-400/30 shadow-[0_0_15px_rgba(6,182,212,0.25)]">
+                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-gold-500/15 text-gold-300 border border-gold-400/30 shadow-[0_0_15px_rgba(232,179,23,0.25)]">
                   <PhaseIcon className="h-5 w-5" strokeWidth={2} />
                 </span>
                 <div className={isRTL ? 'text-right' : 'text-left'}>
-                  <p className="font-mono text-xs font-bold uppercase tracking-wider text-[#D3EE22]">
+                  <p className="font-mono text-xs font-bold uppercase tracking-wider text-[#E8B317]">
                     {phase.kicker[language]}
                   </p>
                   <p className="text-[11px] font-semibold font-mono text-slate-400">
@@ -522,14 +522,14 @@ export default function LandLogisticsSection({
                           isRTL ? 'flex-row-reverse justify-end' : 'flex-row'
                         }`}
                       >
-                        <MetricIcon className="h-3 w-3 shrink-0 text-cyan-400" strokeWidth={2} />
+                        <MetricIcon className="h-3 w-3 shrink-0 text-gold-400" strokeWidth={2} />
                         <span className="font-mono text-[9px] uppercase tracking-wider text-slate-400 truncate">
                           {metric.label[language]}
                         </span>
                       </div>
                       <p
                         dir="ltr"
-                        className={`font-mono text-[10.5px] font-bold text-cyan-300 ${
+                        className={`font-mono text-[10.5px] font-bold text-gold-300 ${
                           isAr ? 'text-right' : 'text-left'
                         }`}
                       >
@@ -548,10 +548,10 @@ export default function LandLogisticsSection({
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3 }}
-            className="mt-3 p-3 rounded-2xl border border-cyan-500/30 bg-slate-950/85 backdrop-blur-2xl flex items-center justify-between gap-2 shadow-[0_0_20px_rgba(6,182,212,0.15)]"
+            className="mt-3 p-3 rounded-2xl border border-gold-500/30 bg-slate-950/85 backdrop-blur-2xl flex items-center justify-between gap-2 shadow-[0_0_20px_rgba(232,179,23,0.15)]"
           >
             <div className="flex items-center gap-2">
-              <Sparkles className="w-3.5 h-3.5 text-cyan-400 animate-pulse" />
+              <Sparkles className="w-3.5 h-3.5 text-gold-400 animate-pulse" />
               <span className="font-mono text-[10px] font-bold text-slate-200">
                 {PHASES[activePhase].floatingProjection[language]}
               </span>
@@ -570,7 +570,7 @@ export default function LandLogisticsSection({
               key={p.index}
               className={`w-1.5 rounded-full transition-all duration-400 ${
                 p.index === activePhase
-                  ? 'h-10 bg-cyan-400 shadow-[0_0_15px_rgba(6,182,212,1)] scale-y-110'
+                  ? 'h-10 bg-gold-400 shadow-[0_0_15px_rgba(232,179,23,1)] scale-y-110'
                   : 'h-6 bg-slate-700/60'
               }`}
               role="presentation"
@@ -595,7 +595,7 @@ export default function LandLogisticsSection({
                 animate={{ y: [0, 4, 0] }}
                 transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
               >
-                <ChevronDown className="h-4 w-4 text-[#D3EE22]" />
+                <ChevronDown className="h-4 w-4 text-[#E8B317]" />
               </motion.span>
             </motion.div>
           )}
@@ -610,7 +610,7 @@ export default function LandLogisticsSection({
           aria-label="Simulation Telemetry Monitoring Panel"
         >
           <div 
-            className="rounded-3xl border border-cyan-500/30 bg-slate-950/85 backdrop-blur-2xl shadow-[0_20px_50px_rgba(0,0,0,0.8)]"
+            className="rounded-3xl border border-gold-500/30 bg-slate-950/85 backdrop-blur-2xl shadow-[0_20px_50px_rgba(0,0,0,0.8)]"
             style={{
               paddingRight: '9px',
               marginLeft: '1px',
@@ -631,18 +631,18 @@ export default function LandLogisticsSection({
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
                   <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.9)]" />
                 </span>
-                <span className="font-mono font-extrabold text-[10px] tracking-wider text-cyan-400">
+                <span className="font-mono font-extrabold text-[10px] tracking-wider text-gold-400">
                   {i18n.ui.simulationBadge}: ONLINE
                 </span>
               </div>
 
               <div className="flex items-center gap-2">
-                <span className="px-2 py-0.5 rounded-lg bg-cyan-500/15 border border-cyan-400/30 text-[9px] font-mono font-bold text-cyan-300">
+                <span className="px-2 py-0.5 rounded-lg bg-gold-500/15 border border-gold-400/30 text-[9px] font-mono font-bold text-gold-300">
                   SCROLL SCRUB
                 </span>
 
                 <div className="flex items-center gap-1">
-                  <Terminal className="w-3 h-3 text-cyan-400" />
+                  <Terminal className="w-3 h-3 text-gold-400" />
                   <span ref={telemetryTimeSpanRef} className="font-mono text-[10px] font-bold text-slate-400">
                     T+00:00.00
                   </span>
@@ -653,10 +653,10 @@ export default function LandLogisticsSection({
             {/* Dynamic Phase Status */}
             <div className={`mb-2.5 ${isAr ? 'text-right' : 'text-left'}`}>
               <div className="flex items-center justify-between gap-1.5 mb-1">
-                <span className="font-bold font-mono text-[11px] text-cyan-300 truncate">
+                <span className="font-bold font-mono text-[11px] text-gold-300 truncate">
                   {currentSimDetail.badge[language]}
                 </span>
-                <span className="px-2 py-0.5 rounded-full font-mono text-[9px] font-bold shrink-0 bg-cyan-500/15 text-cyan-300 border border-cyan-500/30">
+                <span className="px-2 py-0.5 rounded-full font-mono text-[9px] font-bold shrink-0 bg-gold-500/15 text-gold-300 border border-gold-500/30">
                   {currentSimDetail.status[language]}
                 </span>
               </div>
@@ -668,23 +668,23 @@ export default function LandLogisticsSection({
             {/* Signal Stream & Telemetry Waveform Bar */}
             <div className="p-2.5 rounded-2xl mb-2.5 flex items-center justify-between gap-2.5 bg-white/[0.03] border border-white/10">
               <div className="flex items-center gap-1.5">
-                <Radio className="w-3.5 h-3.5 text-cyan-400 animate-pulse" />
+                <Radio className="w-3.5 h-3.5 text-gold-400 animate-pulse" />
                 <span className="font-mono text-[9px] uppercase font-bold text-slate-400">
                   STREAM: 99.8% FIDELITY
                 </span>
               </div>
               <div className="flex items-end gap-1 h-3">
-                <span className="w-0.5 bg-cyan-400 rounded-xs animate-pulse h-1.5" />
-                <span className="w-0.5 bg-cyan-400 rounded-xs animate-pulse h-3 delay-75" />
-                <span className="w-0.5 bg-cyan-400 rounded-xs animate-pulse h-1 delay-150" />
-                <span className="w-0.5 bg-cyan-400 rounded-xs animate-pulse h-2.5 delay-100" />
+                <span className="w-0.5 bg-gold-400 rounded-xs animate-pulse h-1.5" />
+                <span className="w-0.5 bg-gold-400 rounded-xs animate-pulse h-3 delay-75" />
+                <span className="w-0.5 bg-gold-400 rounded-xs animate-pulse h-1 delay-150" />
+                <span className="w-0.5 bg-gold-400 rounded-xs animate-pulse h-2.5 delay-100" />
               </div>
             </div>
 
             {/* Operational Clarification Notice */}
             <div className="pt-2 border-t border-white/10">
               <div className={`flex items-start gap-1.5 ${isAr ? 'text-right flex-row-reverse' : 'text-left'}`}>
-                <Activity className="w-3 h-3 shrink-0 mt-0.5 text-cyan-400" />
+                <Activity className="w-3 h-3 shrink-0 mt-0.5 text-gold-400" />
                 <p className="text-[9.5px] leading-relaxed text-slate-400">
                   {i18n.disclaimer}
                 </p>
@@ -694,13 +694,13 @@ export default function LandLogisticsSection({
         </motion.aside>
 
         {/* Mobile Bottom Floating Action Bar */}
-        <div className="sm:hidden absolute bottom-4 inset-x-4 z-20 flex items-center justify-between p-2.5 rounded-2xl bg-slate-950/90 border border-cyan-500/30 backdrop-blur-xl">
+        <div className="sm:hidden absolute bottom-4 inset-x-4 z-20 flex items-center justify-between p-2.5 rounded-2xl bg-slate-950/90 border border-gold-500/30 backdrop-blur-xl">
           <div className="flex items-center gap-2">
             <span className="relative flex h-2 w-2">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
               <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
             </span>
-            <span className="text-[10px] font-mono font-bold text-cyan-300">
+            <span className="text-[10px] font-mono font-bold text-gold-300">
               0{activePhase + 1} // {PHASES[activePhase]?.kicker[language]?.split('//')[1] || ''}
             </span>
           </div>

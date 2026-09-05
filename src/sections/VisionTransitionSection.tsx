@@ -138,16 +138,16 @@ export default function VisionTransitionSection() {
                 transition={{ duration: 0.5, delay: 0.2 + idx * 0.08 }}
                 className={`relative rounded-3xl p-5 sm:p-6 border backdrop-blur-2xl transition-all duration-300 group flex flex-col justify-between ${
                   mode === 'dark'
-                    ? 'bg-slate-950/80 border-white/15 hover:border-cyan-400/40 shadow-[0_10px_30px_rgba(0,0,0,0.8)] hover:shadow-[0_0_30px_rgba(6,182,212,0.15)]'
-                    : 'bg-slate-50 border-slate-200/90 hover:border-cyan-500/40 shadow-sm'
+                    ? 'bg-slate-950/80 border-white/15 hover:border-gold-400/40 shadow-[0_10px_30px_rgba(0,0,0,0.8)] hover:shadow-[0_0_30px_rgba(232,179,23,0.15)]'
+                    : 'bg-slate-50 border-slate-200/90 hover:border-gold-500/40 shadow-sm'
                 }`}
               >
                 {/* Specular Top Reflection */}
                 <div
                   className={`absolute inset-x-0 top-0 h-[1px] pointer-events-none ${
                     mode === 'dark'
-                      ? 'bg-gradient-to-r from-transparent via-cyan-400/30 to-transparent'
-                      : 'bg-gradient-to-r from-transparent via-cyan-500/20 to-transparent'
+                      ? 'bg-gradient-to-r from-transparent via-gold-400/30 to-transparent'
+                      : 'bg-gradient-to-r from-transparent via-gold-500/20 to-transparent'
                   }`}
                 />
 
@@ -156,8 +156,8 @@ export default function VisionTransitionSection() {
                     <div
                       className={`w-10 h-10 rounded-2xl border flex items-center justify-center transition-all duration-300 ${
                         mode === 'dark'
-                          ? 'bg-cyan-500/10 border-cyan-500/30 text-cyan-300 group-hover:bg-cyan-500 group-hover:text-slate-950'
-                          : 'bg-cyan-50 border-cyan-200 text-cyan-700 group-hover:bg-cyan-600 group-hover:text-white'
+                          ? 'bg-gold-500/10 border-gold-500/30 text-gold-300 group-hover:bg-gold-500 group-hover:text-slate-950'
+                          : 'bg-gold-50 border-gold-200 text-gold-800 group-hover:bg-gold-600 group-hover:text-white'
                       }`}
                     >
                       <Icon className="w-5 h-5" />
@@ -221,7 +221,7 @@ export default function VisionTransitionSection() {
               <div key={i} className="flex items-center gap-2.5 px-3 py-1">
                 <BadgeIcon
                   className={`w-4 h-4 ${
-                    mode === 'dark' ? 'text-cyan-400' : 'text-cyan-600'
+                    mode === 'dark' ? 'text-gold-400' : 'text-gold-700'
                   }`}
                 />
                 <div className="text-start font-mono">
@@ -261,7 +261,7 @@ export default function VisionTransitionSection() {
           <span>{visionCopy.scrollDown[language]}</span>
           <ArrowDown
             className={`w-3.5 h-3.5 animate-bounce ${
-              mode === 'dark' ? 'text-[#D3EE22]' : 'text-cyan-600'
+              mode === 'dark' ? 'text-[#E8B317]' : 'text-gold-700'
             }`}
           />
         </motion.a>

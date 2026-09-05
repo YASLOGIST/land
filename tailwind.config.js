@@ -72,6 +72,24 @@ export default {
           500: '#06b6d4',
           950: '#042f2e',
         },
+        gold: {
+          50: '#fdfbf2',
+          100: '#fcf6e1',
+          200: '#f8ebbf',
+          300: '#f2dc94',
+          400: '#f0c742',
+          500: '#E8B317', // Primary Sovereign Signal Gold
+          600: '#cc970e',
+          700: '#a3730e',
+          800: '#7A5400', // High contrast text in light mode
+          900: '#593e09',
+          950: '#332102',
+        },
+        signal: {
+          DEFAULT: '#E8B317',
+          dark: '#E8B317',
+          light: '#7A5400',
+        },
       },
       borderRadius: {
         lg: 'var(--radius)',
@@ -82,8 +100,9 @@ export default {
       },
       boxShadow: {
         'crystal': '0 8px 32px 0 rgba(0, 0, 0, 0.37), inset 0 1px 1px 0 rgba(255, 255, 255, 0.15)',
-        'crystal-glow': '0 0 25px rgba(6, 182, 212, 0.25), inset 0 1px 2px 0 rgba(255, 255, 255, 0.2)',
-        'neon-cyan': '0 0 20px rgba(6, 182, 212, 0.4)',
+        'crystal-glow': '0 0 25px rgba(232, 179, 23, 0.25), inset 0 1px 2px 0 rgba(255, 255, 255, 0.2)',
+        'neon-gold': '0 0 20px rgba(232, 179, 23, 0.4)',
+        'neon-cyan': '0 0 20px rgba(232, 179, 23, 0.4)',
       },
       animation: {
         'accordion-down': 'accordion-down 0.2s ease-out',

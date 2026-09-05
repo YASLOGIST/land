@@ -133,16 +133,16 @@ export function RouteComparisonModal({
             transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
             onClick={(e) => e.stopPropagation()}
             dir={isRTL ? 'rtl' : 'ltr'}
-            className="relative max-w-4xl w-full rounded-3xl p-6 sm:p-8 border border-white/15 bg-slate-900/95 shadow-[0_0_80px_rgba(6,182,212,0.35)] text-white my-8 max-h-[90vh] overflow-y-auto"
+            className="relative max-w-4xl w-full rounded-3xl p-6 sm:p-8 border border-white/15 bg-slate-900/95 shadow-[0_0_80px_rgba(232,179,23,0.2)] text-white my-8 max-h-[90vh] overflow-y-auto"
           >
             {/* Header */}
             <div className="flex items-start justify-between pb-6 border-b border-white/10">
               <div>
                 <div className="flex items-center gap-2 mb-2">
-                  <span className="p-1.5 rounded-lg bg-cyan-500/10 border border-cyan-400/30 text-cyan-300">
+                  <span className="p-1.5 rounded-lg bg-gold-500/10 border border-gold-400/30 text-gold-400">
                     <Sparkles className="w-4 h-4" />
                   </span>
-                  <span className="font-mono text-xs uppercase tracking-widest text-[#D3EE22] font-bold">
+                  <span className="font-mono text-xs uppercase tracking-widest text-gold-400 font-bold">
                     {isArabic ? 'مقارنة أنماط الشحن البري' : 'TERRESTRIAL LOGISTICS MODALITY BENCHMARK'}
                   </span>
                 </div>
@@ -172,7 +172,7 @@ export function RouteComparisonModal({
                     key={b.id}
                     className={`relative rounded-2xl p-5 border flex flex-col justify-between transition-all backdrop-blur-xl ${
                       b.isFastest
-                        ? 'border-cyan-500/50 bg-cyan-950/20 shadow-[0_0_30px_rgba(6,182,212,0.15)]'
+                        ? 'border-gold-500/50 bg-gold-950/20 shadow-[0_0_30px_rgba(232,179,23,0.15)]'
                         : b.isGreenest
                         ? 'border-emerald-500/50 bg-emerald-950/20 shadow-[0_0_30px_rgba(16,185,129,0.15)]'
                         : 'border-blue-500/50 bg-blue-950/20 shadow-[0_0_30px_rgba(59,130,246,0.15)]'
@@ -185,7 +185,7 @@ export function RouteComparisonModal({
                           <Icon className="w-5 h-5" />
                         </div>
                         {b.isFastest && (
-                          <span className="px-2 py-0.5 rounded-full font-mono text-[9.5px] font-bold bg-cyan-500/20 text-cyan-300 border border-cyan-400/40">
+                          <span className="px-2 py-0.5 rounded-full font-mono text-[9.5px] font-bold bg-gold-500/20 text-gold-300 border border-gold-400/40">
                             {isArabic ? 'الأسرع وصولاً' : 'DIRECT FTL'}
                           </span>
                         )}
@@ -209,7 +209,7 @@ export function RouteComparisonModal({
                       <div className="grid grid-cols-2 gap-2 my-4 p-3 rounded-xl bg-black/40 border border-white/10 font-mono">
                         <div>
                           <span className="text-[10px] text-slate-400 block">{isArabic ? 'زمن الوصول' : 'Transit Time'}</span>
-                          <span className="text-base font-bold text-cyan-300">{isArabic ? b.transitDisplayAr : b.transitDisplayEn}</span>
+                          <span className="text-base font-bold text-gold-300">{isArabic ? b.transitDisplayAr : b.transitDisplayEn}</span>
                         </div>
                         <div>
                           <span className="text-[10px] text-slate-400 block">{isArabic ? 'التكلفة التقديرية' : 'Est. Cost'}</span>
@@ -221,7 +221,7 @@ export function RouteComparisonModal({
                         </div>
                         <div>
                           <span className="text-[10px] text-slate-400 block">{isArabic ? 'الاعتمادية' : 'SLA Target'}</span>
-                          <span className="text-xs font-bold text-cyan-400">{b.reliabilityPercent}%</span>
+                          <span className="text-xs font-bold text-gold-400">{b.reliabilityPercent}%</span>
                         </div>
                       </div>
 
@@ -239,7 +239,7 @@ export function RouteComparisonModal({
                       <ul className="space-y-1.5 mb-2">
                         {(isArabic ? b.prosAr : b.prosEn).map((pro, pIdx) => (
                           <li key={pIdx} className="flex items-center gap-1.5 text-[11px] text-slate-300">
-                            <ShieldCheck className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
+                            <ShieldCheck className="w-3.5 h-3.5 text-gold-400 shrink-0" />
                             <span>{pro}</span>
                           </li>
                         ))}

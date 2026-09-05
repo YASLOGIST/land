@@ -131,7 +131,7 @@ export default function StatsSection() {
           transition={{ duration: 0.6 }}
           className="text-center max-w-3xl mx-auto mb-20"
         >
-          <p className={`text-cyan-400 font-bold mb-3 ${isRtl ? 'text-xs tracking-normal' : 'text-xs uppercase tracking-widest'}`}>
+          <p className={`text-gold-500 font-bold mb-3 ${isRtl ? 'text-xs tracking-normal' : 'text-xs uppercase tracking-widest'}`}>
             {kicker[language]}
           </p>
           <h2
@@ -169,13 +169,13 @@ export default function StatsSection() {
                 transition={{ duration: 0.5, delay: index * 0.1 }}
                 className={`group relative flex flex-col justify-between rounded-3xl p-7 transition-all duration-300 backdrop-blur-2xl ${
                   mode === 'dark'
-                    ? 'bg-white/[0.025] hover:bg-white/[0.045] border border-white/10 hover:border-cyan-400/40 shadow-[0_8px_32px_0_rgba(0,0,0,0.37),inset_0_1px_1px_0_rgba(255,255,255,0.1)] hover:shadow-[0_0_30px_rgba(6,182,212,0.2)]'
-                    : 'bg-white/80 hover:bg-white border border-slate-200/90 hover:border-cyan-400/60 shadow-md hover:shadow-xl'
+                    ? 'bg-white/[0.025] hover:bg-white/[0.045] border border-white/10 hover:border-gold-400/40 shadow-[0_8px_32px_0_rgba(0,0,0,0.37),inset_0_1px_1px_0_rgba(255,255,255,0.1)] hover:shadow-[0_0_30px_rgba(232,179,23,0.2)]'
+                    : 'bg-white/80 hover:bg-white border border-slate-200/90 hover:border-gold-500/60 shadow-md hover:shadow-xl'
                 }`}
               >
                 {/* Specular Top Reflection Line */}
                 <div
-                  className="absolute inset-x-0 top-0 h-[1.5px] bg-gradient-to-r from-transparent via-white/40 dark:via-cyan-400/40 to-transparent pointer-events-none"
+                  className="absolute inset-x-0 top-0 h-[1.5px] bg-gradient-to-r from-transparent via-white/40 dark:via-gold-400/40 to-transparent pointer-events-none"
                   aria-hidden="true"
                 />
 
@@ -183,8 +183,8 @@ export default function StatsSection() {
                 <div>
                   <div className="flex items-center justify-between gap-2 mb-6">
                     <div className="flex items-center gap-2">
-                      <span className="inline-block w-2 h-2 rounded-full bg-cyan-400 animate-pulse shadow-[0_0_8px_rgba(6,182,212,1)]" />
-                      <span className={`font-mono font-bold text-cyan-400 ${isRtl ? 'text-xs tracking-normal' : 'text-[10px] uppercase tracking-widest'}`}>
+                      <span className="inline-block w-2 h-2 rounded-full bg-gold-400 animate-pulse shadow-[0_0_8px_rgba(232,179,23,1)]" />
+                      <span className={`font-mono font-bold text-gold-400 ${isRtl ? 'text-xs tracking-normal' : 'text-[10px] uppercase tracking-widest'}`}>
                         {stat.status[language]}
                       </span>
                     </div>
@@ -197,7 +197,7 @@ export default function StatsSection() {
                   {/* Physics-Based Rolling Metric Counter */}
                   <div
                     dir="ltr"
-                    className="text-4xl sm:text-5xl font-extrabold font-mono tracking-tight bg-gradient-to-r from-cyan-400 via-cyan-200 to-blue-400 bg-clip-text text-transparent drop-shadow-[0_0_18px_rgba(6,182,212,0.35)] mb-3"
+                    className="text-4xl sm:text-5xl font-extrabold font-mono tracking-tight bg-gradient-to-r from-gold-400 via-amber-200 to-yellow-500 bg-clip-text text-transparent drop-shadow-[0_0_18px_rgba(232,179,23,0.35)] mb-3"
                   >
                     <DynamicCounter
                       value={stat.numValue}

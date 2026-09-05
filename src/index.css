@@ -13,7 +13,8 @@
     --popover: 222.2 84% 4.9%;
     --popover-foreground: 210 40% 98%;
 
-    --primary: 188 95% 42%;
+    /* Sovereign Signal Gold: #E8B317 */
+    --primary: 45 82% 50%;
     --primary-foreground: 222.2 47.4% 11.2%;
 
     --secondary: 217.2 32.6% 17.5%;
@@ -30,7 +31,7 @@
 
     --border: 217.2 32.6% 17.5%;
     --input: 217.2 32.6% 17.5%;
-    --ring: 188 95% 42%;
+    --ring: 45 82% 50%;
 
     --radius: 0.75rem;
   }
@@ -45,7 +46,8 @@
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
 
-    --primary: 188 95% 36%;
+    /* High-contrast Gold in light mode: #7A5400 */
+    --primary: 43 100% 24%;
     --primary-foreground: 210 40% 98%;
 
     --secondary: 210 40% 96.1%;
@@ -62,7 +64,7 @@
 
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
-    --ring: 188 95% 36%;
+    --ring: 45 82% 50%;
   }
 
   * {
@@ -123,7 +125,7 @@
   border: 2px solid #020617;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #06b6d4;
+  background: #E8B317;
 }
 
 /* Specific button style requested by user selection */
@@ -139,4 +141,16 @@
 .brand-logo-font {
   font-family: 'Archivo', system-ui, sans-serif !important;
   font-stretch: 78%;
+}
+
+/* Accessibility: Respect prefers-reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
