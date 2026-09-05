@@ -230,11 +230,7 @@ export default function LandLogisticsSection({
 
         if (v.readyState >= 1 && Math.abs(v.currentTime - targetTime) > 0.015) {
           try {
-            if ('fastSeek' in v && typeof (v as unknown as { fastSeek: (t: number) => void }).fastSeek === 'function') {
-              (v as unknown as { fastSeek: (t: number) => void }).fastSeek(targetTime)
-            } else {
-              v.currentTime = targetTime
-            }
+            v.currentTime = targetTime
           } catch {
             // Ignore throttled seek exceptions
           }

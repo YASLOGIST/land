@@ -166,11 +166,7 @@ export default function HeroSection() {
 
         if (video.readyState >= 1 && Math.abs(video.currentTime - targetTime) > 0.015) {
           try {
-            if ('fastSeek' in video && typeof (video as unknown as { fastSeek: (t: number) => void }).fastSeek === 'function') {
-              (video as unknown as { fastSeek: (t: number) => void }).fastSeek(targetTime)
-            } else {
-              video.currentTime = targetTime
-            }
+            video.currentTime = targetTime
           } catch {
             // Guard for seek throttling
           }
