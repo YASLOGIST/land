@@ -159,7 +159,7 @@ export default function Navbar() {
               </div>
 
               {/* Subtitle Tagline */}
-              <span className={`transition-colors mt-0.5 ${
+              <span className={`transition-colors mt-0.5 max-w-[170px] xs:max-w-[240px] sm:max-w-xs md:max-w-none truncate ${
                 isRTL ? 'text-[9.5px] tracking-normal font-normal' : 'text-[7.5px] sm:text-[8.5px] uppercase font-mono font-bold tracking-[0.2em] sm:tracking-[0.25em]'
               } ${
                 mode === 'dark' ? 'text-gold-200/80 group-hover:text-gold-300' : 'text-slate-600 group-hover:text-gold-700'
@@ -170,7 +170,7 @@ export default function Navbar() {
           </a>
 
           {/* Desktop Navigation Links */}
-          <nav className={`hidden md:flex items-center gap-8 ${isRTL ? 'flex-row-reverse' : 'flex-row'}`}>
+          <nav className={`hidden lg:flex items-center gap-6 xl:gap-8 ${isRTL ? 'flex-row-reverse' : 'flex-row'}`}>
             {navLinks.map((link) => (
               <a
                 key={link.href}
@@ -187,12 +187,9 @@ export default function Navbar() {
           </nav>
 
           {/* Global Controls: Suite Switcher, High-Tech Language Pill & Theme */}
-          <div className="hidden md:flex items-center gap-3">
-            {/* `lg` and up: at `md` this row already carries the wordmark, a
-                two-line tagline, three nav links, the language pill and the
-                theme toggle, so the switcher waits for the wider breakpoint.
-                Phones get the grid in the drawer below. */}
-            <SuiteSwitcher current="land" className="hidden lg:flex" />
+          <div className="hidden lg:flex items-center gap-3">
+            {/* Suite Switcher */}
+            <SuiteSwitcher current="land" className="hidden xl:flex" />
 
             {/* Multi-Language Switcher (EN, AR, ZH, TR, FR) */}
             <div
@@ -237,7 +234,7 @@ export default function Navbar() {
           </div>
 
           {/* Mobile Hamburger Trigger */}
-          <div className="flex md:hidden items-center gap-3">
+          <div className="flex lg:hidden items-center gap-3">
             <ThemeToggle 
               className={`!h-8 !w-8 rounded-full transition-all duration-300 [&>svg]:!w-4 [&>svg]:!h-4 ${
                 mode === 'dark'
@@ -269,7 +266,7 @@ export default function Navbar() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.25, ease: 'easeInOut' }}
-            className={`fixed top-16 left-0 right-0 z-40 md:hidden border-b flex flex-col p-5 sm:p-6 gap-5 sm:gap-6 backdrop-blur-2xl max-h-[calc(100vh-4rem)] overflow-y-auto overscroll-contain ${
+            className={`fixed top-16 left-0 right-0 z-40 lg:hidden border-b flex flex-col p-5 sm:p-6 gap-5 sm:gap-6 backdrop-blur-2xl max-h-[calc(100vh-4rem)] overflow-y-auto overscroll-contain ${
               mode === 'dark'
                 ? 'bg-slate-950/95 border-white/[0.08] shadow-2xl'
                 : 'bg-white/95 border-slate-200 shadow-xl'

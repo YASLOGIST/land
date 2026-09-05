@@ -142,7 +142,38 @@ export default function HeroSection() {
       let isMounted = true
       const isLoopingRef = { current: false }
 
-      // Smooth RAF loop: strictly interpolates progress and seeks video.currentTime
+      // Non-blocking hardware-accelerated video seek controller
+      let isSeeking = false
+      let pendingTime: number | null = null
+
+      const seekTo = (targetTime: number) => {
+        if (!video || video.readyState < 1) return
+        if (video.seeking || isSeeking) {
+          pendingTime = targetTime
+          return
+        }
+        isSeeking = true
+        try {
+          video.currentTime = targetTime
+        } catch {
+          isSeeking = false
+        }
+      }
+
+      const onSeeked = () => {
+        isSeeking = false
+        if (pendingTime !== null) {
+          const next = pendingTime
+          pendingTime = null
+          if (Math.abs(video.currentTime - next) > 0.015) {
+            seekTo(next)
+          }
+        }
+      }
+
+      video.addEventListener('seeked', onSeeked)
+
+      // Smooth RAF loop: strictly interpolates progress and non-blocking seeks video
       const renderLoop = () => {
         if (!isMounted) return
 
@@ -165,11 +196,7 @@ export default function HeroSection() {
         const targetTime = Math.max(0, Math.min(p * dur, dur - 0.02))
 
         if (video.readyState >= 1 && Math.abs(video.currentTime - targetTime) > 0.015) {
-          try {
-            video.currentTime = targetTime
-          } catch {
-            // Guard for seek throttling
-          }
+          seekTo(targetTime)
         }
 
         // 60fps Timeline HUD indicators
@@ -238,6 +265,7 @@ export default function HeroSection() {
           cancelAnimationFrame(animFrameIdRef.current)
         }
         window.removeEventListener('resize', handleResize)
+        video.removeEventListener('seeked', onSeeked)
         video.removeEventListener('loadedmetadata', onVideoReady)
         video.removeEventListener('canplay', onVideoReady)
         trigger.kill()
@@ -376,10 +404,10 @@ export default function HeroSection() {
             transition={{ duration: 0.65, delay: 0.16 }}
             className="mb-4"
           >
-            <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-900/80 border border-white/15 backdrop-blur-xl text-xs font-mono tracking-widest uppercase text-gold-300">
-              <Truck className="w-3.5 h-3.5 text-[#E8B317]" />
-              <span className="text-slate-200 font-bold">{content.subtitle[language]}</span>
-              <Warehouse className="w-3.5 h-3.5 text-gold-400" />
+            <span className="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 rounded-full bg-slate-900/80 border border-white/15 backdrop-blur-xl text-[10px] sm:text-xs font-mono tracking-wider sm:tracking-widest uppercase text-gold-300 max-w-full">
+              <Truck className="w-3.5 h-3.5 text-[#E8B317] shrink-0" />
+              <span className="text-slate-200 font-bold truncate">{content.subtitle[language]}</span>
+              <Warehouse className="w-3.5 h-3.5 text-gold-400 shrink-0" />
             </span>
           </motion.div>
 

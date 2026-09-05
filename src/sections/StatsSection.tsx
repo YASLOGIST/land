@@ -51,6 +51,9 @@ export default function StatsSection() {
   const subtitle = t(
     `Modelled figures for the ${CORRIDOR_COUNT} active corridors and the yards along them, at the intervals a standard telematics unit and a monthly cycle count actually report.`,
     `أرقام محاكاة لعدد ${CORRIDOR_COUNT} ممرات نشطة والساحات الواقعة عليها، بالفترات التي يبلّغ بها فعلياً جهاز التتبع القياسي والجرد الدوري الشهري.`,
+    `针对 ${CORRIDOR_COUNT} 条在途重点活跃走廊及沿线场站的数字化推演指标，以标准车载遥测终端及月度循环盘点的真实频次进行实时核算。`,
+    `${CORRIDOR_COUNT} aktif koridor ve güzergahtaki lojistik sahaları için, standart telematik ünitesi ve aylık döngüsel sayımın bildirdiği aralıklarla modellenen veriler.`,
+    `Données modélisées pour les ${CORRIDOR_COUNT} corridors actifs et leurs plateformes, aux intervalles de rapportage réels de la télématique embarquée et des inventaires mensuels.`,
   )
 
   const stats: StatTile[] = [
@@ -88,6 +91,9 @@ export default function StatsSection() {
       description: t(
         `${NODE_COUNT} nodes across ${CORRIDOR_COUNT} corridors. YASLOGIST books capacity at them; the facilities belong to their port and zone authorities.`,
         `${NODE_COUNT} عقد على ${CORRIDOR_COUNT} ممرات. تحجز ياسلوجيست طاقة تشغيلية بها، والمنشآت مملوكة لهيئات الموانئ والمناطق التابعة لها.`,
+        `分布于 ${CORRIDOR_COUNT} 条重点走廊上的 ${NODE_COUNT} 个关键物流节点。YASLOGIST 预定其通过运力；设施归属各大港务及开发区管委会所有。`,
+        `${CORRIDOR_COUNT} koridor genelinde ${NODE_COUNT} düğüm noktası. YASLOGIST bunlarda kapasite rezerve eder; tesisler ilgili liman ve serbest bölge idarelerine aittir.`,
+        `${NODE_COUNT} nœuds répartis sur ${CORRIDOR_COUNT} corridors. YASLOGIST y réserve des capacités ; les infrastructures relèvent de leurs autorités portuaires et de zones respectives.`,
       ),
     },
     {
