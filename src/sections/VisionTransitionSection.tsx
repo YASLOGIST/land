@@ -6,7 +6,7 @@ import { useLanguage } from '@/hooks/use-language'
 import { Truck, Network, Warehouse, ArrowDown, ShieldCheck, Cpu, Building2 } from 'lucide-react'
 import { NETWORK_SUMMARY } from '@/data/network-summary'
 
-const t = (en: string, ar: string) => ({ en, ar })
+import { t } from '@/lib/i18n'
 
 const visionCopy = {
   kicker: t(

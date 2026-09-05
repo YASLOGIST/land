@@ -20,7 +20,7 @@ import {
   CheckCircle2,
 } from 'lucide-react'
 import { useAccessibleMotion } from '@/hooks/use-reduced-motion'
-import type { BilingualText } from '@/types/land-logistics'
+import type { BilingualText, Language } from '@/types/land-logistics'
 import type { ContingencyStrategyOption, DisruptionScenarioOption } from '@/types/disruption'
 
 export type IncidentMapLayerMode = 'vector-dark' | 'satellite' | 'vector-arterial'
@@ -61,7 +61,7 @@ export interface RealDisruptionScenarioData extends DisruptionScenarioOption {
 export interface IncidentRealMapProps {
   activeScenario: RealDisruptionScenarioData
   activeStrategy: ContingencyStrategyOption
-  language: 'en' | 'ar'
+  language: Language
   isRTL: boolean
   isFullscreen: boolean
   setIsFullscreen: (val: boolean) => void

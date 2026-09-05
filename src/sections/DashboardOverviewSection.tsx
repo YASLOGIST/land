@@ -15,6 +15,8 @@ import {
   Cell
 } from 'recharts'
 import { useLanguage } from '@/hooks/use-language'
+import type { Language } from '@/types/land-logistics'
+import { t } from '@/lib/i18n'
 import { Activity, Cpu, Sliders, RefreshCw } from 'lucide-react'
 import ModelBadge from '@/components/ModelBadge'
 
@@ -23,15 +25,23 @@ interface CustomTooltipProps {
   active?: boolean
   payload?: Array<{ value: number | string; name?: string }>
   label?: string
-  language: 'en' | 'ar'
+  language: Language
 }
 
 function ChartTooltip({ active, payload, label, language }: CustomTooltipProps) {
   if (!active || !payload || !payload.length) return null
 
-  const isRtl = language === 'ar'
   const val = payload[0].value
-  const labelText = isRtl ? 'حجم التدفق' : 'Throughput'
+  const labelText =
+    language === 'ar'
+      ? 'حجم التدفق'
+      : language === 'zh'
+      ? '吞吐量'
+      : language === 'tr'
+      ? 'Taşıma Hacmi'
+      : language === 'fr'
+      ? 'Débit de Fret'
+      : 'Throughput'
 
   return (
     <div className="rounded-xl border border-gold-500/30 bg-slate-950/95 p-3.5 shadow-[0_10px_30px_rgba(0,0,0,0.8)] backdrop-blur-md">
@@ -51,8 +61,6 @@ export default function DashboardOverviewSection() {
   const { language, direction } = useLanguage()
 
   const mode = resolvedTheme === 'light' ? 'light' : 'dark'
-
-  const t = (en: string, ar: string) => ({ en, ar })
 
   // Subtitle translations & static copy
   const ui = {
@@ -339,30 +347,51 @@ export default function DashboardOverviewSection() {
             }`}
           >
             <div>
-              {/* Card Title */}
-              <div className="mb-6">
-                <h3
-                  className={`text-lg sm:text-xl font-bold tracking-tight ${
-                    mode === 'dark' ? 'text-white' : 'text-slate-900'
-                  }`}
-                >
-                  {ui.efficiencyTitle[language]}
-                </h3>
-                <p className="text-xs text-slate-500 mt-1 leading-relaxed">
+              {/* Card Title & Description */}
+              <div className="mb-4">
+                <div className="flex items-center justify-between gap-2">
+                  <h3
+                    className={`text-lg sm:text-xl font-bold tracking-tight ${
+                      mode === 'dark' ? 'text-white' : 'text-slate-900'
+                    }`}
+                  >
+                    {ui.efficiencyTitle[language]}
+                  </h3>
+                  <span className="shrink-0 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-mono font-bold bg-gold-500/10 text-gold-400 border border-gold-500/25">
+                    <span className="w-1.5 h-1.5 rounded-full bg-gold-400 animate-pulse" />
+                    {(networkEfficiency * 0.4).toFixed(0)} / 40 {ui.nodesText[language]}
+                  </span>
+                </div>
+                <p className="text-xs text-slate-400 mt-1.5 leading-relaxed">
                   {ui.efficiencyDesc[language]}
                 </p>
               </div>
 
+              {/* Dedicated Status Strip (OPTIMAL LOAD FREIGHT / HEAVY TRAFFIC DETECTED) */}
+              <div className="flex items-center justify-between gap-2 px-3.5 py-2.5 rounded-2xl bg-slate-900/80 border border-gold-500/20 mb-3 backdrop-blur-md">
+                <div className="flex items-center gap-2 min-w-0">
+                  <span className={`w-2 h-2 rounded-full shrink-0 ${gridLoad > 75 ? 'bg-amber-400 animate-ping' : 'bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.8)]'}`} />
+                  <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-slate-200 truncate">
+                    {gridLoad > 75 ? ui.highLoadText[language] : ui.optLoadText[language]}
+                  </span>
+                </div>
+                <span className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded-lg shrink-0 ${
+                  gridLoad > 75 ? 'bg-amber-500/10 text-amber-300 border border-amber-500/30' : 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30'
+                }`}>
+                  {gridLoad > 75 ? 'WARN' : 'OPTIMAL'}
+                </span>
+              </div>
+
               {/* PieChart Circular Gauge Rendering */}
-              <div className="relative w-full h-[180px] flex items-center justify-center mb-6">
+              <div className="relative w-full h-[190px] flex items-center justify-center mb-4">
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
                     <Pie
                       data={gaugeData}
                       cx="50%"
                       cy="50%"
-                      innerRadius={68}
-                      outerRadius={82}
+                      innerRadius={74}
+                      outerRadius={88}
                       startAngle={225}
                       endAngle={-45}
                       dataKey="value"
@@ -382,19 +411,19 @@ export default function DashboardOverviewSection() {
                   </PieChart>
                 </ResponsiveContainer>
 
-                {/* Gauge Core Overlay HUD */}
-                <div className="absolute inset-0 flex flex-col items-center justify-center text-center mt-2">
-                  <span className="text-[10px] text-slate-500 font-bold uppercase tracking-widest font-mono">
-                    {gridLoad > 75 ? ui.highLoadText[language] : ui.optLoadText[language]}
+                {/* Gauge Core Overlay HUD - Pristine Centered Metrics */}
+                <div className="absolute inset-0 flex flex-col items-center justify-center text-center pointer-events-none">
+                  <span className="text-[10px] text-slate-400 font-bold uppercase tracking-widest font-mono">
+                    EFFICIENCY
                   </span>
-                  <div className="flex items-baseline gap-0.5 justify-center mt-1">
-                    <span className="text-4xl sm:text-5xl font-black font-mono tracking-tighter bg-gradient-to-r from-gold-400 to-amber-300 bg-clip-text text-transparent">
+                  <div className="flex items-baseline gap-0.5 justify-center mt-0.5">
+                    <span className="text-4xl sm:text-5xl font-black font-mono tracking-tighter bg-gradient-to-r from-gold-400 via-amber-300 to-yellow-400 bg-clip-text text-transparent drop-shadow-[0_0_20px_rgba(232,179,23,0.3)]">
                       {networkEfficiency}
                     </span>
                     <span className="text-lg font-bold text-slate-400">%</span>
                   </div>
-                  <span className="text-[9px] font-mono px-2.5 py-0.5 rounded-full mt-2 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 shadow-[0_0_10px_rgba(16,185,129,0.15)] uppercase">
-                    {(networkEfficiency * 0.4).toFixed(0)} / 40 {ui.nodesText[language]}
+                  <span className="text-[9px] font-mono text-emerald-400/90 font-semibold uppercase tracking-wider mt-0.5">
+                    REAL-TIME STABILITY
                   </span>
                 </div>
               </div>

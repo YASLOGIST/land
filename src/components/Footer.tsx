@@ -3,6 +3,7 @@
 import React, { useState } from 'react'
 import { useTheme } from 'next-themes'
 import { useLanguage } from '@/hooks/use-language'
+import { t } from '@/lib/i18n'
 import { Mail, CheckCircle2, AlertCircle, Loader2, Phone, MapPin } from 'lucide-react'
 import LegalModal, { type LegalKey } from '@/components/LegalModal'
 
@@ -55,8 +56,6 @@ export default function Footer() {
 
   const mode = resolvedTheme === 'light' ? 'light' : 'dark'
   const isRtl = direction === 'rtl'
-
-  const t = (en: string, ar: string) => ({ en, ar })
 
   const content = {
     tagline: t(

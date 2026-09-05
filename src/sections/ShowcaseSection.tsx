@@ -6,7 +6,7 @@ import { useTheme } from 'next-themes'
 import { useLanguage } from '@/hooks/use-language'
 import { Maximize2, X, Sparkles, Building2, Truck, Radio } from 'lucide-react'
 
-const t = (en: string, ar: string) => ({ en, ar })
+import { t } from '@/lib/i18n'
 
 const showcaseItems = [
   {

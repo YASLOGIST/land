@@ -32,6 +32,7 @@ import { INLAND_LOGISTICS_HUBS, LAND_TRADE_CORRIDORS } from '@/data/landCorridor
 import { useAccessibleMotion } from '@/hooks/use-reduced-motion'
 import type { TransportModeId } from '@/types/dispatch'
 import type { RealTradeCorridor, WaypointDetail, GlobalHubPin } from '@/types/dispatch-extended'
+import type { Language } from '@/types/land-logistics'
 
 export type MapLayerMode = 'satellite' | 'vector-dark' | 'vector-arterial'
 
@@ -43,7 +44,7 @@ export interface HighQualityRealMapProps {
   setShowHeatmap: (val: boolean) => void
   isFullscreen: boolean
   setIsFullscreen: (val: boolean) => void
-  language: 'en' | 'ar'
+  language: Language
   isRTL: boolean
   selectedWaypointNode: WaypointDetail | null
   setSelectedWaypointNode: (wp: WaypointDetail | null) => void

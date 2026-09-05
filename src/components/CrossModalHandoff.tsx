@@ -15,10 +15,10 @@ import { motion } from 'framer-motion'
 import { useTheme } from 'next-themes'
 import { Ship, Plane, ArrowRight, ArrowLeft } from 'lucide-react'
 import { useLanguage } from '@/hooks/use-language'
+import { t } from '@/lib/i18n'
+import type { BilingualText } from '@/types/land-logistics'
 import ModelBadge from '@/components/ModelBadge'
 import { SURFACES, type SurfaceId } from '@/lib/suite'
-
-const t = (en: string, ar: string) => ({ en, ar })
 
 const COPY = {
   tag: t('Intermodal handoff', 'تسليم متعدد الوسائط'),
@@ -36,9 +36,9 @@ const COPY = {
 const CARDS: {
   id: Extract<SurfaceId, 'ocean' | 'air'>
   icon: typeof Ship
-  title: { en: string; ar: string }
-  desc: { en: string; ar: string }
-  cta: { en: string; ar: string }
+  title: BilingualText
+  desc: BilingualText
+  cta: BilingualText
 }[] = [
   {
     id: 'ocean',

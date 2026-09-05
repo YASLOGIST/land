@@ -20,12 +20,12 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import { useLanguage } from '@/hooks/use-language'
+import { t } from '@/lib/i18n'
+import type { BilingualText } from '@/types/land-logistics'
 
 export type LegalKey = 'terms' | 'privacy' | 'security'
 
-const t = (en: string, ar: string) => ({ en, ar })
-
-const LEGAL: Record<LegalKey, { title: { en: string; ar: string }; body: { en: string; ar: string }[] }> = {
+const LEGAL: Record<LegalKey, { title: BilingualText; body: BilingualText[] }> = {
   terms: {
     title: t('Terms of Service', 'الشروط والأحكام'),
     body: [

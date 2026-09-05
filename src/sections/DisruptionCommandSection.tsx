@@ -36,7 +36,6 @@ import {
   Network,
 } from 'lucide-react'
 import { useLanguage } from '@/hooks/use-language'
-import type { BilingualText } from '@/types/land-logistics'
 import type {
   StrategyModeId,
   DisruptionSimulationResult,
@@ -48,7 +47,7 @@ import { IncidentRealMap, type RealDisruptionScenarioData } from '@/components/d
 /** Declared line-haul speed for scenario ETA arithmetic (MODELLED). */
 const SCENARIO_LINEHAUL_KMH = 80
 
-const t = (en: string, ar: string): BilingualText => ({ en, ar })
+import { t } from '@/lib/i18n'
 
 /* ========================================================================== */
 /*  Disruption Scenarios & AI Contingency Strategies Data Matrix              */

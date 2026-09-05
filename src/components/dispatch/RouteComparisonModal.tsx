@@ -8,13 +8,14 @@ import {
   Network,
 } from 'lucide-react'
 import type { RealTradeCorridor } from '@/types/dispatch-extended'
+import type { Language } from '@/types/land-logistics'
 
 interface RouteComparisonModalProps {
   isOpen: boolean
   onClose: () => void
   activeCorridor: RealTradeCorridor
   payloadTons: number
-  language: 'en' | 'ar'
+  language: Language
   isRTL: boolean
 }
 

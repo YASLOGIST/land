@@ -18,7 +18,7 @@ import DynamicCounter from '@/components/DynamicCounter'
 import ModelBadge from '@/components/ModelBadge'
 import type { CapabilityCardItem } from '@/types/land-logistics'
 
-const t = (en: string, ar: string) => ({ en, ar })
+import { t } from '@/lib/i18n'
 
 /* ========================================================================== */
 /*  6 Upgraded Interactive Micro-Visual Components                            */

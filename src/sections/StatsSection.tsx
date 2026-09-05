@@ -15,6 +15,7 @@ import { useTheme } from 'next-themes'
 import { Activity, ShieldCheck, Zap, Globe } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import { useLanguage } from '@/hooks/use-language'
+import { t } from '@/lib/i18n'
 import type { BilingualText } from '@/types/land-logistics'
 import { INLAND_LOGISTICS_HUBS, LAND_TRADE_CORRIDORS } from '@/data/landCorridors'
 import DynamicCounter from '@/components/DynamicCounter'
@@ -44,8 +45,6 @@ export default function StatsSection() {
 
   const mode = resolvedTheme === 'light' ? 'light' : 'dark'
   const isRtl = direction === 'rtl'
-
-  const t = (en: string, ar: string) => ({ en, ar })
 
   const kicker = t('SYSTEM TELEMETRY & PERFORMANCE', 'القياس عن بعد والأداء التشغيلي')
   const title = t('Operational Excellence in Numbers', 'التميز التشغيلي بالأرقام والبيانات')

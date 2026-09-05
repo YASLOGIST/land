@@ -26,6 +26,9 @@ export interface Surface {
   glow: string
   en: { name: string; note: string }
   ar: { name: string; note: string }
+  zh: { name: string; note: string }
+  tr: { name: string; note: string }
+  fr: { name: string; note: string }
 }
 
 export const SURFACES: Surface[] = [
@@ -37,6 +40,9 @@ export const SURFACES: Surface[] = [
     glow: 'rgba(148, 163, 184, 0.35)',
     en: { name: 'Hub', note: 'Corporate' },
     ar: { name: 'الرئيسية', note: 'المنصة الأم' },
+    zh: { name: '中枢', note: '综合总部' },
+    tr: { name: 'Merkez', note: 'Kurumsal' },
+    fr: { name: 'Hub', note: 'Plateforme Centrale' },
   },
   {
     id: 'land',
@@ -46,6 +52,9 @@ export const SURFACES: Surface[] = [
     glow: 'rgba(211, 238, 34, 0.4)',
     en: { name: 'Land', note: 'Road freight' },
     ar: { name: 'البري', note: 'الشحن البري' },
+    zh: { name: '陆运', note: '干线公路货运' },
+    tr: { name: 'Kara', note: 'Karayolu Taşımacılığı' },
+    fr: { name: 'Terre', note: 'Fret Routier' },
   },
   {
     id: 'ocean',
@@ -55,6 +64,9 @@ export const SURFACES: Surface[] = [
     glow: 'rgba(34, 211, 238, 0.45)',
     en: { name: 'Ocean', note: 'Maritime' },
     ar: { name: 'البحري', note: 'الشحن البحري' },
+    zh: { name: '海运', note: '远洋集装箱' },
+    tr: { name: 'Deniz', note: 'Denizyolu Taşımacılığı' },
+    fr: { name: 'Mer', note: 'Fret Maritime' },
   },
   {
     id: 'air',
@@ -64,10 +76,16 @@ export const SURFACES: Surface[] = [
     glow: 'rgba(155, 176, 188, 0.3)',
     en: { name: 'Air', note: 'CAI Cargo Village' },
     ar: { name: 'الجوي', note: 'قرية البضائع CAI' },
+    zh: { name: '航空', note: 'CAI 货运中心' },
+    tr: { name: 'Hava', note: 'CAI Kargo Köyü' },
+    fr: { name: 'Air', note: 'Village Cargo CAI' },
   },
 ]
 
-export const SUITE_LABEL = {
+export const SUITE_LABEL: Record<string, string> = {
   en: 'Logistics Suite',
   ar: 'منظومة الخدمات',
+  zh: '多式联运生态',
+  tr: 'Lojistik Ekosistemi',
+  fr: 'Suite Logistique',
 }

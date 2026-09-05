@@ -20,7 +20,6 @@ import {
 } from 'lucide-react'
 import { useLanguage } from '@/hooks/use-language'
 import ModelBadge from '@/components/ModelBadge'
-import type { BilingualText } from '@/types/land-logistics'
 import type {
   TransportModeOption,
   TransportModeId,
@@ -35,7 +34,7 @@ import { useGisPanZoom } from '@/hooks/useGisPanZoom'
 import { HighQualityRealMap } from '@/components/dispatch/HighQualityRealMap'
 import { RouteComparisonModal } from '@/components/dispatch/RouteComparisonModal'
 
-const t = (en: string, ar: string): BilingualText => ({ en, ar })
+import { t } from '@/lib/i18n'
 
 type TrafficLightState = 'green' | 'yellow' | 'red'
 

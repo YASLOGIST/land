@@ -9,15 +9,19 @@ declare module 'react' {
 }
 
 /** Supported locales for the YASLOGIST platform. */
-export type Language = 'en' | 'ar'
+export type Language = 'en' | 'ar' | 'zh' | 'tr' | 'fr'
 
 /** Text direction derived from the active locale. */
 export type Direction = 'ltr' | 'rtl'
 
-/** A single bilingual string pair. */
+/** A localized string dictionary supporting global trade languages. */
 export interface BilingualText {
   en: string
   ar: string
+  zh: string
+  tr: string
+  fr: string
+  [key: string]: string
 }
 
 /** One operational telemetry metric shown on a phase card. */
