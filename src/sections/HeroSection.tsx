@@ -103,7 +103,7 @@ export default function HeroSection() {
   const currentProgressRef = useRef<number>(0)
   const animFrameIdRef = useRef<number | null>(null)
 
-  // ── GSAP ScrollTrigger Pinning (Desktop) & Native Looping Video (Mobile) ──
+  // ── GSAP ScrollTrigger Pinning & Scroll-Driven Video Scrubbing ──
   useEffect(() => {
     const video = videoRef.current
     const section = sectionRef.current
@@ -113,53 +113,7 @@ export default function HeroSection() {
     let disposed = false
     let innerCleanup: (() => void) | undefined
 
-    const isTouchOrMobile =
-      typeof window !== 'undefined' &&
-      (window.innerWidth < 1024 ||
-        'ontouchstart' in window ||
-        navigator.maxTouchPoints > 0)
-
-    // Mobile / Touchscreen: run smooth hardware-accelerated continuous looping video
-    if (isTouchOrMobile) {
-      video.muted = true
-      video.playsInline = true
-      video.autoplay = true
-      video.loop = true
-      video.preload = 'auto'
-
-      const attemptPlay = () => {
-        const playPromise = video.play()
-        if (playPromise !== undefined) {
-          playPromise
-            .then(() => setVideoLoaded(true))
-            .catch(() => {
-              // Autoplay policy fallback: resume playback on user gesture
-              const touchHandler = () => {
-                video
-                  .play()
-                  .then(() => setVideoLoaded(true))
-                  .catch(() => {})
-                window.removeEventListener('touchstart', touchHandler)
-                window.removeEventListener('click', touchHandler)
-              }
-              window.addEventListener('touchstart', touchHandler, { once: true })
-              window.addEventListener('click', touchHandler, { once: true })
-            })
-        }
-      }
-
-      attemptPlay()
-
-      video.addEventListener('loadedmetadata', attemptPlay)
-      video.addEventListener('canplay', attemptPlay)
-
-      return () => {
-        video.removeEventListener('loadedmetadata', attemptPlay)
-        video.removeEventListener('canplay', attemptPlay)
-      }
-    }
-
-    // ── Desktop: GSAP ScrollTrigger Pinning & Scroll-Driven Video Scrubbing ──
+    // Dynamic import: GSAP loads after first paint, before the first scroll.
     void (async () => {
       const [{ gsap }, { ScrollTrigger }] = await Promise.all([
         import('gsap'),
@@ -288,19 +242,9 @@ export default function HeroSection() {
     if (video) {
       video.muted = true
       video.playsInline = true
-      const isTouchOrMobile =
-        typeof window !== 'undefined' &&
-        (window.innerWidth < 1024 ||
-          'ontouchstart' in window ||
-          navigator.maxTouchPoints > 0)
-      if (isTouchOrMobile) {
-        video.loop = true
-        video.play().catch(() => {})
-      } else {
-        video.preload = 'auto'
-        video.pause()
-        video.currentTime = 0
-      }
+      video.preload = 'auto'
+      video.pause()
+      video.currentTime = 0
     }
   }
 
@@ -344,10 +288,15 @@ export default function HeroSection() {
           x5-playsinline="true"
           preload="auto"
           controls={false}
-          autoPlay
-          loop
+          autoPlay={false}
+          loop={false}
           onLoadedMetadata={handleLoadedMetadata}
-          onCanPlay={() => setVideoLoaded(true)}
+          onCanPlay={() => {
+            setVideoLoaded(true)
+            if (videoRef.current && !videoRef.current.paused) {
+              videoRef.current.pause()
+            }
+          }}
           className="absolute inset-0 w-full h-full object-cover z-0 pointer-events-none"
           style={{
             opacity: videoLoaded ? 1 : 0.85,
