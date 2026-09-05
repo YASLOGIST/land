@@ -7,7 +7,10 @@
     "dev": "vite --host 0.0.0.0 --port 3000",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit -p tsconfig.app.json",
+    "check:bundle": "node scripts/check-bundle.mjs",
+    "gate": "npm run typecheck && npm run lint && npm run build && npm run check:bundle"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",

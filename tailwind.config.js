@@ -14,10 +14,16 @@ export default {
       },
     },
     extend: {
+      /* The corporate hub's type stack (main/index.html). `Alexandria` and
+         `JetBrains Mono` were named here but never requested by the shell, so
+         every `font-arabic` and `font-mono` utility silently rendered in a
+         system fallback. */
       fontFamily: {
-        sans: ['"Plus Jakarta Sans"', 'Alexandria', 'system-ui', '-apple-system', 'sans-serif'],
-        arabic: ['Alexandria', '"Plus Jakarta Sans"', 'system-ui', '-apple-system', 'sans-serif'],
-        mono: ['"JetBrains Mono"', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace'],
+        sans: ['"IBM Plex Sans"', '"IBM Plex Sans Arabic"', 'system-ui', 'sans-serif'],
+        display: ['"Archivo"', 'system-ui', 'sans-serif'],
+        arabic: ['"IBM Plex Sans Arabic"', 'system-ui', 'sans-serif'],
+        ruqaa: ['"Aref Ruqaa"', '"IBM Plex Sans Arabic"', 'serif'],
+        mono: ['"IBM Plex Mono"', 'ui-monospace', 'monospace'],
       },
       colors: {
         border: 'hsl(var(--border))',

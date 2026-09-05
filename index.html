@@ -3,35 +3,90 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>YASLOGIST — Next-Gen Supply Chain Intelligence Platform</title>
-    
-    <!-- Google Fonts: Space Grotesk, Plus Jakarta Sans & Outfit (EN), Cairo & Tajawal (AR), JetBrains Mono (Telemetry) -->
+    <meta name="theme-color" content="#020617" />
+    <meta
+      name="description"
+      content="YASLOGIST Land — autonomous road freight intelligence and smart warehousing. FTL/LTL corridor dispatch, predictive routing and fleet telemetry, presented as an interactive digital-twin model. Corporate branch: New Cairo, Cairo, Egypt."
+    />
+    <title>YASLOGIST Land — Autonomous Freight &amp; Corridors</title>
+
+    <!-- Canonical YASLOGIST mark, inlined so the tab icon needs no extra request. -->
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64' fill='none' stroke='%2322d3ee'%3E%3Cg stroke-width='1.6' opacity='.55'%3E%3Cellipse cx='32' cy='32' rx='12.5' ry='29'/%3E%3Cpath d='M3 32h58M8 17.5h48M8 46.5h48'/%3E%3C/g%3E%3Ccircle cx='32' cy='32' r='29' stroke-width='2.2'/%3E%3Cg stroke-width='5' stroke-linecap='square'%3E%3Cpath d='M16 16 L27.5 31.5 L27.5 49'/%3E%3Cpath d='M39 16 L30 28'/%3E%3Cpath d='M40.5 20 L40.5 48 L53 48'/%3E%3C/g%3E%3C/svg%3E"
+    />
+
+    <!-- Applied before first paint so the page never flashes the wrong theme or
+         direction. The shell previously hardcoded `class="dark" dir="ltr"` and
+         read nothing back, so a visitor who chose light got a dark flash, and a
+         visitor who chose Arabic watched the whole layout mirror after hydration.
+         Keys are the ones the app actually writes: `theme` (next-themes' default,
+         src/main.tsx) and `yaslogist-language` (STORAGE_KEY in
+         src/hooks/use-language.tsx). -->
+    <script>
+      (function () {
+        var d = document.documentElement;
+        try {
+          var t = localStorage.getItem("theme");
+          /* Falls back to "dark", matching ThemeProvider's defaultTheme in
+             src/main.tsx. Reading prefers-color-scheme here instead would
+             disagree with the app on a first visit and flash twice. */
+          if (t !== "light" && t !== "dark") t = "dark";
+          d.classList.remove("light", "dark");
+          d.classList.add(t);
+          d.style.colorScheme = t;
+        } catch (e) {}
+        try {
+          /* resolveInitialLanguage() treats anything that is not "ar" as "en",
+             so this mirrors it exactly — no third state to disagree about. */
+          if (localStorage.getItem("yaslogist-language") === "ar") {
+            d.setAttribute("lang", "ar");
+            d.setAttribute("dir", "rtl");
+          }
+        } catch (e) {}
+      })();
+    </script>
+
+    <!-- The corporate hub's type stack, identical to main/index.html and
+         ocean/index.html. Archivo = display (variable width axis), IBM Plex Sans
+         = body, IBM Plex Mono = telemetry, IBM Plex Sans Arabic = Arabic UI,
+         Aref Ruqaa = Arabic display. Replaced twelve families, five of which
+         were requested on every load and referenced nowhere in the source;
+         see CHANGELOG.md for the list. (Named there rather than here: Vite
+         keeps HTML comments, so the old names would ship in the artifact and
+         trip a grep for legacy families.) -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Aref+Ruqaa:wght@400;700&family=Cairo:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700;800&family=Outfit:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600;1,700&family=Space+Grotesk:wght@400;500;600;700&family=Tajawal:wght@400;500;700;800;900&family=Fraunces:opsz,wght@9..144,400;9..144,700&family=Gentium+Book+Plus:wght@400;700&family=Gentium+Plus:wght@400;700&family=Jacques+Francois&family=Frank+Ruhl+Libre:wght@400;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=Aref+Ruqaa:wght@400;700&family=Aref+Ruqaa+Ink:wght@700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
 
     <style>
-      /* Critical CSS & Base Typography */
+      /* Critical CSS & Base Typography.
+         The shell ground is a variable rather than a literal: it was hardcoded
+         to the dark value on html, body AND #root, so the html.light rule below
+         could never win and the light theme still painted a dark page. */
+      :root { --shell-bg: #020617; }
+      html.light { --shell-bg: #f8fafc; }
+
       html, body, #root {
         margin: 0;
         padding: 0;
         min-height: 100vh;
-        background-color: #020617;
+        background-color: var(--shell-bg);
       }
-      
+
       /* English/LTR Default Font */
       html[dir="ltr"] body, html[dir="ltr"] {
-        font-family: 'Space Grotesk', 'Outfit', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        font-family: 'IBM Plex Sans', system-ui, sans-serif;
       }
 
       /* Arabic/RTL Universal Font Enforcement */
       html[dir="rtl"] body,
       html[dir="rtl"],
       [dir="rtl"] {
-        font-family: 'Cairo', 'Tajawal', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+        font-family: 'IBM Plex Sans Arabic', 'IBM Plex Sans', system-ui, sans-serif !important;
       }
 
       /* Reset letter-spacing in Arabic to maintain cursive ligature rendering */
