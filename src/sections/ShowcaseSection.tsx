@@ -11,7 +11,7 @@ const t = (en: string, ar: string) => ({ en, ar })
 const showcaseItems = [
   {
     id: 'global-hub',
-    videoSrc: '/assets/mainlandbackground.mp4',
+    videoSrc: '/videos/yaslogist.mp4',
     badge: t('Arterial Highways & Inland Hubs', 'الشحن الشرياني والمراكز الجافة'),
     icon: Building2,
     title: t(
@@ -27,7 +27,7 @@ const showcaseItems = [
   },
   {
     id: 'smart-warehouse',
-    videoSrc: '/videos/FINAL.mp4',
+    videoSrc: '/videos/Robots_smart_warehouse.mp4',
     badge: t('Automation & Ground Fleet', 'الأتمتة والأسطول الأرضي'),
     icon: Truck,
     title: t(
