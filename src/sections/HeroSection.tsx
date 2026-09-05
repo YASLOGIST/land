@@ -121,11 +121,23 @@ export default function HeroSection() {
       ])
       if (disposed) return
       gsap.registerPlugin(ScrollTrigger)
+      ScrollTrigger.config({ ignoreMobileResize: true })
 
       video.muted = true
+      video.defaultMuted = true
       video.playsInline = true
+      video.setAttribute('playsinline', '')
+      video.setAttribute('webkit-playsinline', '')
+      video.setAttribute('x5-playsinline', '')
       video.preload = 'auto'
       video.pause()
+      if (video.readyState < 1) {
+        try {
+          video.load()
+        } catch {
+          // Ignore load exceptions
+        }
+      }
 
       let isMounted = true
       const isLoopingRef = { current: false }
@@ -152,9 +164,13 @@ export default function HeroSection() {
         const dur = video.duration && !isNaN(video.duration) && video.duration > 0 ? video.duration : 10.006
         const targetTime = Math.max(0, Math.min(p * dur, dur - 0.02))
 
-        if (video.readyState >= 2 && Math.abs(video.currentTime - targetTime) > 0.015) {
+        if (video.readyState >= 1 && Math.abs(video.currentTime - targetTime) > 0.015) {
           try {
-            video.currentTime = targetTime
+            if ('fastSeek' in video && typeof (video as unknown as { fastSeek: (t: number) => void }).fastSeek === 'function') {
+              (video as unknown as { fastSeek: (t: number) => void }).fastSeek(targetTime)
+            } else {
+              video.currentTime = targetTime
+            }
           } catch {
             // Guard for seek throttling
           }
@@ -186,6 +202,8 @@ export default function HeroSection() {
       // Initial trigger
       startLoop()
 
+      const scrubDistance = typeof window !== 'undefined' && window.innerWidth < 768 ? '+=2600' : '+=3500'
+
       // Robust GSAP ScrollTrigger with true pinning and pinSpacing
       const trigger = ScrollTrigger.create({
         trigger: section,
@@ -193,7 +211,7 @@ export default function HeroSection() {
         pinSpacing: true,
         anticipatePin: 1,
         start: 'top top',
-        end: '+=3500',
+        end: scrubDistance,
         scrub: 0.5,
         onUpdate: (self) => {
           targetProgressRef.current = self.progress
@@ -274,7 +292,7 @@ export default function HeroSection() {
       {/* ─── PINNED VIEWPORT CONTAINER (GSAP PINNED) ─── */}
       <div
         ref={pinContainerRef}
-        className="relative h-screen w-full overflow-hidden flex flex-col justify-between pt-20 pb-5 px-4 sm:px-8 lg:px-12 bg-slate-950"
+        className="relative h-screen min-h-[100dvh] w-full overflow-hidden flex flex-col justify-between pt-16 sm:pt-20 pb-3 sm:pb-5 px-3 sm:px-8 lg:px-12 bg-slate-950"
       >
         
         {/* ─── SINGLE SOURCE OF TRUTH BACKGROUND LAYER (Z-0) ─── */}
@@ -374,7 +392,7 @@ export default function HeroSection() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.22 }}
-            className="text-xs sm:text-sm md:text-base text-slate-200/95 font-medium leading-relaxed max-w-2xl mb-7 drop-shadow-[0_2px_12px_rgba(0,0,0,0.9)]"
+            className="text-xs sm:text-sm md:text-base text-slate-200/95 font-medium leading-relaxed max-w-2xl mb-4 sm:mb-7 drop-shadow-[0_2px_12px_rgba(0,0,0,0.9)]"
           >
             {content.description[language]}
           </motion.p>

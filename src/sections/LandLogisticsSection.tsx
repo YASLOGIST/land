@@ -228,9 +228,13 @@ export default function LandLogisticsSection({
         const dur = v.duration && !isNaN(v.duration) && v.duration > 0 ? v.duration : 10.0
         const targetTime = Math.max(0, Math.min(p * dur, dur - 0.03))
 
-        if (v.readyState >= 2 && Math.abs(v.currentTime - targetTime) > 0.015) {
+        if (v.readyState >= 1 && Math.abs(v.currentTime - targetTime) > 0.015) {
           try {
-            v.currentTime = targetTime
+            if ('fastSeek' in v && typeof (v as unknown as { fastSeek: (t: number) => void }).fastSeek === 'function') {
+              (v as unknown as { fastSeek: (t: number) => void }).fastSeek(targetTime)
+            } else {
+              v.currentTime = targetTime
+            }
           } catch {
             // Ignore throttled seek exceptions
           }
