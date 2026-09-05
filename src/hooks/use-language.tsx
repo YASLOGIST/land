@@ -22,8 +22,11 @@ const STORAGE_KEY = 'yaslogist-language'
 
 function resolveInitialLanguage(): Language {
   if (typeof window === 'undefined') return 'en'
-  const stored = window.localStorage.getItem(STORAGE_KEY)
-  return stored === 'ar' ? 'ar' : 'en'
+  const stored = window.localStorage.getItem(STORAGE_KEY) as Language | null
+  if (stored && ['en', 'ar', 'zh', 'tr', 'fr'].includes(stored)) {
+    return stored
+  }
+  return 'en'
 }
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
@@ -36,7 +39,11 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   }, [])
 
   const toggleLanguage = useCallback(() => {
-    setLanguageState((prev) => (prev === 'ar' ? 'en' : 'ar'))
+    const cycle: Language[] = ['en', 'ar', 'zh', 'tr', 'fr']
+    setLanguageState((prev) => {
+      const idx = cycle.indexOf(prev)
+      return cycle[(idx + 1) % cycle.length]
+    })
   }, [])
 
   // Keep <html lang/dir> in sync so native bidi behavior and a11y stay correct.

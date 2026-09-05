@@ -15,6 +15,7 @@ import { useTheme } from 'next-themes'
 import { Activity, ShieldCheck, Zap, Globe } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import { useLanguage } from '@/hooks/use-language'
+import { t } from '@/lib/i18n'
 import type { BilingualText } from '@/types/land-logistics'
 import { INLAND_LOGISTICS_HUBS, LAND_TRADE_CORRIDORS } from '@/data/landCorridors'
 import DynamicCounter from '@/components/DynamicCounter'
@@ -44,8 +45,6 @@ export default function StatsSection() {
 
   const mode = resolvedTheme === 'light' ? 'light' : 'dark'
   const isRtl = direction === 'rtl'
-
-  const t = (en: string, ar: string) => ({ en, ar })
 
   const kicker = t('SYSTEM TELEMETRY & PERFORMANCE', 'القياس عن بعد والأداء التشغيلي')
   const title = t('Operational Excellence in Numbers', 'التميز التشغيلي بالأرقام والبيانات')
@@ -118,7 +117,7 @@ export default function StatsSection() {
     >
       {/* Dynamic Background Glow */}
       <div
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_60%_40%_at_50%_50%,rgba(6,182,212,0.06),transparent)]"
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_60%_40%_at_50%_50%,rgba(232,179,23,0.06),transparent)]"
         aria-hidden="true"
       />
 
@@ -190,7 +189,7 @@ export default function StatsSection() {
                     </div>
                     <Icon 
                       className="w-4 h-4 transition-colors" 
-                      style={{ color: ['#e7ca00', '#53fffc', '#2ee46a', '#0054d0'][index] }}
+                      style={{ color: ['#E8B317', '#FBBF24', '#10b981', '#3b82f6'][index] }}
                     />
                   </div>
 

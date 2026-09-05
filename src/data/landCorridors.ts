@@ -1,8 +1,7 @@
-import type { BilingualText } from '@/types/land-logistics'
 import type { RealTradeCorridor, GlobalHubPin } from '@/types/dispatch-extended'
 import { projectGeo } from '@/utils/gis-projection'
 
-const t = (en: string, ar: string): BilingualText => ({ en, ar })
+import { t } from '@/lib/i18n'
 
 /* ── Reading the numbers on this page ─────────────────────────────────────
    Throughput and turn times are modelled figures for the dispatch simulator,

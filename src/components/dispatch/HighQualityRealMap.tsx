@@ -32,6 +32,7 @@ import { INLAND_LOGISTICS_HUBS, LAND_TRADE_CORRIDORS } from '@/data/landCorridor
 import { useAccessibleMotion } from '@/hooks/use-reduced-motion'
 import type { TransportModeId } from '@/types/dispatch'
 import type { RealTradeCorridor, WaypointDetail, GlobalHubPin } from '@/types/dispatch-extended'
+import type { Language } from '@/types/land-logistics'
 
 export type MapLayerMode = 'satellite' | 'vector-dark' | 'vector-arterial'
 
@@ -43,7 +44,7 @@ export interface HighQualityRealMapProps {
   setShowHeatmap: (val: boolean) => void
   isFullscreen: boolean
   setIsFullscreen: (val: boolean) => void
-  language: 'en' | 'ar'
+  language: Language
   isRTL: boolean
   selectedWaypointNode: WaypointDetail | null
   setSelectedWaypointNode: (wp: WaypointDetail | null) => void
@@ -790,7 +791,7 @@ export function HighQualityRealMap({
         </div>
 
         {/* Right: Layer Toggles & Fullscreen View */}
-        <div className="flex items-center gap-1.5">
+        <div className="flex items-center gap-1.5 overflow-x-auto max-w-full py-0.5 no-scrollbar shrink-0">
           {/* Highway Artery Grid Toggle */}
           <button
             onClick={() => setShowHighways(!showHighways)}
@@ -921,31 +922,31 @@ export function HighQualityRealMap({
 
         {/* Live Simulation Floating Playback & Telemetry Controller */}
         <div
-          className={`absolute bottom-4 ${isRTL ? 'right-4' : 'left-4'} z-20 flex flex-col gap-2 pointer-events-auto`}
+          className={`absolute bottom-4 ${isRTL ? 'right-4' : 'left-4'} z-20 flex flex-col gap-2 pointer-events-auto max-w-[calc(100%-4.5rem)] sm:max-w-md`}
         >
           {/* Real-Time Vehicle Status Floating Card */}
-          <div className="p-3 rounded-2xl bg-slate-900/90 border border-white/10 backdrop-blur-xl shadow-2xl flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-gold-500/20 border border-gold-500/40 flex items-center justify-center text-gold-300 shrink-0">
-              <Navigation className="w-4 h-4 animate-spin" style={{ animationDuration: '6s' }} />
+          <div className="p-2.5 sm:p-3 rounded-2xl bg-slate-900/90 border border-white/10 backdrop-blur-xl shadow-2xl flex items-center gap-2.5 sm:gap-3 min-w-0">
+            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gold-500/20 border border-gold-500/40 flex items-center justify-center text-gold-300 shrink-0">
+              <Navigation className="w-3.5 h-3.5 sm:w-4 sm:h-4 animate-spin" style={{ animationDuration: '6s' }} />
             </div>
-            <div className="font-mono text-xs">
-              <div className="flex items-center gap-2">
-                <span className="font-bold text-white">AUTONOMOUS DISPATCH</span>
+            <div className="font-mono text-xs min-w-0 flex-1">
+              <div className="flex items-center gap-1.5 truncate">
+                <span className="font-bold text-white text-[10.5px] sm:text-xs truncate">AUTONOMOUS DISPATCH</span>
                 <span
                   title="Simulation feed — no telematics backend"
-                  className="px-1.5 py-0.2 text-[9px] rounded bg-amber-500/20 text-amber-300 border border-amber-500/40"
+                  className="px-1.5 py-0.2 text-[8.5px] sm:text-[9px] rounded bg-amber-500/20 text-amber-300 border border-amber-500/40 shrink-0"
                 >
                   SIM
                 </span>
               </div>
-              <div className="text-[10px] text-slate-400">
+              <div className="text-[9px] sm:text-[10px] text-slate-400 truncate">
                 PROG: <span className="text-gold-300 font-bold">{Math.round(fleetProgress * 100)}%</span> | SPEED:{' '}
                 <span className="text-white font-bold">{Math.round(simSpeedKmh)} KM/H (MODELLED)</span>
               </div>
             </div>
 
             {/* Playback & Speed Controls */}
-            <div className="flex items-center gap-1.5 border-l border-white/10 pl-2">
+            <div className="flex items-center gap-1.5 border-l border-white/10 pl-2 shrink-0">
               <button
                 onClick={() => setIsPlaying(!isPlaying)}
                 aria-label={isPlaying ? 'Pause Simulation' : 'Play Simulation'}
@@ -1006,7 +1007,7 @@ export function HighQualityRealMap({
               initial={{ opacity: 0, y: 10, scale: 0.95 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 10, scale: 0.95 }}
-              className={`absolute top-4 ${isRTL ? 'left-4' : 'right-4'} z-30 max-w-xs w-full p-4 rounded-2xl bg-slate-900/95 border border-gold-500/40 backdrop-blur-2xl shadow-2xl text-white font-mono text-xs`}
+              className={`absolute top-4 ${isRTL ? 'left-4' : 'right-4'} z-30 max-w-[calc(100%-2rem)] sm:max-w-xs w-full p-4 rounded-2xl bg-slate-900/95 border border-gold-500/40 backdrop-blur-2xl shadow-2xl text-white font-mono text-xs`}
             >
               <div className="flex items-start justify-between gap-2 mb-2">
                 <div>
@@ -1049,7 +1050,7 @@ export function HighQualityRealMap({
               initial={{ opacity: 0, y: 10, scale: 0.95 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 10, scale: 0.95 }}
-              className={`absolute top-4 ${isRTL ? 'left-4' : 'right-4'} z-30 max-w-xs w-full p-4 rounded-2xl bg-slate-900/95 border border-emerald-500/40 backdrop-blur-2xl shadow-2xl text-white font-mono text-xs`}
+              className={`absolute top-4 ${isRTL ? 'left-4' : 'right-4'} z-30 max-w-[calc(100%-2rem)] sm:max-w-xs w-full p-4 rounded-2xl bg-slate-900/95 border border-emerald-500/40 backdrop-blur-2xl shadow-2xl text-white font-mono text-xs`}
             >
               <div className="flex items-start justify-between gap-2 mb-2">
                 <div>

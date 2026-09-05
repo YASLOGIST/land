@@ -46,7 +46,7 @@ function loadGsap(): Promise<LoadedGsap> {
 
 const EASE_CURVE: [number, number, number, number] = [0.22, 1, 0.36, 1]
 
-const t = (en: string, ar: string): BilingualText => ({ en, ar })
+import { t } from '@/lib/i18n'
 
 const PHASES: (PhaseProps & {
   floatingProjection: BilingualText

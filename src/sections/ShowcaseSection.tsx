@@ -6,7 +6,7 @@ import { useTheme } from 'next-themes'
 import { useLanguage } from '@/hooks/use-language'
 import { Maximize2, X, Sparkles, Building2, Truck, Radio } from 'lucide-react'
 
-const t = (en: string, ar: string) => ({ en, ar })
+import { t } from '@/lib/i18n'
 
 const showcaseItems = [
   {
@@ -74,7 +74,7 @@ export default function ShowcaseSection() {
     >
       {/* Ambient background glow */}
       <div
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_60%_40%_at_50%_10%,rgba(6,182,212,0.06),transparent)]"
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_60%_40%_at_50%_10%,rgba(232,179,23,0.06),transparent)]"
         aria-hidden="true"
       />
 

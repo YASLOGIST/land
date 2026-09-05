@@ -10,31 +10,78 @@ import {
   Warehouse,
 } from 'lucide-react'
 import { useLanguage } from '@/hooks/use-language'
+import { t } from '@/lib/i18n'
 // GSAP + ScrollTrigger are loaded lazily inside the scrub effect (below) so
 // the scroll-scrubbed hero video never blocks first paint with the GSAP
 // bundle. The type-only import below keeps the ref type at zero runtime cost.
 import type { ScrollTrigger } from 'gsap/ScrollTrigger'
 
-const t = (en: string, ar: string) => ({ en, ar })
-
 const content = {
   kicker: t(
     'ROAD FREIGHT VISIBILITY · NAFEZA / ACID INTEGRATED · GATE TO GATE',
     'تتبّع الشحن البري · متكامل مع نافذة ورقم ACID · من بوابة إلى بوابة',
+    '公路货运全程可视化 · 对接NAFEZA及ACID电子系统 · 门到门监管',
+    'KARAYOLU TAŞIMA GÖRÜNÜRLÜĞÜ · NAFEZA / ACID ENTEGRELİ · KAPIDAN KAPIYA',
+    'VISIBILITÉ DU FRET ROUTIER · INTÉGRÉ NAFEZA / ACID · DE BOUT EN BOUT',
   ),
-  title: t('YASLOGIST', 'YASLOGIST'),
-  subtitle: t('ROAD FREIGHT · FTL/LTL · SMART WAREHOUSING', 'شحن بري · حمولات كاملة ومجزأة · تخزين ذكي'),
+  title: t('YASLOGIST', 'YASLOGIST', 'YASLOGIST', 'YASLOGIST', 'YASLOGIST'),
+  subtitle: t(
+    'ROAD FREIGHT · FTL/LTL · SMART WAREHOUSING',
+    'شحن بري · حمولات كاملة ومجزأة · تخزين ذكي',
+    '干线公路货运 · 整车/拼车(FTL/LTL) · 智能仓储',
+    'KARAYOLU TAŞIMACILIĞI · FTL/LTL · AKILLI DEPOLAMA',
+    'FRET ROUTIER · FTL/LTL · ENTREPOSAGE INTELLIGENT',
+  ),
   description: t(
     'One shipment record across the Egyptian road network — booking, bill of lading, container, truck plate, gate pass and ACID resolved to a single identity, with turn times tracked on the Sokhna–Alexandria, 30th of June Axis and Regional Ring Road corridors.',
     'سجل واحد للشحنة عبر شبكة الطرق المصرية — الحجز وبوليصة الشحن والحاوية ولوحة الشاحنة وإذن البوابة ورقم ACID تُربط في هوية واحدة، مع قياس أزمنة الدوران على محاور السخنة–الإسكندرية، ومحور 30 يونيو، والطريق الدائري الإقليمي.',
+    '贯通埃及国家公路网的一体化运单体系——订舱、提单、集装箱、车牌号、闸口通行证与ACID代码统一鉴权，在苏赫奈-亚历山大、6月30日枢纽轴线及区域环线实现全链路周转时效实时监控。',
+    'Mısır karayolu ağı genelinde tek bir sevkiyat kaydı — rezervasyon, konşimento, konteyner, kamyon plakası, kapı geçiş belgesi ve ACID tek bir kimlikte birleştirilir; Sokhna-İskenderiye, 30 Haziran Aksı ve Bölgesel Çevre Yolu koridorlarında dönüş süreleri takip edilir.',
+    "Un registre d'expédition unique sur le réseau routier égyptien — réservation, connaissement, conteneur, plaque d'immatriculation, laissez-passer de porte et ACID unifiés sous une même identité, avec suivi des temps de rotation sur les corridors Sokhna–Alexandrie, Axe du 30 Juin et Rocade Régionale.",
   ),
-  cta: t('Explore Operations', 'استكشف العمليات'),
-  scrollPrompt: t('Scroll to Advance Video', 'مرّر للتحكم بالفيديو'),
+  cta: t(
+    'Explore Operations',
+    'استكشف العمليات',
+    '探索干线运营',
+    'Operasyonları Keşfet',
+    'Explorer les Opérations',
+  ),
+  scrollPrompt: t(
+    'Scroll to Advance Video',
+    'مرّر للتحكم بالفيديو',
+    '向下滚动推进视角',
+    'İlerlemek İçin Kaydırın',
+    'Faire Défiler pour Avancer',
+  ),
   founder: {
-    category: t('PLATFORM FOUNDER', 'مؤسس المنصة'),
-    name: t('Ahmed Yasser Ali', 'أحمد ياسر علي'),
-    role: t('Supply Chain & Logistics Specialist', 'أخصائي سلاسل الإمداد واللوجستيات'),
-    subfooter: t('YASLOGIST · NEW CAIRO, CAIRO', 'ياسلوجيست · القاهرة الجديدة، القاهرة'),
+    category: t(
+      'PLATFORM FOUNDER',
+      'مؤسس المنصة',
+      '平台创始人',
+      'PLATFORM KURUCUSU',
+      'FONDATEUR DE LA PLATEFORME',
+    ),
+    name: t(
+      'Ahmed Yasser Ali',
+      'أحمد ياسر علي',
+      'Ahmed Yasser Ali',
+      'Ahmed Yasser Ali',
+      'Ahmed Yasser Ali',
+    ),
+    role: t(
+      'Supply Chain & Logistics Specialist',
+      'أخصائي سلاسل الإمداد واللوجستيات',
+      '供应链与国际物流专家',
+      'Tedarik Zinciri ve Lojistik Uzmanı',
+      'Spécialiste Supply Chain & Logistique',
+    ),
+    subfooter: t(
+      'YASLOGIST · NEW CAIRO, CAIRO',
+      'ياسلوجيست · القاهرة الجديدة، القاهرة',
+      'YASLOGIST · 新开罗，开罗',
+      'YASLOGIST · YENİ KAHİRE, KAHİRE',
+      'YASLOGIST · NOUVEAU CAIRE, LE CAIRE',
+    ),
   },
 }
 
@@ -56,7 +103,7 @@ export default function HeroSection() {
   const currentProgressRef = useRef<number>(0)
   const animFrameIdRef = useRef<number | null>(null)
 
-  // ── GSAP ScrollTrigger Pinning & Scroll-Driven Video Scrubbing ──
+  // ── GSAP ScrollTrigger Pinning (Desktop) & Native Looping Video (Mobile) ──
   useEffect(() => {
     const video = videoRef.current
     const section = sectionRef.current
@@ -66,7 +113,53 @@ export default function HeroSection() {
     let disposed = false
     let innerCleanup: (() => void) | undefined
 
-    // Dynamic import: GSAP loads after first paint, before the first scroll.
+    const isTouchOrMobile =
+      typeof window !== 'undefined' &&
+      (window.innerWidth < 1024 ||
+        'ontouchstart' in window ||
+        navigator.maxTouchPoints > 0)
+
+    // Mobile / Touchscreen: run smooth hardware-accelerated continuous looping video
+    if (isTouchOrMobile) {
+      video.muted = true
+      video.playsInline = true
+      video.autoplay = true
+      video.loop = true
+      video.preload = 'auto'
+
+      const attemptPlay = () => {
+        const playPromise = video.play()
+        if (playPromise !== undefined) {
+          playPromise
+            .then(() => setVideoLoaded(true))
+            .catch(() => {
+              // Autoplay policy fallback: resume playback on user gesture
+              const touchHandler = () => {
+                video
+                  .play()
+                  .then(() => setVideoLoaded(true))
+                  .catch(() => {})
+                window.removeEventListener('touchstart', touchHandler)
+                window.removeEventListener('click', touchHandler)
+              }
+              window.addEventListener('touchstart', touchHandler, { once: true })
+              window.addEventListener('click', touchHandler, { once: true })
+            })
+        }
+      }
+
+      attemptPlay()
+
+      video.addEventListener('loadedmetadata', attemptPlay)
+      video.addEventListener('canplay', attemptPlay)
+
+      return () => {
+        video.removeEventListener('loadedmetadata', attemptPlay)
+        video.removeEventListener('canplay', attemptPlay)
+      }
+    }
+
+    // ── Desktop: GSAP ScrollTrigger Pinning & Scroll-Driven Video Scrubbing ──
     void (async () => {
       const [{ gsap }, { ScrollTrigger }] = await Promise.all([
         import('gsap'),
@@ -83,104 +176,104 @@ export default function HeroSection() {
       let isMounted = true
       const isLoopingRef = { current: false }
 
-    // Smooth RAF loop: strictly interpolates progress and seeks video.currentTime
-    const renderLoop = () => {
-      if (!isMounted) return
+      // Smooth RAF loop: strictly interpolates progress and seeks video.currentTime
+      const renderLoop = () => {
+        if (!isMounted) return
 
-      const targetP = targetProgressRef.current
-      const curP = currentProgressRef.current
-      const diff = targetP - curP
+        const targetP = targetProgressRef.current
+        const curP = currentProgressRef.current
+        const diff = targetP - curP
 
-      let continueLoop = false
+        let continueLoop = false
 
-      // Fluid lerp for forward and reverse scrubbing
-      if (Math.abs(diff) > 0.0002) {
-        currentProgressRef.current += diff * 0.22 // Softer, ultra-smooth interpolation rate
-        continueLoop = true
-      } else {
-        currentProgressRef.current = targetP
-      }
+        // Fluid lerp for forward and reverse scrubbing
+        if (Math.abs(diff) > 0.0002) {
+          currentProgressRef.current += diff * 0.22 // Softer, ultra-smooth interpolation rate
+          continueLoop = true
+        } else {
+          currentProgressRef.current = targetP
+        }
 
-      const p = Math.max(0, Math.min(1, currentProgressRef.current))
-      const dur = video.duration && !isNaN(video.duration) && video.duration > 0 ? video.duration : 10.006
-      const targetTime = Math.max(0, Math.min(p * dur, dur - 0.02))
+        const p = Math.max(0, Math.min(1, currentProgressRef.current))
+        const dur = video.duration && !isNaN(video.duration) && video.duration > 0 ? video.duration : 10.006
+        const targetTime = Math.max(0, Math.min(p * dur, dur - 0.02))
 
-      if (video.readyState >= 2 && Math.abs(video.currentTime - targetTime) > 0.015) {
-        try {
-          video.currentTime = targetTime
-        } catch {
-          // Guard for seek throttling
+        if (video.readyState >= 2 && Math.abs(video.currentTime - targetTime) > 0.015) {
+          try {
+            video.currentTime = targetTime
+          } catch {
+            // Guard for seek throttling
+          }
+        }
+
+        // 60fps Timeline HUD indicators
+        const pct = Math.round(p * 100)
+        if (timelineTextRef.current) {
+          timelineTextRef.current.textContent = `TIMELINE: ${pct}%`
+        }
+        if (timelineBarRef.current) {
+          timelineBarRef.current.style.width = `${pct}%`
+        }
+
+        if (continueLoop) {
+          animFrameIdRef.current = requestAnimationFrame(renderLoop)
+        } else {
+          isLoopingRef.current = false
         }
       }
 
-      // 60fps Timeline HUD indicators
-      const pct = Math.round(p * 100)
-      if (timelineTextRef.current) {
-        timelineTextRef.current.textContent = `TIMELINE: ${pct}%`
-      }
-      if (timelineBarRef.current) {
-        timelineBarRef.current.style.width = `${pct}%`
+      const startLoop = () => {
+        if (!isLoopingRef.current) {
+          isLoopingRef.current = true
+          animFrameIdRef.current = requestAnimationFrame(renderLoop)
+        }
       }
 
-      if (continueLoop) {
-        animFrameIdRef.current = requestAnimationFrame(renderLoop)
+      // Initial trigger
+      startLoop()
+
+      // Robust GSAP ScrollTrigger with true pinning and pinSpacing
+      const trigger = ScrollTrigger.create({
+        trigger: section,
+        pin: pinContainer,
+        pinSpacing: true,
+        anticipatePin: 1,
+        start: 'top top',
+        end: '+=3500',
+        scrub: 0.5,
+        onUpdate: (self) => {
+          targetProgressRef.current = self.progress
+          startLoop()
+        },
+      })
+      scrollTriggerRef.current = trigger
+
+      const onVideoReady = () => {
+        setVideoLoaded(true)
+        video.pause()
+        ScrollTrigger.refresh()
+      }
+
+      if (video.readyState >= 2) {
+        onVideoReady()
       } else {
-        isLoopingRef.current = false
+        video.addEventListener('loadedmetadata', onVideoReady, { once: true })
+        video.addEventListener('canplay', onVideoReady, { once: true })
       }
-    }
 
-    const startLoop = () => {
-      if (!isLoopingRef.current) {
-        isLoopingRef.current = true
-        animFrameIdRef.current = requestAnimationFrame(renderLoop)
+      const handleResize = () => ScrollTrigger.refresh()
+      window.addEventListener('resize', handleResize, { passive: true })
+
+      innerCleanup = () => {
+        isMounted = false
+        if (animFrameIdRef.current) {
+          cancelAnimationFrame(animFrameIdRef.current)
+        }
+        window.removeEventListener('resize', handleResize)
+        video.removeEventListener('loadedmetadata', onVideoReady)
+        video.removeEventListener('canplay', onVideoReady)
+        trigger.kill()
       }
-    }
-
-    // Initial trigger
-    startLoop()
-
-    // Robust GSAP ScrollTrigger with true pinning and pinSpacing
-    const trigger = ScrollTrigger.create({
-      trigger: section,
-      pin: pinContainer,
-      pinSpacing: true,
-      anticipatePin: 1,
-      start: 'top top',
-      end: '+=3500',
-      scrub: 0.5,
-      onUpdate: (self) => {
-        targetProgressRef.current = self.progress
-        startLoop()
-      },
-    })
-    scrollTriggerRef.current = trigger
-
-    const onVideoReady = () => {
-      setVideoLoaded(true)
-      video.pause()
-      ScrollTrigger.refresh()
-    }
-
-    if (video.readyState >= 2) {
-      onVideoReady()
-    } else {
-      video.addEventListener('loadedmetadata', onVideoReady, { once: true })
-      video.addEventListener('canplay', onVideoReady, { once: true })
-    }
-
-    const handleResize = () => ScrollTrigger.refresh()
-    window.addEventListener('resize', handleResize, { passive: true })
-
-    innerCleanup = () => {
-      isMounted = false
-      if (animFrameIdRef.current) {
-        cancelAnimationFrame(animFrameIdRef.current)
-      }
-      window.removeEventListener('resize', handleResize)
-      video.removeEventListener('loadedmetadata', onVideoReady)
-      video.removeEventListener('canplay', onVideoReady)
-      trigger.kill()
-    }
     })() // end async scrub setup
 
     return () => {
@@ -195,9 +288,19 @@ export default function HeroSection() {
     if (video) {
       video.muted = true
       video.playsInline = true
-      video.preload = 'auto'
-      video.pause()
-      video.currentTime = 0
+      const isTouchOrMobile =
+        typeof window !== 'undefined' &&
+        (window.innerWidth < 1024 ||
+          'ontouchstart' in window ||
+          navigator.maxTouchPoints > 0)
+      if (isTouchOrMobile) {
+        video.loop = true
+        video.play().catch(() => {})
+      } else {
+        video.preload = 'auto'
+        video.pause()
+        video.currentTime = 0
+      }
     }
   }
 
@@ -241,13 +344,14 @@ export default function HeroSection() {
           x5-playsinline="true"
           preload="auto"
           controls={false}
-          autoPlay={false}
-          loop={false}
+          autoPlay
+          loop
           onLoadedMetadata={handleLoadedMetadata}
           onCanPlay={() => setVideoLoaded(true)}
           className="absolute inset-0 w-full h-full object-cover z-0 pointer-events-none"
           style={{
             opacity: videoLoaded ? 1 : 0.85,
+            transition: 'opacity 0.4s ease',
           }}
           aria-hidden="true"
         >
@@ -277,6 +381,21 @@ export default function HeroSection() {
                 <>
                   الشحن الذكي.<br />
                   <span className="text-[#D3EE22] drop-shadow-[0_0_20px_rgba(211,238,34,0.35)]">آفاق بلا حدود.</span>
+                </>
+              ) : language === 'zh' ? (
+                <>
+                  智能货运。<br />
+                  <span className="text-[#D3EE22] drop-shadow-[0_0_20px_rgba(211,238,34,0.35)]">纵横无界。</span>
+                </>
+              ) : language === 'tr' ? (
+                <>
+                  Akıllı Taşımacılık.<br />
+                  <span className="text-[#D3EE22] drop-shadow-[0_0_20px_rgba(211,238,34,0.35)]">Sınırsız Rotalar.</span>
+                </>
+              ) : language === 'fr' ? (
+                <>
+                  Fret Intelligent.<br />
+                  <span className="text-[#D3EE22] drop-shadow-[0_0_20px_rgba(211,238,34,0.35)]">Horizons Sans Limites.</span>
                 </>
               ) : (
                 <>

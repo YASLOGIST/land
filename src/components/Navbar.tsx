@@ -5,8 +5,9 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useTheme } from 'next-themes'
 import { ThemeToggle } from '@/components/ThemeToggle'
 import { useLanguage } from '@/hooks/use-language'
-import { Menu, X, Languages } from 'lucide-react'
+import { Menu, X } from 'lucide-react'
 import SuiteSwitcher from '@/components/SuiteSwitcher'
+import { SUPPORTED_LANGUAGES } from '@/lib/i18n'
 
 export default function Navbar() {
   const { resolvedTheme } = useTheme()
@@ -16,17 +17,65 @@ export default function Navbar() {
   const mode = resolvedTheme === 'light' ? 'light' : 'dark'
   const isRTL = direction === 'rtl'
 
-  const t = (en: string, ar: string) => ({ en, ar })
-
-  const subtitle = t(
-    'THE NEXT-GEN SUPPLY CHAIN INTELLIGENCE PLATFORM',
-    'منصة ذكاء سلسلة التوريد للجيل القادم'
-  )
+  const subtitle = {
+    en: 'THE NEXT-GEN SUPPLY CHAIN INTELLIGENCE PLATFORM',
+    ar: 'منصة ذكاء سلسلة التوريد للجيل القادم',
+    zh: '下一代国际供应链智能物流平台',
+    tr: 'YENİ NESİL TEDARİK ZİNCİRİ İSTİHBARAT PLATFORMU',
+    fr: "PLATEFORME D'INTELLIGENCE LOGISTIQUE NOUVELLE GÉNÉRATION",
+  }
 
   const navLinks = [
-    { label: t('Solutions', 'الحلول'), href: '#capabilities' },
-    { label: t('Platform', 'المنصة'), href: '#dashboard-overview' },
-    { label: t('Contact', 'التواصل'), href: '#footer' }
+    {
+      label: {
+        en: 'Solutions',
+        ar: 'الحلول',
+        zh: '解决方案',
+        tr: 'Çözümler',
+        fr: 'Solutions',
+      },
+      href: '#capabilities',
+    },
+    {
+      label: {
+        en: 'Platform',
+        ar: 'المنصة',
+        zh: '监控大屏',
+        tr: 'Platform',
+        fr: 'Plateforme',
+      },
+      href: '#dashboard-overview',
+    },
+    {
+      label: {
+        en: 'Corridors',
+        ar: 'الممرات',
+        zh: '国际走廊',
+        tr: 'Koridorlar',
+        fr: 'Corridors',
+      },
+      href: '#corridor-dispatch',
+    },
+    {
+      label: {
+        en: 'Disruption',
+        ar: 'الأزمات',
+        zh: '应急调度',
+        tr: 'Kriz Yönetimi',
+        fr: 'Urgences',
+      },
+      href: '#disruption-command',
+    },
+    {
+      label: {
+        en: 'Contact',
+        ar: 'التواصل',
+        zh: '联系我们',
+        tr: 'İletişim',
+        fr: 'Contact',
+      },
+      href: '#footer',
+    },
   ]
 
   const handleLinkClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
@@ -145,53 +194,36 @@ export default function Navbar() {
                 Phones get the grid in the drawer below. */}
             <SuiteSwitcher current="land" className="hidden lg:flex" />
 
-            {/* Language Toggle Switch */}
+            {/* Multi-Language Switcher (EN, AR, ZH, TR, FR) */}
             <div
               dir="ltr"
-              className="relative flex items-center p-1 rounded-full bg-[#051336]/90 border border-gold-500/35 backdrop-blur-2xl shadow-[inset_0_1px_2px_rgba(0,0,0,0.5),0_0_15px_rgba(232,179,23,0.2)]"
+              className="relative flex items-center p-0.5 rounded-full bg-[#051336]/90 border border-gold-500/35 backdrop-blur-2xl shadow-[inset_0_1px_2px_rgba(0,0,0,0.5),0_0_15px_rgba(232,179,23,0.2)]"
             >
-              {/* EN Button */}
-              <button
-                onClick={() => setLanguage('en')}
-                className={`relative z-10 px-3.5 py-1 rounded-full text-xs font-bold leading-none select-none transition-colors duration-200 ${
-                  language === 'en'
-                    ? 'text-slate-950 font-black'
-                    : 'text-slate-300 hover:text-white'
-                }`}
-                style={{ borderRadius: '10002px' }}
-                aria-label="Switch to English"
-              >
-                {language === 'en' && (
-                  <motion.div
-                    layoutId="navbar-active-lang"
-                    className="absolute inset-0 rounded-full bg-gradient-to-r from-gold-400 to-amber-500 shadow-[0_0_14px_rgba(232,179,23,0.85)] z-[-1]"
-                    transition={{ type: 'spring', stiffness: 500, damping: 35 }}
-                  />
-                )}
-                EN
-              </button>
-
-              {/* AR Button */}
-              <button
-                onClick={() => setLanguage('ar')}
-                className={`relative z-10 px-3.5 py-1 rounded-full font-bold leading-none select-none transition-[colors,font-weight,box-shadow] duration-300 ar-lang-button focus:outline-none focus:ring-2 focus:ring-gold-400 focus:ring-offset-2 focus:ring-offset-[#051336] focus:shadow-[0_0_12px_rgba(232,179,23,0.8)] hover:font-black flex items-center justify-center gap-1.5 ${
-                  language === 'ar'
-                    ? 'text-slate-950 font-black'
-                    : 'text-slate-300 hover:text-white'
-                }`}
-                style={{ fontFamily: 'Aref Ruqaa', fontSize: '15px' }}
-                aria-label="التبديل إلى العربية"
-              >
-                {language === 'ar' && (
-                  <motion.div
-                    layoutId="navbar-active-lang"
-                    className="absolute inset-0 rounded-full bg-gradient-to-r from-gold-400 to-amber-500 shadow-[0_0_14px_rgba(232,179,23,0.85)] z-[-1]"
-                    transition={{ type: 'spring', stiffness: 500, damping: 35 }}
-                  />
-                )}
-                <Languages className="w-3.5 h-3.5 transition-transform duration-300 group-hover:scale-110" />
-                <span>عربي</span>
-              </button>
+              {SUPPORTED_LANGUAGES.map((item) => {
+                const isSelected = language === item.code
+                return (
+                  <button
+                    key={item.code}
+                    onClick={() => setLanguage(item.code)}
+                    className={`relative z-10 px-2.5 py-1 rounded-full text-[11px] font-bold leading-none select-none transition-colors duration-200 ${
+                      isSelected
+                        ? 'text-slate-950 font-black'
+                        : 'text-slate-300 hover:text-white'
+                    }`}
+                    style={item.code === 'ar' ? { fontFamily: 'Aref Ruqaa', fontSize: '13.5px' } : undefined}
+                    aria-label={`Switch language to ${item.nativeName}`}
+                  >
+                    {isSelected && (
+                      <motion.div
+                        layoutId="navbar-active-lang"
+                        className="absolute inset-0 rounded-full bg-gradient-to-r from-gold-400 to-amber-500 shadow-[0_0_14px_rgba(232,179,23,0.85)] z-[-1]"
+                        transition={{ type: 'spring', stiffness: 500, damping: 35 }}
+                      />
+                    )}
+                    {item.label}
+                  </button>
+                )
+              })}
             </div>
             
             {/* Theme Toggle */}
@@ -237,7 +269,7 @@ export default function Navbar() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.25, ease: 'easeInOut' }}
-            className={`fixed top-16 left-0 right-0 z-40 md:hidden border-b flex flex-col p-6 gap-6 backdrop-blur-2xl ${
+            className={`fixed top-16 left-0 right-0 z-40 md:hidden border-b flex flex-col p-5 sm:p-6 gap-5 sm:gap-6 backdrop-blur-2xl max-h-[calc(100vh-4rem)] overflow-y-auto overscroll-contain ${
               mode === 'dark'
                 ? 'bg-slate-950/95 border-white/[0.08] shadow-2xl'
                 : 'bg-white/95 border-slate-200 shadow-xl'
@@ -272,29 +304,36 @@ export default function Navbar() {
             </nav>
 
             {/* Language Selection inside Drawer */}
-            <div className="flex items-center justify-between pt-2">
-              <span className="text-xs font-mono text-slate-500 uppercase">
-                {language === 'en' ? 'Select Language' : 'اختر اللغة'}
+            <div className="flex flex-col gap-2 pt-2 border-t border-white/[0.06]">
+              <span className="text-[10px] font-mono text-slate-500 uppercase tracking-wider">
+                {language === 'ar'
+                  ? 'اختر لغة المنصة'
+                  : language === 'zh'
+                  ? '选择平台语言'
+                  : language === 'tr'
+                  ? 'Platform Dilini Seçin'
+                  : language === 'fr'
+                  ? 'Choisir la Langue'
+                  : 'Select Platform Language'}
               </span>
 
-              <div className="flex p-1 rounded-xl bg-slate-900 border border-slate-700/50">
-                <button
-                  onClick={() => setLanguage('en')}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
-                    language === 'en' ? 'bg-gold-500 text-slate-950 font-black' : 'text-slate-400'
-                  }`}
-                >
-                  EN
-                </button>
-                <button
-                  onClick={() => setLanguage('ar')}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
-                    language === 'ar' ? 'bg-gold-500 text-slate-950 font-black' : 'text-slate-400'
-                  }`}
-                  style={{ fontFamily: 'Aref Ruqaa' }}
-                >
-                  عربي
-                </button>
+              <div className="grid grid-cols-5 p-1 rounded-2xl bg-slate-900 border border-slate-700/50 gap-1">
+                {SUPPORTED_LANGUAGES.map((item) => {
+                  const isSelected = language === item.code
+                  return (
+                    <button
+                      key={item.code}
+                      onClick={() => setLanguage(item.code)}
+                      className={`py-2 px-1 rounded-xl text-xs font-bold transition-all text-center flex flex-col items-center justify-center gap-0.5 ${
+                        isSelected ? 'bg-gold-500 text-slate-950 font-black shadow-md' : 'text-slate-400 hover:text-white'
+                      }`}
+                      style={item.code === 'ar' ? { fontFamily: 'Aref Ruqaa' } : undefined}
+                    >
+                      <span className="text-[11px] leading-tight font-black">{item.label}</span>
+                      <span className="text-[8.5px] opacity-75 font-normal truncate max-w-full">{item.nativeName}</span>
+                    </button>
+                  )
+                })}
               </div>
             </div>
           </motion.div>

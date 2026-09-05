@@ -16,13 +16,23 @@
 
 import { AlertTriangle } from 'lucide-react'
 import { useLanguage } from '@/hooks/use-language'
+import { t } from '@/lib/i18n'
 
 const LABEL = {
-  full: {
-    en: 'Interactive Model · Digital Twin Simulation',
-    ar: 'نموذج تفاعلي · محاكاة توأم رقمي',
-  },
-  short: { en: 'Simulated', ar: 'محاكاة' },
+  full: t(
+    'Interactive Model · Digital Twin Simulation',
+    'نموذج تفاعلي · محاكاة توأم رقمي',
+    '交互式推演模型 · 数字孪生仿真',
+    'İnteraktif Model · Dijital İkiz Simülasyonu',
+    'Modèle Interactif · Simulation Jumeau Numérique',
+  ),
+  short: t(
+    'Simulated',
+    'محاكاة',
+    '模拟推演',
+    'Simüle Edildi',
+    'Simulé',
+  ),
 }
 
 export default function ModelBadge({

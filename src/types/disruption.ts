@@ -27,7 +27,7 @@ export interface DisruptionScenarioOption {
   impactDescription: BilingualText
   baseDelayHours: number
   potentialLossRisk: string
-  radarCoordinates: [number, number] // Percentage coordinates for SVG incident radar [x%, y%]
+  radarCoordinates?: [number, number] // Percentage coordinates for SVG incident radar [x%, y%]
   strategies: ContingencyStrategyOption[]
 }
 
