@@ -2,8 +2,10 @@
 
 import { useEffect, useMemo, useRef, useState, useCallback } from 'react'
 import { useTheme } from 'next-themes'
-import { gsap } from 'gsap'
-import { ScrollTrigger } from 'gsap/ScrollTrigger'
+// GSAP + ScrollTrigger load lazily (first effect run), so the heavy GSAP
+// bundle stays out of the initial paint path for this below-the-fold
+// section. The type-only import keeps ref types at zero runtime cost.
+import type { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { AnimatePresence, motion } from 'framer-motion'
 import {
   Activity,
@@ -26,8 +28,20 @@ import type {
   TranslationProps,
 } from '@/types/land-logistics'
 
-if (typeof window !== 'undefined') {
-  gsap.registerPlugin(ScrollTrigger)
+type LoadedGsap = {
+  gsap: typeof import('gsap')['gsap']
+  ScrollTrigger: typeof import('gsap/ScrollTrigger')['ScrollTrigger']
+}
+
+let gsapLoadPromise: Promise<LoadedGsap> | null = null
+
+function loadGsap(): Promise<LoadedGsap> {
+  gsapLoadPromise ||= import('gsap').then(async ({ gsap }) => {
+    const { ScrollTrigger } = await import('gsap/ScrollTrigger')
+    gsap.registerPlugin(ScrollTrigger)
+    return { gsap, ScrollTrigger }
+  })
+  return gsapLoadPromise
 }
 
 const EASE_CURVE: [number, number, number, number] = [0.22, 1, 0.36, 1]
@@ -165,23 +179,29 @@ export default function LandLogisticsSection({
     const nightVideo = nightVideoRef.current
     if (!section || !pinContainer) return
 
-    if (dayVideo) {
-      dayVideo.muted = true
-      dayVideo.playsInline = true
-      dayVideo.preload = 'auto'
-      dayVideo.pause()
-    }
-    if (nightVideo) {
-      nightVideo.muted = true
-      nightVideo.playsInline = true
-      nightVideo.preload = 'auto'
-      nightVideo.pause()
-    }
+    let disposed = false
+    let innerCleanup: (() => void) | undefined
 
-    gsap.registerPlugin(ScrollTrigger)
+    // Dynamic import: GSAP arrives after first paint, cached for re-runs.
+    void (async () => {
+      const { ScrollTrigger } = await loadGsap()
+      if (disposed) return
 
-    let isRunning = true
-    const isLoopingRef = { current: false }
+      if (dayVideo) {
+        dayVideo.muted = true
+        dayVideo.playsInline = true
+        dayVideo.preload = 'auto'
+        dayVideo.pause()
+      }
+      if (nightVideo) {
+        nightVideo.muted = true
+        nightVideo.playsInline = true
+        nightVideo.preload = 'auto'
+        nightVideo.pause()
+      }
+
+      let isRunning = true
+      const isLoopingRef = { current: false }
 
     const renderLoop = () => {
       if (!isRunning) return
@@ -293,7 +313,7 @@ export default function LandLogisticsSection({
     const handleResize = () => ScrollTrigger.refresh()
     window.addEventListener('resize', handleResize, { passive: true })
 
-    return () => {
+    innerCleanup = () => {
       isRunning = false
       if (animFrameIdRef.current) {
         cancelAnimationFrame(animFrameIdRef.current)
@@ -308,6 +328,12 @@ export default function LandLogisticsSection({
         nightVideo.removeEventListener('canplay', onVideoReady)
       }
       trigger.kill()
+    }
+    })() // end async scrub setup
+
+    return () => {
+      disposed = true
+      innerCleanup?.()
     }
   }, [updatePhase])
 

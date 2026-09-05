@@ -34,9 +34,22 @@ export interface DisruptionScenarioOption {
 export interface DisruptionSimulationResult {
   activeScenario: DisruptionScenarioOption
   selectedStrategy: ContingencyStrategyOption
+  /** Residual hold after mitigation, hours — recomputed from the ETA engine
+   *  as mitigated total minus planned total. */
   netDelayHours: number
+  /** Engine-computed hours recovered: disrupted total − mitigated total. */
   hoursSaved: number
   fuelEfficiencyGain: number
   lossPreventionRate: string
   authChecksumToken: string
+  /** Total door-to-door ETA with no incident, formatted (MODELLED). */
+  etaPlannedFormatted: string
+  /** Total door-to-door ETA with the incident and no mitigation. */
+  etaDisruptedFormatted: string
+  /** Total door-to-door ETA after the selected strategy's mitigation. */
+  etaMitigatedFormatted: string
+  /** Declared ± confidence band (minutes) on the affected corridor. */
+  etaBandMin: number
+  /** Per-strategy recovered hours, engine-computed for the option cards. */
+  strategySavingsHours: Record<string, number>
 }

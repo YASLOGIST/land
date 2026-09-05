@@ -214,6 +214,10 @@ export const LAND_TRADE_CORRIDORS: RealTradeCorridor[] = [
     axleLoadLimitT: 13,
     clearanceHeightM: 4.2,
     railSlotTime: 'YARD SLOT 04:00–06:00 EET',
+    /* Declared ETA segments (MODELLED) — every figure traces to a string in
+       this file: gate 45–180 min at Sokhna hub, axle weigh ~6 min at the
+       Regional Ring Road waypoint. No declared border or rest window. */
+    etaModel: { gateQueueMin: 112.5, gateQueueBandMin: 67.5, weighbridgeMin: 6, restBreakMin: 0, borderHrs: 0, borderBandHrs: 0 },
     chokepointName: t('Suez Road tollgate and checkpoint', 'بوابة الرسوم ونقطة التفتيش بطريق السويس'),
     chokepointGps: [32.10, 29.85],
     weighbridgeGps: [31.60, 29.95],
@@ -297,6 +301,9 @@ export const LAND_TRADE_CORRIDORS: RealTradeCorridor[] = [
     axleLoadLimitT: 13,
     clearanceHeightM: 4.5,
     railSlotTime: 'YARD SLOT 22:00–00:00 EET',
+    /* Declared ETA segments (MODELLED): gate 60–210 min at Dekheila,
+       Wadi El Natrun check + break ~30 min, axle weigh ~7 min. */
+    etaModel: { gateQueueMin: 135, gateQueueBandMin: 75, weighbridgeMin: 7, restBreakMin: 30, borderHrs: 0, borderBandHrs: 0 },
     chokepointName: t('Wadi El Natrun rest area and checkpoint', 'استراحة ونقطة تفتيش وادي النطرون'),
     chokepointGps: [30.43, 30.40],
     weighbridgeGps: [30.90, 30.20],
@@ -380,6 +387,9 @@ export const LAND_TRADE_CORRIDORS: RealTradeCorridor[] = [
     axleLoadLimitT: 13,
     clearanceHeightM: 4.2,
     railSlotTime: 'YARD SLOT 05:00–07:00 EET',
+    /* Declared ETA segments (MODELLED): gate 50–150 min at Damietta,
+       Banha axle weigh ~9 min. Junction holds are not rest stops. */
+    etaModel: { gateQueueMin: 100, gateQueueBandMin: 50, weighbridgeMin: 9, restBreakMin: 0, borderHrs: 0, borderBandHrs: 0 },
     chokepointName: t('Mansoura bypass junction', 'تقاطع طريق المنصورة الالتفافي'),
     chokepointGps: [31.38, 31.04],
     weighbridgeGps: [31.18, 30.46],
@@ -463,6 +473,12 @@ export const LAND_TRADE_CORRIDORS: RealTradeCorridor[] = [
     axleLoadLimitT: 13,
     clearanceHeightM: 4.2,
     railSlotTime: 'FERRY BOOKING 20:00 EET',
+    /* Declared ETA segments (MODELLED): yard turn ~40 min at 10th Ramadan,
+       Tabuk weigh + rest ~50 min, Nuweiba ferry + customs 6–14 h and
+       Durra–Haql clearance 3–9 h (expected midpoints, additive
+       worst-case band), plus 2 x 45 min scheduled driver rest for ~22 h of
+       driving. */
+    etaModel: { gateQueueMin: 40, gateQueueBandMin: 0, weighbridgeMin: 50, restBreakMin: 90, borderHrs: 16, borderBandHrs: 7 },
     chokepointName: t('Nuweiba–Aqaba ferry crossing', 'معبر عبّارة نويبع–العقبة'),
     chokepointGps: [34.67, 29.03],
     weighbridgeGps: [36.57, 28.38],
@@ -557,6 +573,10 @@ export const LAND_TRADE_CORRIDORS: RealTradeCorridor[] = [
     axleLoadLimitT: 13,
     clearanceHeightM: 4.8,
     railSlotTime: 'YARD SLOT 02:00–04:00 AST',
+    /* Declared ETA segments (MODELLED): Jeddah gate queue 60–240 min,
+       Mecca checkpoint + break ~25 min, H40 axle weigh ~7 min, plus one
+       45 min scheduled driver rest for ~11 h of driving. */
+    etaModel: { gateQueueMin: 150, gateQueueBandMin: 90, weighbridgeMin: 7, restBreakMin: 70, borderHrs: 0, borderBandHrs: 0 },
     chokepointName: t('Mecca north bypass checkpoint (H40)', 'نقطة تفتيش الالتفافي الشمالي لمكة (طريق 40)'),
     chokepointGps: [39.95, 21.58],
     weighbridgeGps: [43.60, 23.60],
@@ -641,9 +661,12 @@ export const LAND_TRADE_CORRIDORS: RealTradeCorridor[] = [
     axleLoadLimitT: 13,
     clearanceHeightM: 4.8,
     railSlotTime: 'YARD SLOT 20:00–22:00 AST',
+    /* Declared ETA segments (MODELLED): Dammam gate queue 45–180 min,
+       desert checkpoint + break ~20 min, Hofuf axle weigh ~8 min. */
+    etaModel: { gateQueueMin: 112.5, gateQueueBandMin: 67.5, weighbridgeMin: 8, restBreakMin: 20, borderHrs: 0, borderBandHrs: 0 },
     chokepointName: t('Hofuf heavy-truck weigh plaza (H40)', 'محطة وزن الشاحنات بالهفوف (طريق 40)'),
     chokepointGps: [49.58, 25.36],
-    weighbridgeGps: [48.25, 24.95],
+    weighbridgeGps: [49.58, 25.36],
     dwellHotspotGps: [50.20, 26.50],
     customsManifestType: t(
       'BAYAN import declaration filed through the FASAH single window',
@@ -725,6 +748,10 @@ export const LAND_TRADE_CORRIDORS: RealTradeCorridor[] = [
     axleLoadLimitT: 13,
     clearanceHeightM: 4.8,
     railSlotTime: 'BORDER SLOT 06:00–20:00 AST',
+    /* Declared ETA segments (MODELLED): Riyadh Dry Port gate turn ~65 min
+       (point value, no declared window), Al Kharj checkpoint + break
+       ~20 min, Haradh axle weigh ~9 min, Al Batha clearance 2–8 h. */
+    etaModel: { gateQueueMin: 65, gateQueueBandMin: 0, weighbridgeMin: 9, restBreakMin: 20, borderHrs: 5, borderBandHrs: 3 },
     chokepointName: t('Al Batha exit formalities plaza', 'ساحة إجراءات المغادرة بمنفذ البطحاء'),
     chokepointGps: [51.20, 24.13],
     weighbridgeGps: [49.07, 24.14],
@@ -809,6 +836,11 @@ export const LAND_TRADE_CORRIDORS: RealTradeCorridor[] = [
     axleLoadLimitT: 13,
     clearanceHeightM: 4.8,
     railSlotTime: 'YARD SLOT 23:00–01:00 AST',
+    /* Declared ETA segments (MODELLED): Jeddah gate queue 60–240 min,
+       Yanbu + Tabuk check/break ~55 min total, Al Wajh weigh + rest
+       ~45 min, Haql clearance 3–9 h, plus one 45 min scheduled driver
+       rest for ~14 h of driving. */
+    etaModel: { gateQueueMin: 150, gateQueueBandMin: 90, weighbridgeMin: 45, restBreakMin: 100, borderHrs: 6, borderBandHrs: 3 },
     chokepointName: t('H5 weigh station north of Yanbu', 'محطة وزن على الطريق 5 شمال ينبع'),
     chokepointGps: [37.60, 24.85],
     weighbridgeGps: [36.46, 26.24],

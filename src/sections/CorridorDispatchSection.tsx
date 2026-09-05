@@ -29,6 +29,7 @@ import type {
   DispatchSimulationOutput,
 } from '@/types/dispatch'
 import type { WaypointDetail, RealTradeCorridor } from '@/types/dispatch-extended'
+import { computeEta, type EtaSegmentId } from '@/lib/eta'
 import { LAND_TRADE_CORRIDORS } from '@/data/landCorridors'
 import { useGisPanZoom } from '@/hooks/useGisPanZoom'
 import { HighQualityRealMap } from '@/components/dispatch/HighQualityRealMap'
@@ -37,6 +38,25 @@ import { RouteComparisonModal } from '@/components/dispatch/RouteComparisonModal
 const t = (en: string, ar: string): BilingualText => ({ en, ar })
 
 type TrafficLightState = 'green' | 'yellow' | 'red'
+
+/** Arabic labels for computeEta breakdown segments (telemetry labels stay
+ *  English in the mono HUD, matching the corridor throughput strings). */
+const SEGMENT_LABEL_AR: Record<EtaSegmentId, string> = {
+  drive: 'قيادة الخط الرئيسي',
+  'origin-gate-queue': 'طابور بوابة / ساحة المنشأ',
+  weighbridge: 'فحص محطة الوزن',
+  'driver-rest': 'راحات السائق المجدولة',
+  'border-clearance': 'تخليص الحدود أو العبّارة',
+  'incident-hold': 'توقف اضطراري معلن',
+}
+
+function formatSegmentMinutes(minutes: number): string {
+  const rounded = Math.round(minutes)
+  const h = Math.floor(rounded / 60)
+  const m = rounded % 60
+  if (h > 0) return `${h}h ${m}m`
+  return `${m}m`
+}
 
 const TRANSPORT_MODES: TransportModeOption[] = [
   {
@@ -174,23 +194,36 @@ export function CorridorDispatchSection() {
     centerOnPoint,
   } = useGisPanZoom({ minScale: 1.0, maxScale: 6.0 })
 
-  // Calculation Engine
+  // Calculation Engine — ETA comes from the pure computeEta module; the
+  // corridor's declared segment figures (etaModel) feed it, so the total is
+  // drive time + declared holds, and the band is the declared gate/border
+  // spread. Departure = next half-hour boundary, model-side.
   const calculation = useMemo<DispatchSimulationOutput>(() => {
     const dist = activeCorridor.distanceKm
     const speed = activeMode.baseSpeedKmh
-    const hours = Number((dist / speed).toFixed(1))
-    const totalMinutes = Math.round(hours * 60)
-    const formattedHours = Math.floor(totalMinutes / 60)
-    const formattedMinutes = totalMinutes % 60
 
+    const now = new Date()
+    const departureMs = Math.ceil((now.getTime() + 2 * 3600_000) / (30 * 60_000)) * 30 * 60_000
+    const eta = computeEta({
+      distanceKm: dist,
+      avgSpeedKmh: speed,
+      gateQueueMin: activeCorridor.etaModel.gateQueueMin,
+      gateQueueBandMin: activeCorridor.etaModel.gateQueueBandMin,
+      weighbridgeMin: activeCorridor.etaModel.weighbridgeMin,
+      restBreakMin: activeCorridor.etaModel.restBreakMin,
+      borderHrs: activeCorridor.etaModel.borderHrs,
+      borderBandHrs: activeCorridor.etaModel.borderBandHrs,
+      departureTime: new Date(departureMs).toISOString(),
+    })
+
+    const totalRounded = Math.round(eta.totalMinutes)
+    const days = Math.floor(totalRounded / (24 * 60))
+    const hours = Math.floor((totalRounded % (24 * 60)) / 60)
+    const minutes = totalRounded % 60
     let formattedDuration = ''
-    if (formattedHours > 24) {
-      const days = Math.floor(formattedHours / 24)
-      const remHours = formattedHours % 24
-      formattedDuration = `${days}d ${remHours}h`
-    } else {
-      formattedDuration = `${formattedHours}h ${formattedMinutes}m`
-    }
+    if (days > 0) formattedDuration = `${days}d ${hours}h ${minutes}m`
+    else if (hours > 0) formattedDuration = `${hours}h ${minutes}m`
+    else formattedDuration = `${minutes}m`
 
     const baselineCo2 = dist * payloadTons * 0.16
     const actualCo2 = dist * payloadTons * activeMode.emissionsFactor
@@ -211,17 +244,24 @@ export function CorridorDispatchSection() {
     }
     const hexHash = `0x9F8B${Math.abs(hashNum).toString(16).toUpperCase().padStart(12, 'E')}74C`
 
+    const arrivalTimeFormatted = new Intl.DateTimeFormat(undefined, {
+      hour: '2-digit',
+      minute: '2-digit',
+    }).format(new Date(eta.etaIso))
+
     return {
-      estimatedTimeHours: hours,
       estimatedTimeFormatted: formattedDuration,
-      etaVarianceFormatted: '< 1.2 min',
+      etaVarianceFormatted:
+        eta.confidenceBandMin > 0
+          ? `±${eta.confidenceBandMin} MIN (MODELLED)`
+          : 'NO DECLARED SPREAD (MODELLED)',
+      arrivalTimeFormatted,
       co2SavedKg: Math.max(120, co2Saved),
       fuelReductionPercent: fuelReduction,
       costEstimateUsd: cost,
-      confidenceScore: 99.4,
       cryptographicManifestHash: hexHash,
       meshNodePingMs: 0.4,
-      zeroLossVerificationStatus: 'TAMPER_PROOF_SEALED',
+      eta,
     }
   }, [activeCorridor, activeMode, activeCargo, payloadTons])
 
@@ -286,7 +326,13 @@ export function CorridorDispatchSection() {
     payloadLabel: t('Payload Weight', 'وزن الحمولة الإجمالي'),
     tonUnit: t('Tons', 'طن'),
     estTime: t('Est. Transit Time', 'زمن الوصول التقديري'),
+    arrivalTime: t('Est. Arrival (Local Time)', 'الوصول المتوقع (بالتوقيت المحلي)'),
     etaVariance: t('ETA Variance', 'معدل التباين'),
+    etaSegmentsTitle: t('ETA SEGMENTS — WHERE THE HOURS GO', 'بنود زمن الوصول — أين تذهب الساعات'),
+    etaSegmentsHint: t(
+      'Deterministic arithmetic from declared corridor figures. Drive + declared holds = total.',
+      'حساب جبري محدد من أرقام الممر المعلنة. القيادة + التوقفات المعلنة = الإجمالي.',
+    ),
     co2Saved: t('CO2 Emissions Offset', 'وفر انبعاثات الكربون'),
     fuelSaved: t('Energy Efficiency Gain', 'تحسين كفاءة الطاقة'),
     estCost: t('Estimated Transit Cost', 'التكلفة التشغيلية التقديرية'),
@@ -470,12 +516,15 @@ export function CorridorDispatchSection() {
               />
             </div>
 
-            {/* 5. Live Calculated Outputs Strip */}
+            {/* 5. Calculated Outputs Strip — ETA from computeEta (MODELLED) */}
             <div className="grid grid-cols-2 gap-3 p-4 rounded-2xl bg-black/40 border border-white/10 font-mono text-xs">
               <div>
                 <span className="text-[10px] text-slate-400 block">{ui.estTime[language]}</span>
                 <span className="text-lg font-black text-cyan-300">{calculation.estimatedTimeFormatted}</span>
-                <span className="text-[9px] text-emerald-400 block">{calculation.etaVarianceFormatted}</span>
+                <span className="text-[9px] text-emerald-400 block">
+                  {ui.arrivalTime[language]} {calculation.arrivalTimeFormatted} (MODELLED)
+                </span>
+                <span className="text-[9px] text-slate-400 block">{calculation.etaVarianceFormatted}</span>
               </div>
 
               <div>
@@ -492,6 +541,43 @@ export function CorridorDispatchSection() {
               <div>
                 <span className="text-[10px] text-slate-400 block">{ui.fuelSaved[language]}</span>
                 <span className="text-sm font-bold text-cyan-300">+{calculation.fuelReductionPercent}% ESG GAIN</span>
+              </div>
+            </div>
+
+            {/* 5b. ETA breakdown — where the hours go (MODELLED) */}
+            <div className="p-4 rounded-2xl bg-black/40 border border-cyan-500/15 font-mono text-xs">
+              <div className="flex items-center justify-between gap-2 mb-1">
+                <span className="text-[10px] font-bold text-cyan-300 uppercase tracking-wider">
+                  {ui.etaSegmentsTitle[language]}
+                </span>
+                <span className="px-1.5 py-0.5 rounded bg-amber-400/10 border border-amber-400/30 text-amber-200/90 text-[8px] font-bold">
+                  MODELLED
+                </span>
+              </div>
+              <p className="text-[9px] text-slate-500 mb-2">{ui.etaSegmentsHint[language]}</p>
+              <div className="space-y-1">
+                {calculation.eta.breakdown.map((segment) => (
+                  <div
+                    key={segment.id}
+                    className="flex items-center justify-between gap-2 border-b border-white/[0.04] pb-1 last:border-0"
+                  >
+                    <span className="text-[10px] text-slate-300">
+                      {segment.label}
+                      <span className="block text-[8px] text-slate-500">
+                        {SEGMENT_LABEL_AR[segment.id]}
+                      </span>
+                    </span>
+                    <span className="text-[11px] font-bold text-white whitespace-nowrap">
+                      {formatSegmentMinutes(segment.minutes)}
+                    </span>
+                  </div>
+                ))}
+                <div className="flex items-center justify-between gap-2 pt-1.5">
+                  <span className="text-[10px] font-bold text-cyan-300">TOTAL (MODELLED)</span>
+                  <span className="text-[12px] font-black text-cyan-300">
+                    {formatSegmentMinutes(calculation.eta.totalMinutes)}
+                  </span>
+                </div>
               </div>
             </div>
 
@@ -564,6 +650,7 @@ export function CorridorDispatchSection() {
               resetView={resetView}
               centerOnPoint={centerOnPoint}
               meshNodePingMs={calculation.meshNodePingMs}
+              simSpeedKmh={activeMode.baseSpeedKmh}
             />
 
             {/* Strategic Waypoint Quick Selection Strip */}

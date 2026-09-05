@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect, useMemo, useRef } from 'react'
+import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   Maximize2,
@@ -22,6 +22,9 @@ import {
   ShieldCheck,
   Zap,
   X,
+  Scale,
+  Coffee,
+  Landmark,
 } from 'lucide-react'
 import { WORLD_LAND_SVG_PATH, WORLD_BORDERS_SVG_PATH } from '@/data/world-land-110m'
 import { INLAND_LOGISTICS_HUBS } from '@/data/landCorridors'
@@ -57,6 +60,93 @@ export interface HighQualityRealMapProps {
   resetView: () => void
   centerOnPoint: (x: number, y: number, targetScale?: number) => void
   meshNodePingMs?: number
+  /** Declared line-haul speed used by the simulated fleet layer (KM/H). */
+  simSpeedKmh?: number
+}
+
+/* ── Simulated fleet geometry helpers ──────────────────────────────────
+   realLandPath is a polyline of absolute M/L commands on the 1000x500
+   canvas. The helpers below parse it deterministically (no DOM APIs) so
+   trucks can be interpolated along the declared route at the declared
+   speed. Trucks are a simulation layer, never a live feed. */
+
+interface MapPoint {
+  x: number
+  y: number
+}
+
+function parsePathPolyline(d: string): MapPoint[] {
+  const points: MapPoint[] = []
+  // Command + first coordinate pair, plus an optional second pair (Q endpoint).
+  const tokenRe = /([MLQ])\s*([-0-9.]+)[,\s]+([-0-9.]+)(?:\s+([-0-9.]+)[,\s]+([-0-9.]+))?/g
+  let match: RegExpExecArray | null
+  let cursor: MapPoint | null = null
+  while ((match = tokenRe.exec(d)) !== null) {
+    const command = match[1]
+    const x = Number(match[2])
+    const y = Number(match[3])
+    if (command === 'M') {
+      cursor = { x, y }
+      points.push({ x, y })
+    } else if (command === 'L' && cursor) {
+      cursor = { x, y }
+      points.push({ x, y })
+    } else if (command === 'Q' && cursor) {
+      // Quadratic: (x,y) is the control point; second pair is the endpoint.
+      const endX = Number(match[4])
+      const endY = Number(match[5])
+      const start = points[points.length - 1]
+      for (let i = 1; i <= 10; i++) {
+        const t = i / 10
+        const mt = 1 - t
+        const px = mt * mt * start.x + 2 * mt * t * x + t * t * endX
+        const py = mt * mt * start.y + 2 * mt * t * y + t * t * endY
+        points.push({ x: px, y: py })
+      }
+      cursor = points[points.length - 1]
+    }
+  }
+  return points
+}
+
+function buildPathMetrics(points: MapPoint[]): {
+  lengths: number[]
+  total: number
+} {
+  const lengths: number[] = [0]
+  let total = 0
+  for (let i = 1; i < points.length; i++) {
+    const dx = points[i].x - points[i - 1].x
+    const dy = points[i].y - points[i - 1].y
+    total += Math.sqrt(dx * dx + dy * dy)
+    lengths.push(total)
+  }
+  return { lengths, total }
+}
+
+function pointAlongPath(
+  points: MapPoint[],
+  lengths: number[],
+  total: number,
+  distance: number,
+): { x: number; y: number; angleDeg: number } {
+  if (total <= 0 || points.length < 2) {
+    const p = points[0] || { x: 500, y: 250 }
+    return { ...p, angleDeg: 0 }
+  }
+  const d = ((distance % total) + total) % total
+  let i = 1
+  while (i < lengths.length && lengths[i] < d) i += 1
+  const segStart = lengths[i - 1]
+  const segEnd = lengths[i]
+  const segLen = Math.max(0.0001, segEnd - segStart)
+  const t = Math.min(1, Math.max(0, (d - segStart) / segLen))
+  const a = points[i - 1]
+  const b = points[i]
+  const x = a.x + (b.x - a.x) * t
+  const y = a.y + (b.y - a.y) * t
+  const angleDeg = (Math.atan2(b.y - a.y, b.x - a.x) * 180) / Math.PI
+  return { x, y, angleDeg }
 }
 
 // LEO satellite constellation simulation coordinates
@@ -93,12 +183,18 @@ export function HighQualityRealMap({
   resetView,
   centerOnPoint,
   meshNodePingMs = 0.4,
+  simSpeedKmh = 80,
 }: HighQualityRealMapProps) {
   // Map Layer Engine state
   const [mapLayerMode, setMapLayerMode] = useState<MapLayerMode>('satellite')
   const [showHighways, setShowHighways] = useState<boolean>(true)
   const [showSatellites, setShowSatellites] = useState<boolean>(true)
   const [showHubs, setShowHubs] = useState<boolean>(true)
+  const [showWeighStations, setShowWeighStations] = useState<boolean>(true)
+  const [showRestStops, setShowRestStops] = useState<boolean>(true)
+  const [showBorderGates, setShowBorderGates] = useState<boolean>(true)
+  const [showSimulatedFleet, setShowSimulatedFleet] = useState<boolean>(true)
+  const [simClockSec, setSimClockSec] = useState<number>(0)
 
   // Simulation Controls & Fleet Tracker state
   const [isPlaying, setIsPlaying] = useState<boolean>(true)
@@ -152,6 +248,123 @@ export function HighQualityRealMap({
   const originPixels = useMemo(() => projectGeo(activeCorridor.originGps), [activeCorridor])
   const destPixels = useMemo(() => projectGeo(activeCorridor.destinationGps), [activeCorridor])
   const chokepointPixels = useMemo(() => projectGeo(activeCorridor.chokepointGps), [activeCorridor])
+
+  // Simulated fleet clock — advances only while the fleet layer is on and
+  // the sim is playing; pauses when the tab is hidden (no invisible rAF).
+  useEffect(() => {
+    if (!showSimulatedFleet || !isPlaying) return
+    let raf = 0
+    const t0 = performance.now()
+    const loop = (now: number) => {
+      if (!document.hidden) setSimClockSec((now - t0) / 1000)
+      raf = requestAnimationFrame(loop)
+    }
+    raf = requestAnimationFrame(loop)
+    return () => cancelAnimationFrame(raf)
+  }, [showSimulatedFleet, isPlaying, activeCorridor])
+
+  /* ── Declared-point layers (weigh / rest / border) ────────────────── */
+  const noWeatherFallback = useMemo(
+    () => ({ en: 'No weather feed — model marker', ar: 'لا توجد بيانات طقس — علامة نموذج' }),
+    [],
+  )
+
+  const markerFromGps = useCallback(
+    (gps: [number, number], fallbackName: string): WaypointDetail => {
+      const wp = activeCorridor.detailedWaypoints.find(
+        (d) => Math.abs(d.gps[0] - gps[0]) < 0.05 && Math.abs(d.gps[1] - gps[1]) < 0.05,
+      )
+      if (wp) return wp
+      return {
+        name: fallbackName,
+        coordinates: projectGeo(gps),
+        gps,
+        status: 'MODEL_POINT',
+        weather: noWeatherFallback,
+        throughputIndex: '—',
+        avgClearanceTime: 'DECLARED STOP (MODELLED)',
+      }
+    },
+    [activeCorridor.detailedWaypoints, noWeatherFallback],
+  )
+
+  const weighStationMarkers = useMemo(() => {
+    const markers: WaypointDetail[] = []
+    const seen = new Set<string>()
+    const push = (gps: [number, number], fallbackName: string) => {
+      const key = `${gps[0].toFixed(2)},${gps[1].toFixed(2)}`
+      if (seen.has(key)) return
+      seen.add(key)
+      markers.push(markerFromGps(gps, fallbackName))
+    }
+    // corridor.weighbridgeGps is the declared overload-risk concentration point
+    push(activeCorridor.weighbridgeGps, 'Corridor Weighbridge (declared)')
+    // plus any additional weighbridge waypoints declared on the route
+    for (const wp of activeCorridor.detailedWaypoints) {
+      if (wp.status.includes('WEIGHBRIDGE')) push(wp.gps, wp.name)
+    }
+    return markers
+  }, [activeCorridor, markerFromGps])
+
+  const restStopMarkers = useMemo(
+    () =>
+      activeCorridor.detailedWaypoints.filter(
+        (wp) => wp.status.includes('REST') || /rest/i.test(wp.name),
+      ),
+    [activeCorridor],
+  )
+
+  const borderGateMarkers = useMemo(
+    () =>
+      activeCorridor.detailedWaypoints.filter(
+        (wp) => wp.status.includes('BORDER') || wp.status.includes('FERRY'),
+      ),
+    [activeCorridor],
+  )
+
+  /* ── Simulated fleet layer ────────────────────────────────────────── */
+  const fleetRoutePoints = useMemo(
+    () =>
+      parsePathPolyline(
+        activeCorridor.realLandPath ||
+          activeCorridor.landBurntOrangeHighwayPath ||
+          activeCorridor.predictivePath,
+      ),
+    [activeCorridor],
+  )
+  const fleetRouteMetrics = useMemo(
+    () => buildPathMetrics(fleetRoutePoints),
+    [fleetRoutePoints],
+  )
+
+  const fleetTrucks = useMemo(() => {
+    if (!showSimulatedFleet) return []
+    const { total, lengths } = fleetRouteMetrics
+    if (total <= 0) return []
+    const pxPerKm = total / Math.max(1, activeCorridor.distanceKm)
+    // Declared speed of the chosen mode, mapped onto canvas pixels.
+    const pxPerSecond = (simSpeedKmh * pxPerKm) / 3600
+    // Spread trucks along the projected route without stacking on short
+    // segments (Dammam–Riyadh is ~12 px on the world canvas).
+    const truckCount = Math.min(5, Math.max(2, Math.floor(total / 18)))
+    const trucks: { x: number; y: number; angleDeg: number }[] = []
+    for (let i = 0; i < truckCount; i++) {
+      const phase = (i / truckCount) * total
+      const distance = (simClockSec * pxPerSecond + phase) % total
+      const p = pointAlongPath(fleetRoutePoints, lengths, total, distance)
+      trucks.push({ x: p.x, y: p.y, angleDeg: p.angleDeg })
+    }
+    return trucks
+  }, [showSimulatedFleet, fleetRouteMetrics, fleetRoutePoints, activeCorridor.distanceKm, simSpeedKmh, simClockSec])
+
+  const openMarkerPopover = useCallback(
+    (wp: WaypointDetail) => {
+      setSelectedWaypointNode(wp)
+      const [x, y] = projectGeo(wp.gps)
+      centerOnPoint(x, y, 3.0)
+    },
+    [setSelectedWaypointNode, centerOnPoint],
+  )
 
   return (
     <div
@@ -274,6 +487,58 @@ export function HighQualityRealMap({
             }`}
           >
             <Flame className="w-3.5 h-3.5" />
+          </button>
+
+          {/* Weigh Station Layer Toggle */}
+          <button
+            onClick={() => setShowWeighStations(!showWeighStations)}
+            title="Toggle Declared Weigh Stations"
+            className={`p-2 rounded-xl text-xs font-mono border transition-all flex items-center gap-1 ${
+              showWeighStations
+                ? 'bg-amber-500/20 text-amber-300 border-amber-500/40'
+                : 'bg-white/5 text-slate-400 border-white/10 hover:text-white'
+            }`}
+          >
+            <Scale className="w-3.5 h-3.5" />
+          </button>
+
+          {/* Rest Stop Layer Toggle */}
+          <button
+            onClick={() => setShowRestStops(!showRestStops)}
+            title="Toggle Rest & Driver-Hours Stops"
+            className={`p-2 rounded-xl text-xs font-mono border transition-all flex items-center gap-1 ${
+              showRestStops
+                ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
+                : 'bg-white/5 text-slate-400 border-white/10 hover:text-white'
+            }`}
+          >
+            <Coffee className="w-3.5 h-3.5" />
+          </button>
+
+          {/* Border Crossing Layer Toggle */}
+          <button
+            onClick={() => setShowBorderGates(!showBorderGates)}
+            title="Toggle Border Crossings & Clearance Windows"
+            className={`p-2 rounded-xl text-xs font-mono border transition-all flex items-center gap-1 ${
+              showBorderGates
+                ? 'bg-rose-500/20 text-rose-300 border-rose-500/40'
+                : 'bg-white/5 text-slate-400 border-white/10 hover:text-white'
+            }`}
+          >
+            <Landmark className="w-3.5 h-3.5" />
+          </button>
+
+          {/* Simulated Fleet Layer Toggle */}
+          <button
+            onClick={() => setShowSimulatedFleet(!showSimulatedFleet)}
+            title="Toggle Simulated Fleet (not a live feed)"
+            className={`p-2 rounded-xl text-xs font-mono border transition-all flex items-center gap-1 ${
+              showSimulatedFleet
+                ? 'bg-sky-500/20 text-sky-300 border-sky-500/40'
+                : 'bg-white/5 text-slate-400 border-white/10 hover:text-white'
+            }`}
+          >
+            <Navigation className="w-3.5 h-3.5" />
           </button>
 
           {/* Fullscreen Button */}
@@ -571,6 +836,128 @@ export function HighQualityRealMap({
                 )
               })}
 
+            {/* 8b. Declared Weigh Stations (corridor.weighbridgeGps) */}
+            {showWeighStations &&
+              weighStationMarkers.map((marker) => {
+                const [mx, my] = marker.coordinates
+                return (
+                  <g
+                    key={`weigh-${marker.gps[0]}-${marker.gps[1]}`}
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      openMarkerPopover(marker)
+                    }}
+                    className="cursor-pointer"
+                  >
+                    <circle cx={mx} cy={my} r="9" fill="rgba(245,158,11,0.2)" />
+                    <g transform={`translate(${mx} ${my}) rotate(45)`}>
+                      <rect x="-4.5" y="-4.5" width="9" height="9" rx="1.5" fill="#f59e0b" stroke="#020617" strokeWidth="0.8" />
+                    </g>
+                    <circle cx={mx} cy={my} r="1.6" fill="#020617" />
+                    {transform.scale > 1.8 && (
+                      <text
+                        x={mx + 8}
+                        y={my + 3}
+                        fill="#fbbf24"
+                        fontSize="6.5"
+                        fontFamily="monospace"
+                        fontWeight="bold"
+                        className="pointer-events-none drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]"
+                      >
+                        WEIGH · {marker.name}
+                      </text>
+                    )}
+                  </g>
+                )
+              })}
+
+            {/* 8c. Rest & Driver-Hours Stops */}
+            {showRestStops &&
+              restStopMarkers.map((marker) => {
+                const [mx, my] = marker.coordinates
+                return (
+                  <g
+                    key={`rest-${marker.gps[0]}-${marker.gps[1]}`}
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      openMarkerPopover(marker)
+                    }}
+                    className="cursor-pointer"
+                  >
+                    <circle cx={mx} cy={my} r="9" fill="rgba(45,212,191,0.18)" />
+                    <g transform={`translate(${mx} ${my})`}>
+                      <rect x="-4" y="-4" width="8" height="8" rx="2" fill="#2dd4bf" stroke="#020617" strokeWidth="0.8" />
+                      <rect x="-1.8" y="-1" width="2.2" height="3" rx="0.6" fill="#042f2e" />
+                      <rect x="1" y="-2.4" width="1.4" height="1.4" rx="0.4" fill="#042f2e" />
+                    </g>
+                    {transform.scale > 1.8 && (
+                      <text
+                        x={mx + 8}
+                        y={my + 3}
+                        fill="#5eead4"
+                        fontSize="6.5"
+                        fontFamily="monospace"
+                        fontWeight="bold"
+                        className="pointer-events-none drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]"
+                      >
+                        REST · {marker.name}
+                      </text>
+                    )}
+                  </g>
+                )
+              })}
+
+            {/* 8d. Border Crossings with declared clearance windows */}
+            {showBorderGates &&
+              borderGateMarkers.map((marker) => {
+                const [mx, my] = marker.coordinates
+                return (
+                  <g
+                    key={`border-${marker.gps[0]}-${marker.gps[1]}`}
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      openMarkerPopover(marker)
+                    }}
+                    className="cursor-pointer"
+                  >
+                    <circle cx={mx} cy={my} r="9" fill="rgba(251,113,133,0.18)" />
+                    <g transform={`translate(${mx} ${my}) rotate(45)`}>
+                      <rect x="-4" y="-4" width="8" height="8" fill="#fb7185" stroke="#020617" strokeWidth="0.8" />
+                    </g>
+                    <rect x={mx - 2} y={my - 2} width="4" height="4" fill="#881337" />
+                    {transform.scale > 1.8 && (
+                      <text
+                        x={mx + 8}
+                        y={my + 3}
+                        fill="#fda4af"
+                        fontSize="6.5"
+                        fontFamily="monospace"
+                        fontWeight="bold"
+                        className="pointer-events-none drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]"
+                      >
+                        BORDER · {marker.name}
+                      </text>
+                    )}
+                  </g>
+                )
+              })}
+
+            {/* 8e. Simulated Fleet — trucks interpolated along realLandPath
+                at the corridor's declared speed. Simulation only. */}
+            {showSimulatedFleet &&
+              fleetTrucks.map((truck, i) => (
+                <g
+                  key={`sim-fleet-${i}`}
+                  transform={`translate(${truck.x} ${truck.y}) rotate(${truck.angleDeg})`}
+                  className="pointer-events-none"
+                >
+                  <circle cx="0" cy="0" r="7" fill="rgba(125,211,252,0.12)" />
+                  <rect x="-6" y="-2.6" width="8.5" height="5.2" rx="1" fill="#7dd3fc" stroke="#0c4a6e" strokeWidth="0.6" />
+                  <polygon points="3,-2.4 6.4,0 3,2.4" fill="#bae6fd" stroke="#0c4a6e" strokeWidth="0.5" />
+                  <circle cx="0" cy="0" r="1" fill="#0c4a6e" />
+                </g>
+              ))}
+
             {/* 9. LEO Satellite Constellation */}
             {showSatellites &&
               LEO_SATELLITES.map((sat) => {
@@ -694,6 +1081,23 @@ export function HighQualityRealMap({
           </g>
         </svg>
 
+        {/* Simulated fleet disclosure — prominent, not a tooltip */}
+        {showSimulatedFleet && (
+          <div
+            dir="auto"
+            className={`absolute top-4 ${isRTL ? 'right-4' : 'left-4'} z-30 max-w-[240px] px-3 py-2 rounded-xl border border-amber-400/40 bg-slate-950/90 backdrop-blur-xl font-mono text-[9px] leading-relaxed pointer-events-none shadow-2xl`}
+          >
+            <span className="flex items-center gap-1.5 font-bold text-amber-300 uppercase tracking-wider">
+              <span className="relative flex h-1.5 w-1.5">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75" />
+                <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-amber-400" />
+              </span>
+              SIMULATED FLEET — NOT A LIVE FEED
+            </span>
+            <span className="block text-amber-100/80 mt-0.5">أسطول مُحاكاة — ليست بيانات بث حي</span>
+          </div>
+        )}
+
         {/* Live Simulation Floating Playback & Telemetry Controller */}
         <div
           className={`absolute bottom-4 ${isRTL ? 'right-4' : 'left-4'} z-20 flex flex-col gap-2 pointer-events-auto`}
@@ -706,15 +1110,16 @@ export function HighQualityRealMap({
             <div className="font-mono text-xs">
               <div className="flex items-center gap-2">
                 <span className="font-bold text-white">AUTONOMOUS DISPATCH</span>
-                <span className="px-1.5 py-0.2 text-[9px] rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">
-                  LIVE
+                <span
+                  title="Simulation feed — no telematics backend"
+                  className="px-1.5 py-0.2 text-[9px] rounded bg-amber-500/20 text-amber-300 border border-amber-500/40"
+                >
+                  SIM
                 </span>
               </div>
               <div className="text-[10px] text-slate-400">
                 PROG: <span className="text-cyan-300 font-bold">{Math.round(fleetProgress * 100)}%</span> | SPEED:{' '}
-                <span className="text-white font-bold">
-                  {selectedModeId === 'electric-platoon' ? '95 KM/H (V2X PLATOON)' : '85 KM/H'}
-                </span>
+                <span className="text-white font-bold">{Math.round(simSpeedKmh)} KM/H (MODELLED)</span>
               </div>
             </div>
 
@@ -793,7 +1198,7 @@ export function HighQualityRealMap({
               <div className="space-y-1.5 text-[11px] text-slate-300 border-t border-white/10 pt-2">
                 <div className="flex justify-between">
                   <span className="text-slate-400">STATUS:</span>
-                  <span className="text-emerald-400 font-bold">ONLINE (LIVE SYNC)</span>
+                  <span className="text-emerald-400 font-bold">DECLARED · MODELLED</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-slate-400">THROUGHPUT:</span>
