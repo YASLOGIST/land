@@ -414,7 +414,7 @@ export function CorridorDispatchSection() {
                   <button
                     key={corridor.id}
                     onClick={() => setSelectedCorridorId(corridor.id)}
-                    className={`w-full text-left p-3 rounded-2xl font-mono text-xs transition-all flex items-center justify-between border ${
+                    className={`w-full text-start p-3 rounded-2xl font-mono text-xs transition-all flex items-center justify-between border ${
                       selectedCorridorId === corridor.id
                         ? 'bg-gold-500/20 border-gold-400 text-white shadow-[0_0_20px_rgba(232,179,23,0.2)]'
                         : 'bg-black/30 border-white/5 text-slate-400 hover:text-slate-200 hover:border-white/15'
@@ -449,7 +449,7 @@ export function CorridorDispatchSection() {
                     <button
                       key={modeItem.id}
                       onClick={() => setSelectedModeId(modeItem.id)}
-                      className={`p-3 rounded-2xl font-mono text-xs transition-all border flex items-center justify-between text-left ${
+                      className={`p-3 rounded-2xl font-mono text-xs transition-all border flex items-center justify-between text-start ${
                         isSelected
                           ? 'bg-gradient-to-r from-gold-950/60 to-amber-950/60 border-gold-400 text-white shadow-[0_0_20px_rgba(232,179,23,0.2)]'
                           : 'bg-black/30 border-white/5 text-slate-400 hover:text-slate-200 hover:border-white/15'

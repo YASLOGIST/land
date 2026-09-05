@@ -117,6 +117,12 @@ const PHASES: (PhaseProps & {
   },
 ]
 
+const PHASE_TAB_LABELS = [
+  t('WAREHOUSING', 'المستودعات', '智能仓储', 'AKILLI DEPO', 'ENTREPOSAGE'),
+  t('DOCK', 'الأرصفة', '闸口装卸', 'YÜKLEME', 'QUAI'),
+  t('HAULAGE', 'النقل الشرياني', '干线运输', 'TAŞIMA', 'TRANSPORT'),
+]
+
 const DISCLAIMER: BilingualText = t(
   'High-fidelity telemetry simulation — a digital-twin model illustrating YASLOGIST road freight mechanics.',
   'نموذج محاكاة عالي الدقة للقياس عن بُعد — يوضح الآلية التشغيلية للشحن البري لمنظومة ياسلوجيست.',
@@ -171,6 +177,21 @@ export default function LandLogisticsSection({
     setActivePhase((prev) => (prev === next ? prev : next))
   }, [])
 
+  const isDarkRef = useRef<boolean>(isDark)
+  useEffect(() => {
+    isDarkRef.current = isDark
+    const active = isDark ? nightVideoRef.current : dayVideoRef.current
+    if (active && active.readyState >= 1) {
+      const dur = active.duration && !isNaN(active.duration) && active.duration > 0 ? active.duration : 10.0
+      const p = Math.max(0, Math.min(1, currentProgressRef.current))
+      try {
+        active.currentTime = Math.max(0, Math.min(p * dur, dur - 0.03))
+      } catch {
+        // Guard seek
+      }
+    }
+  }, [isDark])
+
   // ── GSAP ScrollTrigger Pinning & Scroll-Driven Video Scrubbing ──
   useEffect(() => {
     const section = sectionRef.current
@@ -186,6 +207,7 @@ export default function LandLogisticsSection({
     void (async () => {
       const { ScrollTrigger } = await loadGsap()
       if (disposed) return
+      ScrollTrigger.config({ ignoreMobileResize: true })
 
       if (dayVideo) {
         dayVideo.muted = true
@@ -203,132 +225,168 @@ export default function LandLogisticsSection({
       let isRunning = true
       const isLoopingRef = { current: false }
 
-    const renderLoop = () => {
-      if (!isRunning) return
+      // Non-blocking hardware-accelerated video seek controller
+      let isSeeking = false
+      let pendingTargetTime: number | null = null
 
-      const targetP = targetProgressRef.current
-      const curP = currentProgressRef.current
-      const diff = targetP - curP
+      const seekActive = (targetTime: number) => {
+        const v = isDarkRef.current ? nightVideo : dayVideo
+        if (!v || v.readyState < 1) return
 
-      let continueLoop = false
+        if (v.seeking || isSeeking) {
+          pendingTargetTime = targetTime
+          return
+        }
 
-      // Snappy & responsive lerp interpolation for forward & reverse scrolling
-      if (Math.abs(diff) > 0.0002) {
-        currentProgressRef.current += diff * 0.22 // Smoother, lighter lerping weight
-        continueLoop = true
-      } else {
-        currentProgressRef.current = targetP
+        isSeeking = true
+        try {
+          v.currentTime = targetTime
+        } catch {
+          isSeeking = false
+        }
       }
 
-      const p = Math.max(0, Math.min(1, currentProgressRef.current))
-
-      // Keep both videos in precise lockstep so switching theme is 100% seamless
-      const videos = [dayVideo, nightVideo].filter(Boolean) as HTMLVideoElement[]
-      for (const v of videos) {
-        const dur = v.duration && !isNaN(v.duration) && v.duration > 0 ? v.duration : 10.0
-        const targetTime = Math.max(0, Math.min(p * dur, dur - 0.03))
-
-        if (v.readyState >= 1 && Math.abs(v.currentTime - targetTime) > 0.015) {
-          try {
-            v.currentTime = targetTime
-          } catch {
-            // Ignore throttled seek exceptions
+      const onSeeked = () => {
+        isSeeking = false
+        if (pendingTargetTime !== null) {
+          const next = pendingTargetTime
+          pendingTargetTime = null
+          const v = isDarkRef.current ? nightVideo : dayVideo
+          if (v && Math.abs(v.currentTime - next) > 0.015) {
+            seekActive(next)
           }
         }
       }
 
-      const totalSeconds = p * 60 + (activePhaseRef.current * 30)
-      const minutes = Math.floor(totalSeconds / 60)
-      const seconds = Math.floor(totalSeconds % 60)
-      const millis = Math.floor((totalSeconds % 1) * 100)
-      if (telemetryTimeSpanRef.current) {
-        telemetryTimeSpanRef.current.textContent = `T+${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}.${millis.toString().padStart(2, '0')}`
-      }
+      dayVideo?.addEventListener('seeked', onSeeked)
+      nightVideo?.addEventListener('seeked', onSeeked)
 
-      if (continueLoop) {
-        animFrameIdRef.current = requestAnimationFrame(renderLoop)
-      } else {
-        isLoopingRef.current = false
-      }
-    }
+      const renderLoop = () => {
+        if (!isRunning) return
 
-    const startLoop = () => {
-      if (!isLoopingRef.current) {
-        isLoopingRef.current = true
-        animFrameIdRef.current = requestAnimationFrame(renderLoop)
-      }
-    }
+        const targetP = targetProgressRef.current
+        const curP = currentProgressRef.current
+        const diff = targetP - curP
 
-    // Initial trigger
-    startLoop()
+        let continueLoop = false
 
-    const trigger = ScrollTrigger.create({
-      trigger: section,
-      pin: pinContainer,
-      pinSpacing: true,
-      anticipatePin: 1,
-      start: 'top top',
-      end: '+=3500',
-      scrub: 0.5,
-      onUpdate: (self) => {
-        const p = self.progress
-        targetProgressRef.current = p
-
-        let idx = 0
-        if (p >= 0.66) {
-          idx = 2
-        } else if (p >= 0.33) {
-          idx = 1
+        // Snappy & responsive lerp interpolation for forward & reverse scrolling
+        if (Math.abs(diff) > 0.0002) {
+          currentProgressRef.current += diff * 0.22 // Smoother, lighter lerping weight
+          continueLoop = true
         } else {
-          idx = 0
+          currentProgressRef.current = targetP
         }
-        updatePhase(idx)
-        startLoop()
-      },
-    })
-    scrollTriggerRef.current = trigger
 
-    const onVideoReady = () => {
-      ScrollTrigger.refresh()
-      if (dayVideo && !dayVideo.paused) dayVideo.pause()
-      if (nightVideo && !nightVideo.paused) nightVideo.pause()
-    }
+        const p = Math.max(0, Math.min(1, currentProgressRef.current))
 
-    if (dayVideo) {
-      if (dayVideo.readyState >= 2) onVideoReady()
-      else {
-        dayVideo.addEventListener('loadedmetadata', onVideoReady, { once: true })
-        dayVideo.addEventListener('canplay', onVideoReady, { once: true })
+        // Only scrub the visible active video to eliminate 50% GPU decoder overhead on mobile
+        const activeVideo = isDarkRef.current ? nightVideo : dayVideo
+        if (activeVideo) {
+          const dur = activeVideo.duration && !isNaN(activeVideo.duration) && activeVideo.duration > 0 ? activeVideo.duration : 10.0
+          const targetTime = Math.max(0, Math.min(p * dur, dur - 0.03))
+
+          if (activeVideo.readyState >= 1 && Math.abs(activeVideo.currentTime - targetTime) > 0.015) {
+            seekActive(targetTime)
+          }
+        }
+
+        const totalSeconds = p * 60 + (activePhaseRef.current * 30)
+        const minutes = Math.floor(totalSeconds / 60)
+        const seconds = Math.floor(totalSeconds % 60)
+        const millis = Math.floor((totalSeconds % 1) * 100)
+        if (telemetryTimeSpanRef.current) {
+          telemetryTimeSpanRef.current.textContent = `T+${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}.${millis.toString().padStart(2, '0')}`
+        }
+
+        if (continueLoop) {
+          animFrameIdRef.current = requestAnimationFrame(renderLoop)
+        } else {
+          isLoopingRef.current = false
+        }
       }
-    }
 
-    if (nightVideo) {
-      if (nightVideo.readyState >= 2) onVideoReady()
-      else {
-        nightVideo.addEventListener('loadedmetadata', onVideoReady, { once: true })
-        nightVideo.addEventListener('canplay', onVideoReady, { once: true })
+      const startLoop = () => {
+        if (!isLoopingRef.current) {
+          isLoopingRef.current = true
+          animFrameIdRef.current = requestAnimationFrame(renderLoop)
+        }
       }
-    }
 
-    const handleResize = () => ScrollTrigger.refresh()
-    window.addEventListener('resize', handleResize, { passive: true })
+      // Initial trigger
+      startLoop()
 
-    innerCleanup = () => {
-      isRunning = false
-      if (animFrameIdRef.current) {
-        cancelAnimationFrame(animFrameIdRef.current)
+      const scrubDistance = typeof window !== 'undefined' && window.innerWidth < 768 ? '+=2400' : '+=3500'
+
+      const trigger = ScrollTrigger.create({
+        trigger: section,
+        pin: pinContainer,
+        pinSpacing: true,
+        anticipatePin: 1,
+        start: 'top top',
+        end: scrubDistance,
+        scrub: 0.5,
+        onUpdate: (self) => {
+          const p = self.progress
+          targetProgressRef.current = p
+
+          let idx = 0
+          if (p >= 0.66) {
+            idx = 2
+          } else if (p >= 0.33) {
+            idx = 1
+          } else {
+            idx = 0
+          }
+          updatePhase(idx)
+          startLoop()
+        },
+      })
+      scrollTriggerRef.current = trigger
+
+      const onVideoReady = () => {
+        ScrollTrigger.refresh()
+        if (dayVideo && !dayVideo.paused) dayVideo.pause()
+        if (nightVideo && !nightVideo.paused) nightVideo.pause()
       }
-      window.removeEventListener('resize', handleResize)
+
       if (dayVideo) {
-        dayVideo.removeEventListener('loadedmetadata', onVideoReady)
-        dayVideo.removeEventListener('canplay', onVideoReady)
+        if (dayVideo.readyState >= 2) onVideoReady()
+        else {
+          dayVideo.addEventListener('loadedmetadata', onVideoReady, { once: true })
+          dayVideo.addEventListener('canplay', onVideoReady, { once: true })
+        }
       }
+
       if (nightVideo) {
-        nightVideo.removeEventListener('loadedmetadata', onVideoReady)
-        nightVideo.removeEventListener('canplay', onVideoReady)
+        if (nightVideo.readyState >= 2) onVideoReady()
+        else {
+          nightVideo.addEventListener('loadedmetadata', onVideoReady, { once: true })
+          nightVideo.addEventListener('canplay', onVideoReady, { once: true })
+        }
       }
-      trigger.kill()
-    }
+
+      const handleResize = () => ScrollTrigger.refresh()
+      window.addEventListener('resize', handleResize, { passive: true })
+
+      innerCleanup = () => {
+        isRunning = false
+        if (animFrameIdRef.current) {
+          cancelAnimationFrame(animFrameIdRef.current)
+        }
+        window.removeEventListener('resize', handleResize)
+        dayVideo?.removeEventListener('seeked', onSeeked)
+        nightVideo?.removeEventListener('seeked', onSeeked)
+        if (dayVideo) {
+          dayVideo.removeEventListener('loadedmetadata', onVideoReady)
+          dayVideo.removeEventListener('canplay', onVideoReady)
+        }
+        if (nightVideo) {
+          nightVideo.removeEventListener('loadedmetadata', onVideoReady)
+          nightVideo.removeEventListener('canplay', onVideoReady)
+        }
+        trigger.kill()
+      }
     })() // end async scrub setup
 
     return () => {
@@ -422,12 +480,12 @@ export default function LandLogisticsSection({
 
         {/* ─── LEFT PINNED STAGE CARD (Z-20, POINTER-EVENTS-AUTO) ─── */}
         <div
-          className={`absolute top-24 md:top-1/2 md:-translate-y-1/2 left-4 sm:left-6 lg:left-8 z-20 w-[calc(100%-2rem)] sm:w-[350px] lg:w-[380px] pointer-events-auto ${
+          className={`absolute top-20 sm:top-24 md:top-1/2 md:-translate-y-1/2 left-3 sm:left-6 lg:left-8 z-20 w-[calc(100%-1.5rem)] sm:w-[350px] lg:w-[380px] pointer-events-auto ${
             isRTL ? 'text-right' : 'text-left'
           }`}
         >
           {/* Phase Navigation Tabs with Smooth Auto-Scroll */}
-          <div className={`flex items-center gap-2 mb-3 flex-wrap ${isRTL ? 'flex-row-reverse justify-end' : 'flex-row'}`}>
+          <div className={`flex items-center gap-1.5 sm:gap-2 mb-2.5 sm:mb-3 flex-wrap ${isRTL ? 'flex-row-reverse justify-end' : 'flex-row'}`}>
             {PHASES.map((p) => {
               const isActive = p.index === activePhase
               return (
@@ -448,14 +506,14 @@ export default function LandLogisticsSection({
                       })
                     }
                   }}
-                  className={`min-h-[36px] flex items-center justify-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-mono font-bold transition-all duration-300 cursor-pointer ${
+                  className={`min-h-[34px] sm:min-h-[36px] flex items-center justify-center gap-1.5 sm:gap-2 px-3 sm:px-3.5 py-1 sm:py-1.5 rounded-full text-[11px] sm:text-xs font-mono font-bold transition-all duration-300 cursor-pointer ${
                     isActive
                       ? 'bg-gold-500/25 text-gold-300 border border-gold-400/80 shadow-[0_0_20px_rgba(232,179,23,0.4)] scale-105'
                       : 'bg-slate-950/80 text-slate-400 border border-white/10 hover:border-gold-400/40 hover:text-slate-200'
                   }`}
                 >
                   <span className={`w-2 h-2 rounded-full ${isActive ? 'bg-[#E8B317] shadow-[0_0_8px_#E8B317] animate-pulse' : 'bg-slate-600'}`} />
-                  <span>0{p.index + 1} // {language === 'ar' ? (p.index === 0 ? 'المستودعات' : p.index === 1 ? 'الأرصفة' : 'النقل الشرياني') : (p.index === 0 ? 'WAREHOUSING' : p.index === 1 ? 'DOCK' : 'HAULAGE')}</span>
+                  <span>0{p.index + 1} // {PHASE_TAB_LABELS[p.index][language]}</span>
                 </button>
               )
             })}
@@ -468,7 +526,7 @@ export default function LandLogisticsSection({
               animate={{ opacity: 1, x: 0, scale: 1 }}
               exit={{ opacity: 0, x: -12, scale: 0.98 }}
               transition={{ duration: 0.35, ease: EASE_CURVE }}
-              className="relative rounded-3xl p-5 sm:p-6 border border-gold-500/30 bg-slate-950/80 backdrop-blur-2xl shadow-[0_20px_50px_rgba(0,0,0,0.8)]"
+              className="relative rounded-3xl p-4 sm:p-5 lg:p-6 border border-gold-500/30 bg-slate-950/80 backdrop-blur-2xl shadow-[0_20px_50px_rgba(0,0,0,0.8)]"
             >
               {/* Specular Top Reflection Line */}
               <div
@@ -478,35 +536,35 @@ export default function LandLogisticsSection({
 
               {/* Header Kicker */}
               <div
-                className={`mb-3 flex items-center gap-3 ${
+                className={`mb-2.5 sm:mb-3 flex items-center gap-2.5 sm:gap-3 ${
                   isRTL ? 'flex-row-reverse justify-end' : 'flex-row'
                 }`}
               >
-                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-gold-500/15 text-gold-300 border border-gold-400/30 shadow-[0_0_15px_rgba(232,179,23,0.25)]">
-                  <PhaseIcon className="h-5 w-5" strokeWidth={2} />
+                <span className="flex h-9 w-9 sm:h-10 sm:w-10 shrink-0 items-center justify-center rounded-2xl bg-gold-500/15 text-gold-300 border border-gold-400/30 shadow-[0_0_15px_rgba(232,179,23,0.25)]">
+                  <PhaseIcon className="h-4.5 w-4.5 sm:h-5 sm:w-5" strokeWidth={2} />
                 </span>
                 <div className={isRTL ? 'text-right' : 'text-left'}>
-                  <p className="font-mono text-xs font-bold uppercase tracking-wider text-[#E8B317]">
+                  <p className="font-mono text-[11px] sm:text-xs font-bold uppercase tracking-wider text-[#E8B317]">
                     {phase.kicker[language]}
                   </p>
-                  <p className="text-[11px] font-semibold font-mono text-slate-400">
+                  <p className="text-[10px] sm:text-[11px] font-semibold font-mono text-slate-400">
                     {i18n.ui.phaseCounter} {phase.index + 1} / {i18n.phases.length}
                   </p>
                 </div>
               </div>
 
               {/* Title */}
-              <h2 className="text-base sm:text-lg font-extrabold leading-snug tracking-tight text-white mb-2">
+              <h2 className="text-sm sm:text-base lg:text-lg font-extrabold leading-snug tracking-tight text-white mb-1.5 sm:mb-2">
                 {phase.title[language]}
               </h2>
 
               {/* Subtitle */}
-              <p className="text-xs leading-relaxed text-slate-300 mb-4">
+              <p className="text-[11px] sm:text-xs leading-relaxed text-slate-300 mb-3 sm:mb-4 line-clamp-3 sm:line-clamp-none">
                 {phase.subtitle[language]}
               </p>
 
               {/* Metrics Grid */}
-              <div className="grid grid-cols-3 gap-2">
+              <div className="grid grid-cols-3 gap-1.5 sm:gap-2">
                 {phase.metrics.map((metric, idx) => {
                   const MetricIcon = metric.icon
                   return (
@@ -515,21 +573,21 @@ export default function LandLogisticsSection({
                       initial={{ opacity: 0, y: 6 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.2, delay: 0.02 * idx, ease: EASE_CURVE }}
-                      className="rounded-2xl p-2.5 bg-white/[0.04] border border-white/10 backdrop-blur-xl"
+                      className="rounded-xl sm:rounded-2xl p-2 sm:p-2.5 bg-white/[0.04] border border-white/10 backdrop-blur-xl"
                     >
                       <div
-                        className={`flex items-center gap-1.5 mb-1 ${
+                        className={`flex items-center gap-1 sm:gap-1.5 mb-1 ${
                           isRTL ? 'flex-row-reverse justify-end' : 'flex-row'
                         }`}
                       >
                         <MetricIcon className="h-3 w-3 shrink-0 text-gold-400" strokeWidth={2} />
-                        <span className="font-mono text-[9px] uppercase tracking-wider text-slate-400 truncate">
+                        <span className="font-mono text-[8.5px] sm:text-[9px] uppercase tracking-wider text-slate-400 truncate">
                           {metric.label[language]}
                         </span>
                       </div>
                       <p
                         dir="ltr"
-                        className={`font-mono text-[10.5px] font-bold text-gold-300 ${
+                        className={`font-mono text-[10px] sm:text-[10.5px] font-bold text-gold-300 ${
                           isAr ? 'text-right' : 'text-left'
                         }`}
                       >

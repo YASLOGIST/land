@@ -349,17 +349,17 @@ export default function DashboardOverviewSection() {
             <div>
               {/* Card Title & Description */}
               <div className="mb-4">
-                <div className="flex items-center justify-between gap-2">
+                <div className="flex flex-col xs:flex-row xs:items-center justify-between gap-2">
                   <h3
-                    className={`text-lg sm:text-xl font-bold tracking-tight ${
+                    className={`text-base sm:text-lg lg:text-xl font-bold tracking-tight ${
                       mode === 'dark' ? 'text-white' : 'text-slate-900'
                     }`}
                   >
                     {ui.efficiencyTitle[language]}
                   </h3>
-                  <span className="shrink-0 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-mono font-bold bg-gold-500/10 text-gold-400 border border-gold-500/25">
+                  <span className="self-start xs:self-auto shrink-0 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-mono font-bold bg-gold-500/10 text-gold-400 border border-gold-500/25">
                     <span className="w-1.5 h-1.5 rounded-full bg-gold-400 animate-pulse" />
-                    {(networkEfficiency * 0.4).toFixed(0)} / 40 {ui.nodesText[language]}
+                    {(networkEfficiency * 0.4).toFixed(0)} / 40 <span className="hidden sm:inline">{ui.nodesText[language]}</span>
                   </span>
                 </div>
                 <p className="text-xs text-slate-400 mt-1.5 leading-relaxed">

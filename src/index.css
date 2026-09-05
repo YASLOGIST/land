@@ -72,13 +72,14 @@
   }
 
   html {
-    scroll-behavior: smooth;
+    overflow-x: hidden;
   }
 
   body {
     @apply bg-background text-foreground;
     font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
     font-family: 'IBM Plex Sans', system-ui, sans-serif;
+    overflow-x: hidden;
   }
 
   /* Universal Arabic Font & Normal Letter-Spacing Rule */
