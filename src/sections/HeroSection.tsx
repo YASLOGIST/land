@@ -103,7 +103,7 @@ export default function HeroSection() {
   const currentProgressRef = useRef<number>(0)
   const animFrameIdRef = useRef<number | null>(null)
 
-  // ── GSAP ScrollTrigger Pinning (Desktop) & Native Looping Video (Mobile) ──
+  // ── GSAP ScrollTrigger Pinning & Scroll-Driven Video Scrubbing ──
   useEffect(() => {
     const video = videoRef.current
     const section = sectionRef.current
@@ -113,53 +113,7 @@ export default function HeroSection() {
     let disposed = false
     let innerCleanup: (() => void) | undefined
 
-    const isTouchOrMobile =
-      typeof window !== 'undefined' &&
-      (window.innerWidth < 1024 ||
-        'ontouchstart' in window ||
-        navigator.maxTouchPoints > 0)
-
-    // Mobile / Touchscreen: run smooth hardware-accelerated continuous looping video
-    if (isTouchOrMobile) {
-      video.muted = true
-      video.playsInline = true
-      video.autoplay = true
-      video.loop = true
-      video.preload = 'auto'
-
-      const attemptPlay = () => {
-        const playPromise = video.play()
-        if (playPromise !== undefined) {
-          playPromise
-            .then(() => setVideoLoaded(true))
-            .catch(() => {
-              // Autoplay policy fallback: resume playback on user gesture
-              const touchHandler = () => {
-                video
-                  .play()
-                  .then(() => setVideoLoaded(true))
-                  .catch(() => {})
-                window.removeEventListener('touchstart', touchHandler)
-                window.removeEventListener('click', touchHandler)
-              }
-              window.addEventListener('touchstart', touchHandler, { once: true })
-              window.addEventListener('click', touchHandler, { once: true })
-            })
-        }
-      }
-
-      attemptPlay()
-
-      video.addEventListener('loadedmetadata', attemptPlay)
-      video.addEventListener('canplay', attemptPlay)
-
-      return () => {
-        video.removeEventListener('loadedmetadata', attemptPlay)
-        video.removeEventListener('canplay', attemptPlay)
-      }
-    }
-
-    // ── Desktop: GSAP ScrollTrigger Pinning & Scroll-Driven Video Scrubbing ──
+    // Dynamic import: GSAP loads after first paint, before the first scroll.
     void (async () => {
       const [{ gsap }, { ScrollTrigger }] = await Promise.all([
         import('gsap'),
@@ -167,11 +121,23 @@ export default function HeroSection() {
       ])
       if (disposed) return
       gsap.registerPlugin(ScrollTrigger)
+      ScrollTrigger.config({ ignoreMobileResize: true })
 
       video.muted = true
+      video.defaultMuted = true
       video.playsInline = true
+      video.setAttribute('playsinline', '')
+      video.setAttribute('webkit-playsinline', '')
+      video.setAttribute('x5-playsinline', '')
       video.preload = 'auto'
       video.pause()
+      if (video.readyState < 1) {
+        try {
+          video.load()
+        } catch {
+          // Ignore load exceptions
+        }
+      }
 
       let isMounted = true
       const isLoopingRef = { current: false }
@@ -198,7 +164,7 @@ export default function HeroSection() {
         const dur = video.duration && !isNaN(video.duration) && video.duration > 0 ? video.duration : 10.006
         const targetTime = Math.max(0, Math.min(p * dur, dur - 0.02))
 
-        if (video.readyState >= 2 && Math.abs(video.currentTime - targetTime) > 0.015) {
+        if (video.readyState >= 1 && Math.abs(video.currentTime - targetTime) > 0.015) {
           try {
             video.currentTime = targetTime
           } catch {
@@ -232,6 +198,8 @@ export default function HeroSection() {
       // Initial trigger
       startLoop()
 
+      const scrubDistance = typeof window !== 'undefined' && window.innerWidth < 768 ? '+=2600' : '+=3500'
+
       // Robust GSAP ScrollTrigger with true pinning and pinSpacing
       const trigger = ScrollTrigger.create({
         trigger: section,
@@ -239,7 +207,7 @@ export default function HeroSection() {
         pinSpacing: true,
         anticipatePin: 1,
         start: 'top top',
-        end: '+=3500',
+        end: scrubDistance,
         scrub: 0.5,
         onUpdate: (self) => {
           targetProgressRef.current = self.progress
@@ -288,19 +256,9 @@ export default function HeroSection() {
     if (video) {
       video.muted = true
       video.playsInline = true
-      const isTouchOrMobile =
-        typeof window !== 'undefined' &&
-        (window.innerWidth < 1024 ||
-          'ontouchstart' in window ||
-          navigator.maxTouchPoints > 0)
-      if (isTouchOrMobile) {
-        video.loop = true
-        video.play().catch(() => {})
-      } else {
-        video.preload = 'auto'
-        video.pause()
-        video.currentTime = 0
-      }
+      video.preload = 'auto'
+      video.pause()
+      video.currentTime = 0
     }
   }
 
@@ -330,7 +288,7 @@ export default function HeroSection() {
       {/* ─── PINNED VIEWPORT CONTAINER (GSAP PINNED) ─── */}
       <div
         ref={pinContainerRef}
-        className="relative h-screen w-full overflow-hidden flex flex-col justify-between pt-20 pb-5 px-4 sm:px-8 lg:px-12 bg-slate-950"
+        className="relative h-screen min-h-[100dvh] w-full overflow-hidden flex flex-col justify-between pt-16 sm:pt-20 pb-3 sm:pb-5 px-3 sm:px-8 lg:px-12 bg-slate-950"
       >
         
         {/* ─── SINGLE SOURCE OF TRUTH BACKGROUND LAYER (Z-0) ─── */}
@@ -344,10 +302,15 @@ export default function HeroSection() {
           x5-playsinline="true"
           preload="auto"
           controls={false}
-          autoPlay
-          loop
+          autoPlay={false}
+          loop={false}
           onLoadedMetadata={handleLoadedMetadata}
-          onCanPlay={() => setVideoLoaded(true)}
+          onCanPlay={() => {
+            setVideoLoaded(true)
+            if (videoRef.current && !videoRef.current.paused) {
+              videoRef.current.pause()
+            }
+          }}
           className="absolute inset-0 w-full h-full object-cover z-0 pointer-events-none"
           style={{
             opacity: videoLoaded ? 1 : 0.85,
@@ -425,7 +388,7 @@ export default function HeroSection() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.22 }}
-            className="text-xs sm:text-sm md:text-base text-slate-200/95 font-medium leading-relaxed max-w-2xl mb-7 drop-shadow-[0_2px_12px_rgba(0,0,0,0.9)]"
+            className="text-xs sm:text-sm md:text-base text-slate-200/95 font-medium leading-relaxed max-w-2xl mb-4 sm:mb-7 drop-shadow-[0_2px_12px_rgba(0,0,0,0.9)]"
           >
             {content.description[language]}
           </motion.p>
