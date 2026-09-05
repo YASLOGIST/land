@@ -9,9 +9,10 @@
      --write  rewrites src/data/network-summary.ts (default is --check)
      --check  verifies the committed summary matches the arrays
 
-   npm run gate runs the check, so a count can never drift silently. The
-   npm prebuild/predev hooks run --write, so dev and production builds are
-   always generated from current data.
+   npm run gate runs --check FIRST, against the committed file, so a stale
+   count fails the gate before anything can repair it. --write exists only
+   for developers (npm run network-summary / predev); production builds
+   must never mutate a tracked source file.
 ────────────────────────────────────────────────────────────────────── */
 
 import { build } from 'esbuild'
@@ -49,8 +50,9 @@ function render(net) {
    Source of truth: src/data/landCorridors.ts — this module must never
    import it: landCorridors.ts is intentionally a lazy chunk.
 
-   Regenerate:  npm run network-summary   (runs automatically on dev/build)
-   Verify:      npm run check:network-summary   (part of npm run gate) */
+   Regenerate:  npm run network-summary   (runs automatically on dev via predev)
+   Verify:      npm run check:network-summary   (FIRST step of npm run gate,
+               checking the committed state before anything can rewrite it) */
 export const NETWORK_SUMMARY = {
   hubCount: ${net.hubCount},
   corridorCount: ${net.corridorCount},
