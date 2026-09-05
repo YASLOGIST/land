@@ -143,6 +143,15 @@
   font-stretch: 78%;
 }
 
+/* Hide scrollbars for clean mobile horizontal scroll strips */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
 /* Accessibility: Respect prefers-reduced-motion */
 @media (prefers-reduced-motion: reduce) {
   *,
@@ -154,3 +163,4 @@
     scroll-behavior: auto !important;
   }
 }
+

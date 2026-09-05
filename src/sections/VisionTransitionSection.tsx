@@ -92,8 +92,8 @@ export default function VisionTransitionSection() {
       <div
         className={`absolute inset-0 pointer-events-none transition-opacity duration-500 ${
           mode === 'dark'
-            ? 'bg-[radial-gradient(ellipse_70%_50%_at_50%_50%,rgba(6,182,212,0.05),transparent)]'
-            : 'bg-[radial-gradient(ellipse_70%_50%_at_50%_50%,rgba(6,182,212,0.04),transparent)]'
+            ? 'bg-[radial-gradient(ellipse_70%_50%_at_50%_50%,rgba(232,179,23,0.05),transparent)]'
+            : 'bg-[radial-gradient(ellipse_70%_50%_at_50%_50%,rgba(232,179,23,0.04),transparent)]'
         }`}
       />
 

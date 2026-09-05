@@ -812,7 +812,7 @@ export default function DisruptionCommandSection() {
 
                     {/* Luminous Bypass Gradient */}
                     <linearGradient id="crisis-real-bypass-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                      <stop offset="0%" stopColor="#22d3ee" />
+                      <stop offset="0%" stopColor="#E8B317" />
                       <stop offset="50%" stopColor="#10b981" />
                       <stop offset="100%" stopColor="#34d399" />
                     </linearGradient>
@@ -922,8 +922,8 @@ export default function DisruptionCommandSection() {
 
                     {/* 5. Origin & Destination Strategic Nodes */}
                     <g className="pointer-events-none">
-                      <circle cx={originPixels[0]} cy={originPixels[1]} r="9" fill="rgba(34,211,238,0.3)" filter="url(#crisis-real-emerald)" />
-                      <circle cx={originPixels[0]} cy={originPixels[1]} r="5" fill="#22d3ee" />
+                      <circle cx={originPixels[0]} cy={originPixels[1]} r="9" fill="rgba(232,179,23,0.35)" filter="url(#crisis-real-emerald)" />
+                      <circle cx={originPixels[0]} cy={originPixels[1]} r="5" fill="#E8B317" />
                       <circle cx={originPixels[0]} cy={originPixels[1]} r="2" fill="#ffffff" />
                       
                       <circle cx={destinationPixels[0]} cy={destinationPixels[1]} r="10" fill="rgba(16,185,129,0.3)" filter="url(#crisis-real-emerald)" />

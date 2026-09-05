@@ -80,7 +80,7 @@ export default function CrossModalHandoff() {
       }`}
     >
       <div
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_60%_50%_at_50%_0%,rgba(6,182,212,0.05),transparent)]"
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_60%_50%_at_50%_0%,rgba(232,179,23,0.05),transparent)]"
         aria-hidden="true"
       />
 

@@ -118,7 +118,7 @@ export default function StatsSection() {
     >
       {/* Dynamic Background Glow */}
       <div
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_60%_40%_at_50%_50%,rgba(6,182,212,0.06),transparent)]"
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_60%_40%_at_50%_50%,rgba(232,179,23,0.06),transparent)]"
         aria-hidden="true"
       />
 
@@ -190,7 +190,7 @@ export default function StatsSection() {
                     </div>
                     <Icon 
                       className="w-4 h-4 transition-colors" 
-                      style={{ color: ['#e7ca00', '#53fffc', '#2ee46a', '#0054d0'][index] }}
+                      style={{ color: ['#E8B317', '#FBBF24', '#10b981', '#3b82f6'][index] }}
                     />
                   </div>
 

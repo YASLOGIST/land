@@ -37,7 +37,7 @@ function RouteMicroVisual({ mode, isRtl }: { mode: 'dark' | 'light'; isRtl: bool
       <svg className="w-full h-full" viewBox="0 0 220 44" fill="none">
         <path
           d="M 12 22 Q 60 4, 110 22 T 208 22"
-          stroke={mode === 'dark' ? 'rgba(6,182,212,0.2)' : 'rgba(8,145,178,0.25)'}
+          stroke={mode === 'dark' ? 'rgba(232,179,23,0.2)' : 'rgba(180,130,10,0.25)'}
           strokeWidth="2"
           strokeDasharray="4 4"
         />
@@ -51,14 +51,14 @@ function RouteMicroVisual({ mode, isRtl }: { mode: 'dark' | 'light'; isRtl: bool
         />
         <defs>
           <linearGradient id="route-glow-grad" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stopColor="#22d3ee" stopOpacity="0.2" />
-            <stop offset="50%" stopColor="#0891b2" />
-            <stop offset="100%" stopColor="#0284c7" />
+            <stop offset="0%" stopColor="#E8B317" stopOpacity="0.2" />
+            <stop offset="50%" stopColor="#f0be24" />
+            <stop offset="100%" stopColor="#d97706" />
           </linearGradient>
         </defs>
-        <circle cx="12" cy="22" r="3.5" fill="#0891b2" />
+        <circle cx="12" cy="22" r="3.5" fill="#f0be24" />
         <circle cx="110" cy="22" r="3" fill="#E8B317" />
-        <circle cx="208" cy="22" r="3.5" fill="#f0be24" />
+        <circle cx="208" cy="22" r="3.5" fill="#d97706" />
       </svg>
       <div
         className={`absolute top-1.5 ${isRtl ? 'left-2.5' : 'right-2.5'} text-[9px] font-mono font-bold ${
@@ -246,12 +246,12 @@ function PredictiveMicroVisual({ mode }: { mode: 'dark' | 'light' }) {
       <svg className="w-full h-full" viewBox="0 0 200 40" fill="none">
         <path
           d="M 5 32 L 40 28 L 75 18 L 110 24 L 145 10 L 195 5"
-          stroke={mode === 'dark' ? 'rgba(6,182,212,0.3)' : 'rgba(8,145,178,0.3)'}
+          stroke={mode === 'dark' ? 'rgba(232,179,23,0.3)' : 'rgba(180,130,10,0.3)'}
           strokeWidth="2"
         />
         <motion.path
           d="M 5 32 L 40 28 L 75 18 L 110 24 L 145 10 L 195 5"
-          stroke={mode === 'dark' ? '#22d3ee' : '#0891b2'}
+          stroke={mode === 'dark' ? '#E8B317' : '#d97706'}
           strokeWidth="2.5"
           initial={{ pathLength: 0 }}
           animate={{ pathLength: [0, 1] }}
@@ -434,7 +434,7 @@ export default function CapabilitiesSection() {
     >
       {/* Ambient background glow */}
       <div
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_20%,rgba(6,182,212,0.06),transparent)]"
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_20%,rgba(232,179,23,0.06),transparent)]"
         aria-hidden="true"
       />
 

@@ -237,7 +237,7 @@ export default function Navbar() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.25, ease: 'easeInOut' }}
-            className={`fixed top-16 left-0 right-0 z-40 md:hidden border-b flex flex-col p-6 gap-6 backdrop-blur-2xl ${
+            className={`fixed top-16 left-0 right-0 z-40 md:hidden border-b flex flex-col p-5 sm:p-6 gap-5 sm:gap-6 backdrop-blur-2xl max-h-[calc(100vh-4rem)] overflow-y-auto overscroll-contain ${
               mode === 'dark'
                 ? 'bg-slate-950/95 border-white/[0.08] shadow-2xl'
                 : 'bg-white/95 border-slate-200 shadow-xl'
