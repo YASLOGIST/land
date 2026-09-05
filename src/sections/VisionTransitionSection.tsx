@@ -4,11 +4,9 @@ import { motion } from 'framer-motion'
 import { useTheme } from 'next-themes'
 import { useLanguage } from '@/hooks/use-language'
 import { Truck, Network, Warehouse, ArrowDown, ShieldCheck, Cpu, Building2 } from 'lucide-react'
-import { LAND_TRADE_CORRIDORS } from '@/data/landCorridors'
+import { NETWORK_SUMMARY } from '@/data/network-summary'
 
 const t = (en: string, ar: string) => ({ en, ar })
-
-const ACTIVE_CORRIDOR_COUNT = LAND_TRADE_CORRIDORS.length
 
 const visionCopy = {
   kicker: t(
@@ -61,12 +59,14 @@ const visionCopy = {
       ),
     },
   ],
-  /* Three claims we can actually stand behind: the corridor count is the
-     length of LAND_TRADE_CORRIDORS, the tracking interval is what a standard
-     telematics unit reports, and the customs line names the system we file
-     through rather than promising a clearance time. */
+  /* Three claims we can actually stand behind: the corridor count is a
+     build-generated summary of LAND_TRADE_CORRIDORS — checked against the
+     array by npm run gate, and kept out of the entry bundle by living in
+     its own module — the tracking interval is what a standard telematics
+     unit reports, and the customs line names the systems we file through
+     rather than promising a clearance time. */
   metricBadges: [
-    { label: t('ACTIVE CORRIDORS', 'الممرات النشطة'), val: `${ACTIVE_CORRIDOR_COUNT}`, icon: Building2 },
+    { label: t('ACTIVE CORRIDORS', 'الممرات النشطة'), val: `${NETWORK_SUMMARY.corridorCount}`, icon: Building2 },
     { label: t('GPS PING INTERVAL', 'تردد إشارة التتبع'), val: '30 SEC', icon: Cpu },
     { label: t('CUSTOMS FILING', 'التخليص الجمركي'), val: 'NAFEZA · FASAH', icon: ShieldCheck },
   ],
