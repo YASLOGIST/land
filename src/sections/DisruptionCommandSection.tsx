@@ -525,8 +525,8 @@ export default function DisruptionCommandSection() {
     kicker: t('CORRIDOR EXCEPTION COMMAND CENTRE', 'مركز إدارة استثناءات الممرات'),
     title: t('Corridor Incident Resolution', 'معالجة حوادث الممرات البرية'),
     subtitle: t(
-      'Bottleneck detection across the four active corridors, with modelled reroute options costed against transit time, road charges and cargo condition.',
-      'رصد الاختناقات على الممرات الأربعة النشطة، مع خيارات تحويل محاكاة مُقيّمة مقابل زمن الرحلة ورسوم الطريق وحالة البضاعة.',
+      'Bottleneck detection across the modelled corridor set, with reroute options costed against transit time, road charges and cargo condition.',
+      'رصد الاختناقات على الممرات المشمولة بالنموذج، مع خيارات تحويل محاكاة مُقيّمة مقابل زمن الرحلة ورسوم الطريق وحالة البضاعة.',
     ),
     activeAlertsTitle: t('Active Corridor Disruptions', 'الاضطرابات النشطة على الممرات'),
     mitigationTitle: t('Select AI Autonomous Contingency Protocol', 'اختر بروتوكول التدخل الذكي المناسب'),

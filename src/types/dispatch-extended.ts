@@ -28,13 +28,25 @@ export interface RealTradeCorridor {
    *  YELLOW, HIGH and RED, so keep one of those in the string when the
    *  corridor should not render green. */
   riskScore: string
-  /** Egyptian road classification, e.g. the Cairo-Alexandria Desert Road. */
+  /** Governing trunk route in the corridor's home jurisdiction, e.g. the
+   *  Cairo-Alexandria Desert Road or Saudi Highway 40. */
   roadClass: BilingualText
   /** Governing surface and lane description for the trunk section. */
   roadSurface: BilingualText
-  /** Legal axle load under Egyptian Roads & Bridges Law 84/1968 and its
-   *  amendments, as enforced at the corridor's weighbridges. */
+  /** Per-axle load cap the corridor's weighbridges enforce, in tonnes. The
+   *  number is jurisdiction-specific:
+   *   - Egypt: single-axle limit applied under Roads & Bridges Law 84/1968
+   *     and its amendments.
+   *   - Saudi Arabia: the 13 t maximum on a single non-steered axle under
+   *     Article 23 of the Traffic System Executive Regulations. Steered
+   *     axles are capped lower (8 t single-tyred, 10 t dual-tyred), axles
+   *     inside three-axle groups at 6.5 t each, and gross weights by axle
+   *     count (2-axle 21 t, 3-axle 34 t, 4-axle 42 t, 5-axle 45 t) — the
+   *     single number here is the per-axle ceiling, not the gross limit. */
   axleLoadLimitT: number
+  /** Height envelope in metres the corridor is planned for: clearance under
+   *  structures on Egyptian sections, and the 4.8 m legal vehicle height
+   *  Saudi weigh stations check against. */
   clearanceHeightM: number
   /** Booked departure slot out of the origin yard. */
   railSlotTime: string
@@ -44,7 +56,17 @@ export interface RealTradeCorridor {
   weighbridgeGps: [number, number]
   /** Where the corridor most often loses time: gate queue, checkpoint, ferry. */
   dwellHotspotGps: [number, number]
+  /** Customs declaration regime for cargo moving on the corridor.
+   *   - Egypt: NAFEZA pre-arrival declaration carrying the ACID number.
+   *   - Saudi Arabia: the Bayan declaration (بيان جمركي) filed through the
+   *     FASAH national single window operated under ZATCA. */
   customsManifestType: BilingualText
+  /** Carrier operating licence a freight vehicle must hold on the corridor.
+   *   - Saudi corridors: the Transport General Authority (TGA / الهيئة
+   *     العامة للنقل) operating card (بطاقة تشغيل) required of every
+   *     commercial freight vehicle on Saudi roads.
+   *   - Egyptian corridors: the GARBLT-issued goods-transport licence. */
+  operatorLicence: BilingualText
   // Land route vectors on the 1000x500 equirectangular canvas
   landBurntOrangeHighwayPath: string
   landOliveRuralPath: string

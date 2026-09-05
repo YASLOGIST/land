@@ -4,6 +4,7 @@ import { motion } from 'framer-motion'
 import { useTheme } from 'next-themes'
 import { useLanguage } from '@/hooks/use-language'
 import { Truck, Network, Warehouse, ArrowDown, ShieldCheck, Cpu, Building2 } from 'lucide-react'
+import { NETWORK_SUMMARY } from '@/data/network-summary'
 
 const t = (en: string, ar: string) => ({ en, ar })
 
@@ -41,8 +42,8 @@ const visionCopy = {
         'الشبكة البرية المستقلة ومصفوفة التفريغ المباشر Cross-Dock'
       ),
       desc: t(
-        'Pallet sortation at the cross-dock, bypass routing when a chokepoint backs up, and NAFEZA pre-arrival filing so clearance starts before the truck reaches the gate.',
-        'فرز المنصات بمراكز التفريغ المباشر، وتوجيه بديل عند تكدس أي نقطة اختناق، وتقديم الإقرار المسبق عبر نافذة ليبدأ التخليص قبل وصول الشاحنة إلى البوابة.'
+        'Pallet sortation at the cross-dock, bypass routing when a chokepoint backs up, and pre-arrival filing — NAFEZA/ACID on Egyptian legs, Bayan via FASAH on Saudi legs — so clearance starts before the truck reaches the gate.',
+        'فرز المنصات بمراكز التفريغ المباشر، وتوجيه بديل عند تكدس أي نقطة اختناق، وتقديم الإقرار المسبق — نافذة/ACID على المقطع المصري، وبيان «فسح» على المقطع السعودي — ليبدأ التخليص قبل وصول الشاحنة إلى البوابة.'
       ),
     },
     {
@@ -58,14 +59,16 @@ const visionCopy = {
       ),
     },
   ],
-  /* Three claims we can actually stand behind: the corridor count is the
-     length of LAND_TRADE_CORRIDORS, the tracking interval is what a standard
-     telematics unit reports, and the customs line names the system we file
-     through rather than promising a clearance time. */
+  /* Three claims we can actually stand behind: the corridor count is a
+     build-generated summary of LAND_TRADE_CORRIDORS — checked against the
+     array by npm run gate, and kept out of the entry bundle by living in
+     its own module — the tracking interval is what a standard telematics
+     unit reports, and the customs line names the systems we file through
+     rather than promising a clearance time. */
   metricBadges: [
-    { label: t('ACTIVE CORRIDORS', 'الممرات النشطة'), val: '4', icon: Building2 },
+    { label: t('ACTIVE CORRIDORS', 'الممرات النشطة'), val: `${NETWORK_SUMMARY.corridorCount}`, icon: Building2 },
     { label: t('GPS PING INTERVAL', 'تردد إشارة التتبع'), val: '30 SEC', icon: Cpu },
-    { label: t('CUSTOMS FILING', 'التخليص الجمركي'), val: 'NAFEZA / ACID', icon: ShieldCheck },
+    { label: t('CUSTOMS FILING', 'التخليص الجمركي'), val: 'NAFEZA · FASAH', icon: ShieldCheck },
   ],
   scrollDown: t('Proceed to 3-Phase Operational Simulation', 'انتقل إلى محاكاة العمليات ثلاثية المراحل'),
 }
