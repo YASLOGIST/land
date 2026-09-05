@@ -113,7 +113,7 @@ export default function Navbar() {
               <span className={`transition-colors mt-0.5 ${
                 isRTL ? 'text-[9.5px] tracking-normal font-normal' : 'text-[7.5px] sm:text-[8.5px] uppercase font-mono font-bold tracking-[0.2em] sm:tracking-[0.25em]'
               } ${
-                mode === 'dark' ? 'text-cyan-200/80 group-hover:text-cyan-300' : 'text-slate-600 group-hover:text-cyan-700'
+                mode === 'dark' ? 'text-gold-200/80 group-hover:text-gold-300' : 'text-slate-600 group-hover:text-gold-700'
               }`}>
                 {subtitle[language]}
               </span>
@@ -128,11 +128,11 @@ export default function Navbar() {
                 href={link.href}
                 onClick={(e) => handleLinkClick(e, link.href)}
                 className={`text-xs uppercase font-extrabold tracking-widest transition-all duration-300 relative py-1.5 group ${
-                  mode === 'dark' ? 'text-slate-300 hover:text-cyan-400' : 'text-slate-600 hover:text-cyan-600'
+                  mode === 'dark' ? 'text-slate-300 hover:text-gold-400' : 'text-slate-600 hover:text-gold-600'
                 }`}
               >
                 {link.label[language]}
-                <span className="absolute bottom-0 left-0 w-0 h-[2px] bg-cyan-400 transition-all duration-300 group-hover:w-full" />
+                <span className="absolute bottom-0 left-0 w-0 h-[2px] bg-gold-400 transition-all duration-300 group-hover:w-full" />
               </a>
             ))}
           </nav>
@@ -148,7 +148,7 @@ export default function Navbar() {
             {/* Language Toggle Switch */}
             <div
               dir="ltr"
-              className="relative flex items-center p-1 rounded-full bg-[#051336]/90 border border-cyan-500/35 backdrop-blur-2xl shadow-[inset_0_1px_2px_rgba(0,0,0,0.5),0_0_15px_rgba(6,182,212,0.2)]"
+              className="relative flex items-center p-1 rounded-full bg-[#051336]/90 border border-gold-500/35 backdrop-blur-2xl shadow-[inset_0_1px_2px_rgba(0,0,0,0.5),0_0_15px_rgba(232,179,23,0.2)]"
             >
               {/* EN Button */}
               <button
@@ -164,7 +164,7 @@ export default function Navbar() {
                 {language === 'en' && (
                   <motion.div
                     layoutId="navbar-active-lang"
-                    className="absolute inset-0 rounded-full bg-gradient-to-r from-cyan-400 to-sky-400 shadow-[0_0_14px_rgba(6,182,212,0.85)] z-[-1]"
+                    className="absolute inset-0 rounded-full bg-gradient-to-r from-gold-400 to-amber-500 shadow-[0_0_14px_rgba(232,179,23,0.85)] z-[-1]"
                     transition={{ type: 'spring', stiffness: 500, damping: 35 }}
                   />
                 )}
@@ -174,7 +174,7 @@ export default function Navbar() {
               {/* AR Button */}
               <button
                 onClick={() => setLanguage('ar')}
-                className={`relative z-10 px-3.5 py-1 rounded-full font-bold leading-none select-none transition-[colors,font-weight,box-shadow] duration-300 ar-lang-button focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:ring-offset-2 focus:ring-offset-[#051336] focus:shadow-[0_0_12px_rgba(6,182,212,0.8)] hover:font-black flex items-center justify-center gap-1.5 ${
+                className={`relative z-10 px-3.5 py-1 rounded-full font-bold leading-none select-none transition-[colors,font-weight,box-shadow] duration-300 ar-lang-button focus:outline-none focus:ring-2 focus:ring-gold-400 focus:ring-offset-2 focus:ring-offset-[#051336] focus:shadow-[0_0_12px_rgba(232,179,23,0.8)] hover:font-black flex items-center justify-center gap-1.5 ${
                   language === 'ar'
                     ? 'text-slate-950 font-black'
                     : 'text-slate-300 hover:text-white'
@@ -185,7 +185,7 @@ export default function Navbar() {
                 {language === 'ar' && (
                   <motion.div
                     layoutId="navbar-active-lang"
-                    className="absolute inset-0 rounded-full bg-gradient-to-r from-cyan-400 to-sky-400 shadow-[0_0_14px_rgba(6,182,212,0.85)] z-[-1]"
+                    className="absolute inset-0 rounded-full bg-gradient-to-r from-gold-400 to-amber-500 shadow-[0_0_14px_rgba(232,179,23,0.85)] z-[-1]"
                     transition={{ type: 'spring', stiffness: 500, damping: 35 }}
                   />
                 )}
@@ -198,8 +198,8 @@ export default function Navbar() {
             <ThemeToggle 
               className={`!h-8 !w-8 rounded-full transition-all duration-300 [&>svg]:!w-4 [&>svg]:!h-4 ${
                 mode === 'dark'
-                  ? 'bg-white/[0.04] text-cyan-300 border border-white/10 hover:border-cyan-400/50 hover:bg-cyan-500/10 hover:text-white shadow-[0_0_15px_rgba(0,0,0,0.3)]'
-                  : 'bg-white text-slate-700 border border-slate-200 hover:border-cyan-500/50 hover:bg-cyan-50 shadow-sm'
+                  ? 'bg-white/[0.04] text-gold-300 border border-white/10 hover:border-gold-400/50 hover:bg-gold-500/10 hover:text-white shadow-[0_0_15px_rgba(0,0,0,0.3)]'
+                  : 'bg-white text-slate-700 border border-slate-200 hover:border-gold-500/50 hover:bg-gold-50 shadow-sm'
               }`}
             />
           </div>
@@ -209,8 +209,8 @@ export default function Navbar() {
             <ThemeToggle 
               className={`!h-8 !w-8 rounded-full transition-all duration-300 [&>svg]:!w-4 [&>svg]:!h-4 ${
                 mode === 'dark'
-                  ? 'bg-white/[0.04] text-cyan-300 border border-white/10 hover:border-cyan-400/50 hover:bg-cyan-500/10 hover:text-white shadow-[0_0_15px_rgba(0,0,0,0.3)]'
-                  : 'bg-white text-slate-700 border border-slate-200 hover:border-cyan-505/50 hover:bg-cyan-50 shadow-sm'
+                  ? 'bg-white/[0.04] text-gold-300 border border-white/10 hover:border-gold-400/50 hover:bg-gold-500/10 hover:text-white shadow-[0_0_15px_rgba(0,0,0,0.3)]'
+                  : 'bg-white text-slate-700 border border-slate-200 hover:border-gold-500/50 hover:bg-gold-50 shadow-sm'
               }`}
             />
             <button
@@ -262,8 +262,8 @@ export default function Navbar() {
                   onClick={(e) => handleLinkClick(e, link.href)}
                   className={`text-sm uppercase font-bold tracking-widest py-2 border-b ${
                     mode === 'dark'
-                      ? 'text-slate-300 hover:text-cyan-400 border-white/[0.04]'
-                      : 'text-slate-700 hover:text-cyan-600 border-slate-100'
+                      ? 'text-slate-300 hover:text-gold-400 border-white/[0.04]'
+                      : 'text-slate-700 hover:text-gold-600 border-slate-100'
                   }`}
                 >
                   {link.label[language]}
@@ -281,7 +281,7 @@ export default function Navbar() {
                 <button
                   onClick={() => setLanguage('en')}
                   className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
-                    language === 'en' ? 'bg-cyan-400 text-slate-950 font-black' : 'text-slate-400'
+                    language === 'en' ? 'bg-gold-500 text-slate-950 font-black' : 'text-slate-400'
                   }`}
                 >
                   EN
@@ -289,7 +289,7 @@ export default function Navbar() {
                 <button
                   onClick={() => setLanguage('ar')}
                   className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
-                    language === 'ar' ? 'bg-cyan-400 text-slate-950 font-black' : 'text-slate-400'
+                    language === 'ar' ? 'bg-gold-500 text-slate-950 font-black' : 'text-slate-400'
                   }`}
                   style={{ fontFamily: 'Aref Ruqaa' }}
                 >

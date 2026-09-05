@@ -17,8 +17,8 @@ const ShowcaseSection = lazy(() => import('@/sections/ShowcaseSection'))
 function SectionLoadingFallback() {
   return (
     <div className="w-full py-20 flex items-center justify-center bg-slate-100/60 dark:bg-slate-950/60">
-      <div className="flex items-center gap-3 px-5 py-2.5 rounded-2xl bg-white/60 dark:bg-slate-900/60 border border-cyan-500/20 text-cyan-600 dark:text-cyan-400 font-mono text-xs shadow-sm">
-        <span className="w-2 h-2 rounded-full bg-cyan-500 animate-ping" />
+      <div className="flex items-center gap-3 px-5 py-2.5 rounded-2xl bg-white/60 dark:bg-slate-900/60 border border-gold-500/20 text-gold-700 dark:text-gold-400 font-mono text-xs shadow-sm">
+        <span className="w-2 h-2 rounded-full bg-gold-500 animate-ping" />
         <span>INITIALIZING DIGITAL TWIN…</span>
       </div>
     </div>
@@ -27,7 +27,7 @@ function SectionLoadingFallback() {
 
 export default function Home() {
   return (
-    <div className="relative min-h-screen bg-white dark:bg-slate-950 text-slate-950 dark:text-white selection:bg-cyan-500 selection:text-slate-950 transition-colors duration-300">
+    <div className="relative min-h-screen bg-white dark:bg-slate-950 text-slate-950 dark:text-white selection:bg-gold-500 selection:text-slate-950 transition-colors duration-300">
       <Navbar />
       <HeroSection />
       <VisionTransitionSection />

@@ -180,7 +180,7 @@ export default function Footer() {
               <a
                 href={`tel:${PHONE_TEL}`}
                 className={`flex items-center gap-2 text-sm transition-colors duration-200 ${
-                  mode === 'dark' ? 'text-slate-400 hover:text-cyan-400' : 'text-slate-600 hover:text-cyan-600'
+                  mode === 'dark' ? 'text-slate-400 hover:text-gold-400' : 'text-slate-600 hover:text-gold-600'
                 }`}
               >
                 <Phone className="w-3.5 h-3.5 shrink-0" />
@@ -189,7 +189,7 @@ export default function Footer() {
               <a
                 href={`mailto:${EMAIL}`}
                 className={`flex items-center gap-2 text-sm transition-colors duration-200 ${
-                  mode === 'dark' ? 'text-slate-400 hover:text-cyan-400' : 'text-slate-600 hover:text-cyan-600'
+                  mode === 'dark' ? 'text-slate-400 hover:text-gold-400' : 'text-slate-600 hover:text-gold-600'
                 }`}
               >
                 <Mail className="w-3.5 h-3.5 shrink-0" />
@@ -217,8 +217,8 @@ export default function Footer() {
                     title={s.name}
                     className={`grid h-9 w-9 place-items-center rounded-xl border transition-all duration-200 ${
                       mode === 'dark'
-                        ? 'border-white/10 bg-white/[0.03] text-slate-400 hover:border-cyan-400/40 hover:text-cyan-400'
-                        : 'border-slate-200 bg-white/70 text-slate-500 hover:border-cyan-500/40 hover:text-cyan-600'
+                        ? 'border-white/10 bg-white/[0.03] text-slate-400 hover:border-gold-400/40 hover:text-gold-400'
+                        : 'border-slate-200 bg-white/70 text-slate-500 hover:border-gold-500/40 hover:text-gold-600'
                     }`}
                   >
                     <svg viewBox="0 0 24 24" className="w-4 h-4 fill-current" aria-hidden="true" focusable="false">
@@ -245,8 +245,8 @@ export default function Footer() {
                     href={link.href}
                     className={`text-sm transition-colors duration-200 ${
                       mode === 'dark'
-                        ? 'text-slate-400 hover:text-cyan-400'
-                        : 'text-slate-600 hover:text-cyan-600'
+                        ? 'text-slate-400 hover:text-gold-400'
+                        : 'text-slate-600 hover:text-gold-600'
                     }`}
                   >
                     {link.label[language]}
@@ -271,8 +271,8 @@ export default function Footer() {
                     href={link.href}
                     className={`text-sm transition-colors duration-200 ${
                       mode === 'dark'
-                        ? 'text-slate-400 hover:text-cyan-400'
-                        : 'text-slate-600 hover:text-cyan-600'
+                        ? 'text-slate-400 hover:text-gold-400'
+                        : 'text-slate-600 hover:text-gold-600'
                     }`}
                   >
                     {link.label[language]}
@@ -286,7 +286,7 @@ export default function Footer() {
           <div className="flex flex-col gap-4">
             <h3 
               className={`font-black text-xs uppercase tracking-widest ${isRtl ? 'tracking-normal' : ''}`}
-              style={{ color: mode === 'dark' ? '#22d3ee' : '#0891b2' }}
+              style={{ color: mode === 'dark' ? '#E8B317' : '#7A5400' }}
             >
               {content.newsletterTitle[language]}
             </h3>
@@ -310,8 +310,8 @@ export default function Footer() {
                   placeholder={content.newsletterPlaceholder[language]}
                   className={`w-full py-2.5 px-3.5 pr-10 text-xs rounded-xl transition-all duration-300 outline-none font-sans border ${
                     mode === 'dark'
-                      ? 'bg-slate-900/50 text-white placeholder-slate-500 border-white/10 focus:border-cyan-500/50'
-                      : 'bg-white text-slate-900 placeholder-slate-400 border-slate-200 focus:border-cyan-500/50'
+                      ? 'bg-slate-900/50 text-white placeholder-slate-500 border-white/10 focus:border-gold-500/50'
+                      : 'bg-white text-slate-900 placeholder-slate-400 border-slate-200 focus:border-gold-500/50'
                   } ${status === 'error' ? 'border-red-500/70 focus:border-red-500/80 bg-red-500/[0.02]' : ''} ${
                     status === 'success' ? 'border-emerald-500/70 bg-emerald-500/[0.02]' : ''
                   }`}
@@ -321,7 +321,7 @@ export default function Footer() {
                 {/* Right Input Icon matching LTR / RTL orientation */}
                 <div className={`absolute pointer-events-none ${isRtl ? 'left-3' : 'right-3'}`}>
                   {status === 'loading' ? (
-                    <Loader2 className="w-4 h-4 text-cyan-400 animate-spin" />
+                    <Loader2 className="w-4 h-4 text-gold-500 animate-spin" />
                   ) : status === 'success' ? (
                     <CheckCircle2 className="w-4 h-4 text-emerald-400" />
                   ) : (
@@ -337,7 +337,7 @@ export default function Footer() {
                 className={`py-2.5 px-4 rounded-xl font-bold text-xs transition-all duration-300 shadow-sm flex items-center justify-center gap-1.5 ${
                   status === 'success'
                     ? 'bg-emerald-500 text-slate-950 hover:bg-emerald-500 cursor-default'
-                    : 'bg-gradient-to-r from-cyan-500 to-sky-500 text-slate-950 hover:shadow-[0_0_15px_rgba(6,182,212,0.4)] hover:brightness-105'
+                    : 'bg-gradient-to-r from-gold-500 to-amber-500 text-slate-950 hover:shadow-[0_0_15px_rgba(232,179,23,0.4)] hover:brightness-105'
                 } disabled:opacity-80`}
               >
                 {status === 'loading' ? (
@@ -388,7 +388,7 @@ export default function Footer() {
                 type="button"
                 onClick={() => setLegal(item.key)}
                 className={`text-xs transition-colors duration-200 cursor-pointer ${
-                  mode === 'dark' ? 'text-slate-500 hover:text-cyan-400' : 'text-slate-500 hover:text-cyan-600'
+                  mode === 'dark' ? 'text-slate-500 hover:text-gold-400' : 'text-slate-500 hover:text-gold-600'
                 }`}
               >
                 {item.label[language]}

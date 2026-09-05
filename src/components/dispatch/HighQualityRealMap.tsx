@@ -2,6 +2,8 @@
 
 import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import * as maplibregl from 'maplibre-gl'
+import 'maplibre-gl/dist/maplibre-gl.css'
 import {
   Maximize2,
   Minimize2,
@@ -26,9 +28,8 @@ import {
   Coffee,
   Landmark,
 } from 'lucide-react'
-import { WORLD_LAND_SVG_PATH, WORLD_BORDERS_SVG_PATH } from '@/data/world-land-110m'
-import { INLAND_LOGISTICS_HUBS } from '@/data/landCorridors'
-import { projectGeo } from '@/utils/gis-projection'
+import { INLAND_LOGISTICS_HUBS, LAND_TRADE_CORRIDORS } from '@/data/landCorridors'
+import { useAccessibleMotion } from '@/hooks/use-reduced-motion'
 import type { TransportModeId } from '@/types/dispatch'
 import type { RealTradeCorridor, WaypointDetail, GlobalHubPin } from '@/types/dispatch-extended'
 
@@ -46,120 +47,155 @@ export interface HighQualityRealMapProps {
   isRTL: boolean
   selectedWaypointNode: WaypointDetail | null
   setSelectedWaypointNode: (wp: WaypointDetail | null) => void
-  transform: { x: number; y: number; scale: number }
-  isDragging: boolean
-  handleMouseDown: (e: React.MouseEvent<HTMLDivElement | SVGSVGElement>) => void
-  handleMouseMove: (e: React.MouseEvent<HTMLDivElement | SVGSVGElement>) => void
-  handleMouseUp: () => void
-  handleTouchStart: (e: React.TouchEvent<HTMLDivElement | SVGSVGElement>) => void
-  handleTouchMove: (e: React.TouchEvent<HTMLDivElement | SVGSVGElement>) => void
-  handleTouchEnd: () => void
-  handleWheel: (e: React.WheelEvent<HTMLDivElement | SVGSVGElement>) => void
-  zoomIn: () => void
-  zoomOut: () => void
-  resetView: () => void
-  centerOnPoint: (x: number, y: number, targetScale?: number) => void
+  transform?: { x: number; y: number; scale: number }
+  isDragging?: boolean
+  handleMouseDown?: (e: React.MouseEvent<HTMLDivElement | SVGSVGElement>) => void
+  handleMouseMove?: (e: React.MouseEvent<HTMLDivElement | SVGSVGElement>) => void
+  handleMouseUp?: () => void
+  handleTouchStart?: (e: React.TouchEvent<HTMLDivElement | SVGSVGElement>) => void
+  handleTouchMove?: (e: React.TouchEvent<HTMLDivElement | SVGSVGElement>) => void
+  handleTouchEnd?: () => void
+  handleWheel?: (e: React.WheelEvent<HTMLDivElement | SVGSVGElement>) => void
+  zoomIn?: () => void
+  zoomOut?: () => void
+  resetView?: () => void
+  centerOnPoint?: (x: number, y: number, targetScale?: number) => void
   meshNodePingMs?: number
   /** Declared line-haul speed used by the simulated fleet layer (KM/H). */
   simSpeedKmh?: number
 }
 
-/* ── Simulated fleet geometry helpers ──────────────────────────────────
-   realLandPath is a polyline of absolute M/L commands on the 1000x500
-   canvas. The helpers below parse it deterministically (no DOM APIs) so
-   trucks can be interpolated along the declared route at the declared
-   speed. Trucks are a simulation layer, never a live feed. */
-
-interface MapPoint {
-  x: number
-  y: number
-}
-
-function parsePathPolyline(d: string): MapPoint[] {
-  const points: MapPoint[] = []
-  // Command + first coordinate pair, plus an optional second pair (Q endpoint).
-  const tokenRe = /([MLQ])\s*([-0-9.]+)[,\s]+([-0-9.]+)(?:\s+([-0-9.]+)[,\s]+([-0-9.]+))?/g
-  let match: RegExpExecArray | null
-  let cursor: MapPoint | null = null
-  while ((match = tokenRe.exec(d)) !== null) {
-    const command = match[1]
-    const x = Number(match[2])
-    const y = Number(match[3])
-    if (command === 'M') {
-      cursor = { x, y }
-      points.push({ x, y })
-    } else if (command === 'L' && cursor) {
-      cursor = { x, y }
-      points.push({ x, y })
-    } else if (command === 'Q' && cursor) {
-      // Quadratic: (x,y) is the control point; second pair is the endpoint.
-      const endX = Number(match[4])
-      const endY = Number(match[5])
-      const start = points[points.length - 1]
-      for (let i = 1; i <= 10; i++) {
-        const t = i / 10
-        const mt = 1 - t
-        const px = mt * mt * start.x + 2 * mt * t * x + t * t * endX
-        const py = mt * mt * start.y + 2 * mt * t * y + t * t * endY
-        points.push({ x: px, y: py })
-      }
-      cursor = points[points.length - 1]
-    }
-  }
-  return points
-}
-
-function buildPathMetrics(points: MapPoint[]): {
-  lengths: number[]
-  total: number
-} {
-  const lengths: number[] = [0]
-  let total = 0
-  for (let i = 1; i < points.length; i++) {
-    const dx = points[i].x - points[i - 1].x
-    const dy = points[i].y - points[i - 1].y
-    total += Math.sqrt(dx * dx + dy * dy)
-    lengths.push(total)
-  }
-  return { lengths, total }
-}
-
-function pointAlongPath(
-  points: MapPoint[],
-  lengths: number[],
-  total: number,
-  distance: number,
-): { x: number; y: number; angleDeg: number } {
-  if (total <= 0 || points.length < 2) {
-    const p = points[0] || { x: 500, y: 250 }
-    return { ...p, angleDeg: 0 }
-  }
-  const d = ((distance % total) + total) % total
-  let i = 1
-  while (i < lengths.length && lengths[i] < d) i += 1
-  const segStart = lengths[i - 1]
-  const segEnd = lengths[i]
-  const segLen = Math.max(0.0001, segEnd - segStart)
-  const t = Math.min(1, Math.max(0, (d - segStart) / segLen))
-  const a = points[i - 1]
-  const b = points[i]
-  const x = a.x + (b.x - a.x) * t
-  const y = a.y + (b.y - a.y) * t
-  const angleDeg = (Math.atan2(b.y - a.y, b.x - a.x) * 180) / Math.PI
-  return { x, y, angleDeg }
-}
-
-// LEO satellite constellation simulation coordinates
-const LEO_SATELLITES = [
-  { id: 'leo-alpha-1', name: 'LEO-01 (GEO-SYNC)', lat: 34.0, lon: 45.0, alt: '540 KM', band: 'Ka-band LEO' },
-  { id: 'leo-alpha-2', name: 'LEO-02 (POLAR-APEX)', lat: 58.0, lon: -20.0, alt: '560 KM', band: 'Optical Mesh' },
-  { id: 'leo-alpha-3', name: 'LEO-03 (PACIFIC-RELAY)', lat: 18.0, lon: 140.0, alt: '530 KM', band: 'Ka-band LEO' },
-  { id: 'leo-alpha-4', name: 'LEO-04 (INDIAN-OCEAN)', lat: -5.0, lon: 75.0, alt: '550 KM', band: 'Laser ISL' },
+/* ── Egypt & Arabian Gulf Strategic Geographic Bounding Box ────────── */
+const EGYPT_GULF_BOUNDS: [[number, number], [number, number]] = [
+  [23.5, 14.0], // Southwest: Southern Egypt / Red Sea
+  [56.5, 33.5], // Northeast: Arabian Gulf / Kuwait / Iraq border
 ]
+const EGYPT_GULF_CENTER: [number, number] = [38.5, 25.0]
+
+/* ── Tile Sources Configuration for MapLibre ───────────────────────── */
+function getMapLibreStyle(mode: MapLayerMode): maplibregl.StyleSpecification {
+  const tileUrls: Record<MapLayerMode, string[]> = {
+    'vector-dark': [
+      'https://a.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}@2x.png',
+      'https://b.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}@2x.png',
+      'https://c.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}@2x.png',
+    ],
+    satellite: [
+      'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+    ],
+    'vector-arterial': [
+      'https://a.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}@2x.png',
+      'https://b.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}@2x.png',
+      'https://c.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}@2x.png',
+    ],
+  }
+
+  return {
+    version: 8,
+    sources: {
+      'base-raster-tiles': {
+        type: 'raster',
+        tiles: tileUrls[mode],
+        tileSize: 256,
+        attribution: '© CartoDB, © OpenStreetMap, © Esri',
+      },
+    },
+    layers: [
+      {
+        id: 'base-raster-layer',
+        type: 'raster',
+        source: 'base-raster-tiles',
+        minzoom: 0,
+        maxzoom: 20,
+      },
+    ],
+  }
+}
+
+/* ── Distance & Position Interpolator for Simulated Fleet ───────────── */
+function getGeoDistance(c1: [number, number], c2: [number, number]) {
+  const dx = (c2[0] - c1[0]) * Math.cos(((c1[1] + c2[1]) / 2) * (Math.PI / 180))
+  const dy = c2[1] - c1[1]
+  return Math.sqrt(dx * dx + dy * dy)
+}
+
+function interpolatePositionAndBearing(
+  coords: [number, number][],
+  progress: number
+): { pos: [number, number]; bearing: number } {
+  if (!coords || coords.length === 0) return { pos: EGYPT_GULF_CENTER, bearing: 0 }
+  if (coords.length === 1) return { pos: coords[0], bearing: 0 }
+
+  const segmentLengths: number[] = []
+  let totalLength = 0
+  for (let i = 0; i < coords.length - 1; i++) {
+    const d = getGeoDistance(coords[i], coords[i + 1])
+    segmentLengths.push(d)
+    totalLength += d
+  }
+
+  if (totalLength === 0) return { pos: coords[0], bearing: 0 }
+
+  const targetDist = ((progress % 1) + 1) % 1 * totalLength
+  let accumulated = 0
+
+  for (let i = 0; i < segmentLengths.length; i++) {
+    const segLen = segmentLengths[i]
+    if (accumulated + segLen >= targetDist || i === segmentLengths.length - 1) {
+      const segT = segLen > 0 ? (targetDist - accumulated) / segLen : 0
+      const clampedT = Math.max(0, Math.min(1, segT))
+      const p1 = coords[i]
+      const p2 = coords[i + 1]
+      const lng = p1[0] + (p2[0] - p1[0]) * clampedT
+      const lat = p1[1] + (p2[1] - p1[1]) * clampedT
+
+      const dLng = p2[0] - p1[0]
+      const dLat = p2[1] - p1[1]
+      const rad = Math.atan2(dLng, dLat)
+      const bearing = (rad * 180) / Math.PI
+
+      return { pos: [lng, lat], bearing }
+    }
+    accumulated += segLen
+  }
+
+  return { pos: coords[coords.length - 1], bearing: 0 }
+}
+
+function fitToCorridor(
+  map: maplibregl.Map,
+  coords: [number, number][],
+  reducedMotion: boolean
+) {
+  if (!coords || coords.length === 0) return
+
+  let minLng = coords[0][0]
+  let maxLng = coords[0][0]
+  let minLat = coords[0][1]
+  let maxLat = coords[0][1]
+
+  coords.forEach(([lng, lat]) => {
+    if (lng < minLng) minLng = lng
+    if (lng > maxLng) maxLng = lng
+    if (lat < minLat) minLat = lat
+    if (lat > maxLat) maxLat = lat
+  })
+
+  map.fitBounds(
+    [
+      [minLng, minLat],
+      [maxLng, maxLat],
+    ],
+    {
+      padding: { top: 80, bottom: 80, left: 60, right: 60 },
+      maxZoom: 8.5,
+      duration: reducedMotion ? 0 : 850,
+    }
+  )
+}
 
 export function HighQualityRealMap({
   activeCorridor,
-  selectedModeId,
   trafficLightState,
   showHeatmap,
   setShowHeatmap,
@@ -169,220 +205,538 @@ export function HighQualityRealMap({
   isRTL,
   selectedWaypointNode,
   setSelectedWaypointNode,
-  transform,
-  isDragging,
-  handleMouseDown,
-  handleMouseMove,
-  handleMouseUp,
-  handleTouchStart,
-  handleTouchMove,
-  handleTouchEnd,
-  handleWheel,
-  zoomIn,
-  zoomOut,
-  resetView,
-  centerOnPoint,
   meshNodePingMs = 0.4,
-  simSpeedKmh = 80,
+  simSpeedKmh = 72,
 }: HighQualityRealMapProps) {
-  // Map Layer Engine state
-  const [mapLayerMode, setMapLayerMode] = useState<MapLayerMode>('satellite')
+  const { prefersReducedMotion } = useAccessibleMotion()
+  const mapContainerRef = useRef<HTMLDivElement>(null)
+  const mapRef = useRef<maplibregl.Map | null>(null)
+  const isLoadedRef = useRef<boolean>(false)
+
+  // Map Modes & Overlay Toggles
+  const [mapLayerMode, setMapLayerMode] = useState<MapLayerMode>('vector-dark')
   const [showHighways, setShowHighways] = useState<boolean>(true)
-  const [showSatellites, setShowSatellites] = useState<boolean>(true)
+  const [showSatellites, setShowSatellites] = useState<boolean>(false)
   const [showHubs, setShowHubs] = useState<boolean>(true)
   const [showWeighStations, setShowWeighStations] = useState<boolean>(true)
   const [showRestStops, setShowRestStops] = useState<boolean>(true)
   const [showBorderGates, setShowBorderGates] = useState<boolean>(true)
   const [showSimulatedFleet, setShowSimulatedFleet] = useState<boolean>(true)
-  const [simClockSec, setSimClockSec] = useState<number>(0)
 
-  // Simulation Controls & Fleet Tracker state
-  const [isPlaying, setIsPlaying] = useState<boolean>(true)
-  const [playbackSpeed, setPlaybackSpeed] = useState<number>(1)
-  const [fleetProgress, setFleetProgress] = useState<number>(0.35) // 0 to 1 along the path
+  // Interactive Hub Popover State
   const [selectedHub, setSelectedHub] = useState<GlobalHubPin | null>(null)
 
-  // Track path element for real-time SVG coordinate projection
-  const pathRef = useRef<SVGPathElement | null>(null)
+  // Fleet Simulation Animation State
+  const [fleetProgress, setFleetProgress] = useState<number>(0.38)
+  const [isPlaying, setIsPlaying] = useState<boolean>(true)
+  const [playbackSpeed, setPlaybackSpeed] = useState<number>(1)
 
-  // Animation Loop for Moving Vehicle
-  useEffect(() => {
-    let animationFrameId: number
-    let lastTime = performance.now()
+  // Markers references for cleanup
+  const hubMarkersRef = useRef<maplibregl.Marker[]>([])
+  const waypointMarkersRef = useRef<maplibregl.Marker[]>([])
+  const fleetMarkerRef = useRef<maplibregl.Marker | null>(null)
+  const truckIconElRef = useRef<HTMLDivElement | null>(null)
 
-    const animate = (time: number) => {
-      const delta = (time - lastTime) / 1000
-      lastTime = time
+  // Active corridor line coordinates: [origin, ...waypoints, destination]
+  const activeCorridorCoords = useMemo<[number, number][]>(() => {
+    const coords: [number, number][] = [activeCorridor.originGps]
+    if (activeCorridor.detailedWaypoints && activeCorridor.detailedWaypoints.length > 0) {
+      activeCorridor.detailedWaypoints.forEach((wp) => {
+        coords.push(wp.gps)
+      })
+    }
+    coords.push(activeCorridor.destinationGps)
+    return coords
+  }, [activeCorridor])
 
-      if (isPlaying) {
-        setFleetProgress((prev) => {
-          const speedFactor = 0.04 * playbackSpeed * delta
-          let next = prev + speedFactor
-          if (next > 1) next = 0
-          return next
+  /* ── 3. GeoJSON Sources & Layers Configuration ──────────────────── */
+  const setupGeoJsonLayers = useCallback(
+    (map: maplibregl.Map) => {
+      // 1. All Network Corridors
+      const networkGeoJson = {
+        type: 'FeatureCollection' as const,
+        features: LAND_TRADE_CORRIDORS.map((c) => {
+          const coords: [number, number][] = [c.originGps]
+          if (c.detailedWaypoints) {
+            c.detailedWaypoints.forEach((w) => coords.push(w.gps))
+          }
+          coords.push(c.destinationGps)
+          return {
+            type: 'Feature' as const,
+            properties: { id: c.id, code: c.code },
+            geometry: {
+              type: 'LineString' as const,
+              coordinates: coords,
+            },
+          }
+        }),
+      }
+
+      if (!map.getSource('corridors-network')) {
+        map.addSource('corridors-network', {
+          type: 'geojson',
+          data: networkGeoJson,
+        })
+
+        map.addLayer({
+          id: 'corridors-network-line',
+          type: 'line',
+          source: 'corridors-network',
+          layout: {
+            'line-join': 'round',
+            'line-cap': 'round',
+            visibility: showHighways ? 'visible' : 'none',
+          },
+          paint: {
+            'line-color': '#E8B317',
+            'line-width': 1.8,
+            'line-opacity': 0.3,
+            'line-dasharray': [3, 2],
+          },
         })
       }
 
-      animationFrameId = requestAnimationFrame(animate)
-    }
+      // 2. Active Corridor Line
+      const activeGeoJson = {
+        type: 'FeatureCollection' as const,
+        features: [
+          {
+            type: 'Feature' as const,
+            properties: { id: activeCorridor.id },
+            geometry: {
+              type: 'LineString' as const,
+              coordinates: activeCorridorCoords,
+            },
+          },
+        ],
+      }
 
-    animationFrameId = requestAnimationFrame(animate)
-    return () => cancelAnimationFrame(animationFrameId)
-  }, [isPlaying, playbackSpeed])
+      if (!map.getSource('active-corridor')) {
+        map.addSource('active-corridor', {
+          type: 'geojson',
+          data: activeGeoJson,
+        })
 
-  // Compute vehicle position directly from fleetProgress and activeCorridor coordinates
-  const vehiclePos = useMemo(() => {
-    const start = projectGeo(activeCorridor.originGps)
-    const end = projectGeo(activeCorridor.destinationGps)
-    const currX = start[0] + (end[0] - start[0]) * fleetProgress
-    const currY = start[1] + (end[1] - start[1]) * fleetProgress
-    const angle = Math.atan2(end[1] - start[1], end[0] - start[0]) * (180 / Math.PI)
-    return { x: currX, y: currY, angle }
-  }, [fleetProgress, activeCorridor])
+        // Glowing outer casing
+        map.addLayer({
+          id: 'active-corridor-glow',
+          type: 'line',
+          source: 'active-corridor',
+          layout: {
+            'line-join': 'round',
+            'line-cap': 'round',
+          },
+          paint: {
+            'line-color': '#E8B317',
+            'line-width': 9,
+            'line-opacity': 0.35,
+            'line-blur': 4,
+          },
+        })
 
-  // Trajectory Path based on land modality
-  const activeTrajectoryPath = useMemo(() => {
-    return activeCorridor.realLandPath || activeCorridor.landBurntOrangeHighwayPath || activeCorridor.landForestGreenRailPath || activeCorridor.predictivePath
-  }, [activeCorridor])
+        // Core line
+        map.addLayer({
+          id: 'active-corridor-core',
+          type: 'line',
+          source: 'active-corridor',
+          layout: {
+            'line-join': 'round',
+            'line-cap': 'round',
+          },
+          paint: {
+            'line-color': '#E8B317',
+            'line-width': 3.5,
+            'line-opacity': 0.95,
+          },
+        })
+      } else {
+        const src = map.getSource('active-corridor') as maplibregl.GeoJSONSource
+        src.setData(activeGeoJson)
+      }
 
-  const originPixels = useMemo(() => projectGeo(activeCorridor.originGps), [activeCorridor])
-  const destPixels = useMemo(() => projectGeo(activeCorridor.destinationGps), [activeCorridor])
-  const chokepointPixels = useMemo(() => projectGeo(activeCorridor.chokepointGps), [activeCorridor])
+      // 3. Logistics Density Heatmap Source
+      const heatmapPoints = {
+        type: 'FeatureCollection' as const,
+        features: INLAND_LOGISTICS_HUBS.map((hub) => ({
+          type: 'Feature' as const,
+          properties: { weight: 1.0 },
+          geometry: { type: 'Point' as const, coordinates: hub.gps },
+        })),
+      }
 
-  // Simulated fleet clock — advances only while the fleet layer is on and
-  // the sim is playing; pauses when the tab is hidden (no invisible rAF).
-  useEffect(() => {
-    if (!showSimulatedFleet || !isPlaying) return
-    let raf = 0
-    const t0 = performance.now()
-    const loop = (now: number) => {
-      if (!document.hidden) setSimClockSec((now - t0) / 1000)
-      raf = requestAnimationFrame(loop)
-    }
-    raf = requestAnimationFrame(loop)
-    return () => cancelAnimationFrame(raf)
-  }, [showSimulatedFleet, isPlaying, activeCorridor])
+      if (!map.getSource('corridor-density')) {
+        map.addSource('corridor-density', {
+          type: 'geojson',
+          data: heatmapPoints,
+        })
 
-  /* ── Declared-point layers (weigh / rest / border) ────────────────── */
-  const noWeatherFallback = useMemo(
-    () => ({ en: 'No weather feed — model marker', ar: 'لا توجد بيانات طقس — علامة نموذج' }),
-    [],
-  )
-
-  const markerFromGps = useCallback(
-    (gps: [number, number], fallbackName: string): WaypointDetail => {
-      const wp = activeCorridor.detailedWaypoints.find(
-        (d) => Math.abs(d.gps[0] - gps[0]) < 0.05 && Math.abs(d.gps[1] - gps[1]) < 0.05,
-      )
-      if (wp) return wp
-      return {
-        name: fallbackName,
-        coordinates: projectGeo(gps),
-        gps,
-        status: 'MODEL_POINT',
-        weather: noWeatherFallback,
-        throughputIndex: '—',
-        avgClearanceTime: 'DECLARED STOP (MODELLED)',
+        map.addLayer({
+          id: 'corridor-heatmap-layer',
+          type: 'heatmap',
+          source: 'corridor-density',
+          layout: {
+            visibility: showHeatmap ? 'visible' : 'none',
+          },
+          paint: {
+            'heatmap-weight': 1,
+            'heatmap-intensity': 1.5,
+            'heatmap-radius': 35,
+            'heatmap-opacity': 0.75,
+            'heatmap-color': [
+              'interpolate',
+              ['linear'],
+              ['heatmap-density'],
+              0,
+              'rgba(232, 179, 23, 0)',
+              0.2,
+              'rgba(232, 179, 23, 0.25)',
+              0.5,
+              'rgba(245, 158, 11, 0.6)',
+              0.8,
+              'rgba(239, 68, 68, 0.8)',
+              1,
+              'rgba(239, 68, 68, 0.95)',
+            ],
+          },
+        })
       }
     },
-    [activeCorridor.detailedWaypoints, noWeatherFallback],
+    [activeCorridor, activeCorridorCoords, showHighways, showHeatmap]
   )
 
-  const weighStationMarkers = useMemo(() => {
-    const markers: WaypointDetail[] = []
-    const seen = new Set<string>()
-    const push = (gps: [number, number], fallbackName: string) => {
-      const key = `${gps[0].toFixed(2)},${gps[1].toFixed(2)}`
-      if (seen.has(key)) return
-      seen.add(key)
-      markers.push(markerFromGps(gps, fallbackName))
+
+
+
+  /* ── 1. Initialize MapLibre GL Instance ─────────────────────────── */
+  useEffect(() => {
+    if (!mapContainerRef.current) return
+
+    const initialStyle = getMapLibreStyle(mapLayerMode)
+
+    const map = new maplibregl.Map({
+      container: mapContainerRef.current,
+      style: initialStyle,
+      center: EGYPT_GULF_CENTER,
+      zoom: 5.0,
+      minZoom: 3.5,
+      maxZoom: 14,
+      pitch: 20,
+      attributionControl: false,
+    })
+
+    mapRef.current = map
+
+    map.on('load', () => {
+      isLoadedRef.current = true
+      setupGeoJsonLayers(map)
+      fitToCorridor(map, activeCorridorCoords, prefersReducedMotion)
+    })
+
+    return () => {
+      isLoadedRef.current = false
+      map.remove()
+      mapRef.current = null
     }
-    // corridor.weighbridgeGps is the declared overload-risk concentration point
-    push(activeCorridor.weighbridgeGps, 'Corridor Weighbridge (declared)')
-    // plus any additional weighbridge waypoints declared on the route
-    for (const wp of activeCorridor.detailedWaypoints) {
-      if (wp.status.includes('WEIGHBRIDGE')) push(wp.gps, wp.name)
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
+  /* ── 2. Handle Layer Mode Switch (Carto Dark / Satellite / Voyager) ─ */
+  useEffect(() => {
+    const map = mapRef.current
+    if (!map) return
+
+    const newStyle = getMapLibreStyle(mapLayerMode)
+    map.setStyle(newStyle)
+
+    map.once('style.load', () => {
+      setupGeoJsonLayers(map)
+    })
+  }, [mapLayerMode]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Update active corridor GeoJSON and zoom when activeCorridor changes
+  useEffect(() => {
+    const map = mapRef.current
+    if (!map || !isLoadedRef.current) return
+
+    const src = map.getSource('active-corridor') as maplibregl.GeoJSONSource | undefined
+    if (src) {
+      src.setData({
+        type: 'FeatureCollection',
+        features: [
+          {
+            type: 'Feature',
+            properties: { id: activeCorridor.id },
+            geometry: {
+              type: 'LineString',
+              coordinates: activeCorridorCoords,
+            },
+          },
+        ],
+      })
     }
-    return markers
-  }, [activeCorridor, markerFromGps])
 
-  const restStopMarkers = useMemo(
-    () =>
-      activeCorridor.detailedWaypoints.filter(
-        (wp) => wp.status.includes('REST') || /rest/i.test(wp.name),
-      ),
-    [activeCorridor],
-  )
+    fitToCorridor(map, activeCorridorCoords, prefersReducedMotion)
+  }, [activeCorridor, activeCorridorCoords, prefersReducedMotion])
 
-  const borderGateMarkers = useMemo(
-    () =>
-      activeCorridor.detailedWaypoints.filter(
-        (wp) => wp.status.includes('BORDER') || wp.status.includes('FERRY'),
-      ),
-    [activeCorridor],
-  )
-
-  /* ── Simulated fleet layer ────────────────────────────────────────── */
-  const fleetRoutePoints = useMemo(
-    () =>
-      parsePathPolyline(
-        activeCorridor.realLandPath ||
-          activeCorridor.landBurntOrangeHighwayPath ||
-          activeCorridor.predictivePath,
-      ),
-    [activeCorridor],
-  )
-  const fleetRouteMetrics = useMemo(
-    () => buildPathMetrics(fleetRoutePoints),
-    [fleetRoutePoints],
-  )
-
-  const fleetTrucks = useMemo(() => {
-    if (!showSimulatedFleet) return []
-    const { total, lengths } = fleetRouteMetrics
-    if (total <= 0) return []
-    const pxPerKm = total / Math.max(1, activeCorridor.distanceKm)
-    // Declared speed of the chosen mode, mapped onto canvas pixels.
-    const pxPerSecond = (simSpeedKmh * pxPerKm) / 3600
-    // Spread trucks along the projected route without stacking on short
-    // segments (Dammam–Riyadh is ~12 px on the world canvas).
-    const truckCount = Math.min(5, Math.max(2, Math.floor(total / 18)))
-    const trucks: { x: number; y: number; angleDeg: number }[] = []
-    for (let i = 0; i < truckCount; i++) {
-      const phase = (i / truckCount) * total
-      const distance = (simClockSec * pxPerSecond + phase) % total
-      const p = pointAlongPath(fleetRoutePoints, lengths, total, distance)
-      trucks.push({ x: p.x, y: p.y, angleDeg: p.angleDeg })
+  // Update Heatmap visibility
+  useEffect(() => {
+    const map = mapRef.current
+    if (!map || !isLoadedRef.current) return
+    if (map.getLayer('corridor-heatmap-layer')) {
+      map.setLayoutProperty(
+        'corridor-heatmap-layer',
+        'visibility',
+        showHeatmap ? 'visible' : 'none'
+      )
     }
-    return trucks
-  }, [showSimulatedFleet, fleetRouteMetrics, fleetRoutePoints, activeCorridor.distanceKm, simSpeedKmh, simClockSec])
+  }, [showHeatmap])
 
-  const openMarkerPopover = useCallback(
-    (wp: WaypointDetail) => {
-      setSelectedWaypointNode(wp)
-      const [x, y] = projectGeo(wp.gps)
-      centerOnPoint(x, y, 3.0)
-    },
-    [setSelectedWaypointNode, centerOnPoint],
-  )
+  // Update Highways visibility
+  useEffect(() => {
+    const map = mapRef.current
+    if (!map || !isLoadedRef.current) return
+    if (map.getLayer('corridors-network-line')) {
+      map.setLayoutProperty(
+        'corridors-network-line',
+        'visibility',
+        showHighways ? 'visible' : 'none'
+      )
+    }
+  }, [showHighways])
+
+  /* ── 5. Render 14 Inland Logistics Hubs Markers ─────────────────── */
+  useEffect(() => {
+    const map = mapRef.current
+    if (!map) return
+
+    // Clear old hub markers
+    hubMarkersRef.current.forEach((m) => m.remove())
+    hubMarkersRef.current = []
+
+    if (!showHubs) return
+
+    INLAND_LOGISTICS_HUBS.forEach((hub) => {
+      const el = document.createElement('div')
+      el.className = 'group cursor-pointer transform -translate-x-1/2 -translate-y-1/2'
+      el.setAttribute('role', 'button')
+      el.setAttribute('tabindex', '0')
+      el.setAttribute('aria-label', hub.name[language])
+
+      // Icon & color styling based on hub type
+      const isDryPort = hub.type === 'dry-port'
+      const isBorder = hub.type === 'border-crossing'
+      const borderColor = isDryPort ? 'border-gold-400' : isBorder ? 'border-rose-400' : 'border-emerald-400'
+      const bgColor = isDryPort ? 'bg-gold-500/20' : isBorder ? 'bg-rose-500/20' : 'bg-emerald-500/20'
+      const textColor = isDryPort ? 'text-gold-300' : isBorder ? 'text-rose-300' : 'text-emerald-300'
+
+      el.innerHTML = `
+        <div class="relative flex items-center justify-center">
+          <span class="animate-ping absolute inline-flex h-7 w-7 rounded-full ${bgColor} opacity-60"></span>
+          <div class="relative flex items-center gap-1.5 px-2 py-1 rounded-xl bg-slate-900/95 border ${borderColor} ${textColor} text-[10.5px] font-mono font-bold shadow-xl backdrop-blur-md transition-transform duration-200 group-hover:scale-110">
+            <span class="w-1.5 h-1.5 rounded-full ${isDryPort ? 'bg-gold-400' : 'bg-emerald-400'}"></span>
+            <span class="truncate max-w-[120px] sm:max-w-[160px]">${hub.name[language]}</span>
+          </div>
+        </div>
+      `
+
+      el.addEventListener('click', (e) => {
+        e.stopPropagation()
+        setSelectedHub(hub)
+        map.flyTo({
+          center: hub.gps,
+          zoom: Math.max(map.getZoom(), 7.2),
+          duration: prefersReducedMotion ? 0 : 700,
+        })
+      })
+
+      const marker = new maplibregl.Marker({ element: el })
+        .setLngLat(hub.gps)
+        .addTo(map)
+
+      hubMarkersRef.current.push(marker)
+    })
+
+    return () => {
+      hubMarkersRef.current.forEach((m) => m.remove())
+      hubMarkersRef.current = []
+    }
+  }, [showHubs, language, prefersReducedMotion])
+
+  /* ── 6. Render Active Corridor Waypoints Markers ─────────────────── */
+  useEffect(() => {
+    const map = mapRef.current
+    if (!map) return
+
+    // Clear old waypoint markers
+    waypointMarkersRef.current.forEach((m) => m.remove())
+    waypointMarkersRef.current = []
+
+    if (!activeCorridor.detailedWaypoints) return
+
+    activeCorridor.detailedWaypoints.forEach((wp, idx) => {
+      const isOrigin = idx === 0
+      const isDest = idx === (activeCorridor.detailedWaypoints?.length ?? 1) - 1
+
+      const el = document.createElement('div')
+      el.className = 'cursor-pointer transform -translate-x-1/2 -translate-y-1/2 z-10'
+      el.setAttribute('role', 'button')
+      el.setAttribute('tabindex', '0')
+      el.setAttribute('aria-label', wp.name)
+
+      if (isOrigin) {
+        el.innerHTML = `
+          <div class="flex items-center gap-1 px-2 py-1 rounded-xl bg-slate-950/95 border border-emerald-400 text-emerald-300 font-mono text-[10px] font-black shadow-lg">
+            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+            <span>ORIGIN // ${wp.name}</span>
+          </div>
+        `
+      } else if (isDest) {
+        el.innerHTML = `
+          <div class="flex items-center gap-1 px-2 py-1 rounded-xl bg-slate-950/95 border border-gold-400 text-gold-300 font-mono text-[10px] font-black shadow-lg">
+            <span class="w-2 h-2 rounded-full bg-gold-400 animate-pulse"></span>
+            <span>DEST // ${wp.name}</span>
+          </div>
+        `
+      } else {
+        const isSelected = selectedWaypointNode?.name === wp.name
+        el.innerHTML = `
+          <div class="flex items-center gap-1 px-1.5 py-0.5 rounded-lg ${
+            isSelected ? 'bg-gold-500 text-slate-950 font-bold' : 'bg-slate-900/90 text-gold-400 border border-gold-500/30'
+          } font-mono text-[9px] shadow-md transition-all hover:scale-105">
+            <span class="w-1.5 h-1.5 rounded-full ${isSelected ? 'bg-slate-950' : 'bg-gold-400'}"></span>
+            <span>${wp.name}</span>
+          </div>
+        `
+      }
+
+      el.addEventListener('click', (e) => {
+        e.stopPropagation()
+        setSelectedWaypointNode(wp)
+        map.flyTo({
+          center: wp.gps,
+          zoom: Math.max(map.getZoom(), 8),
+          duration: prefersReducedMotion ? 0 : 650,
+        })
+      })
+
+      const marker = new maplibregl.Marker({ element: el })
+        .setLngLat(wp.gps)
+        .addTo(map)
+
+      waypointMarkersRef.current.push(marker)
+    })
+
+    return () => {
+      waypointMarkersRef.current.forEach((m) => m.remove())
+      waypointMarkersRef.current = []
+    }
+  }, [activeCorridor, selectedWaypointNode, prefersReducedMotion, setSelectedWaypointNode])
+
+  /* ── 7. Simulated Moving Fleet Truck Marker ───────────────────────── */
+  useEffect(() => {
+    const map = mapRef.current
+    if (!map) return
+
+    if (!showSimulatedFleet) {
+      if (fleetMarkerRef.current) {
+        fleetMarkerRef.current.remove()
+        fleetMarkerRef.current = null
+      }
+      return
+    }
+
+    if (!fleetMarkerRef.current) {
+      const el = document.createElement('div')
+      el.className = 'transform -translate-x-1/2 -translate-y-1/2 z-20 pointer-events-none'
+      el.innerHTML = `
+        <div class="relative flex items-center justify-center">
+          <span class="animate-ping absolute inline-flex h-9 w-9 rounded-full bg-gold-400/50"></span>
+          <div class="truck-icon-wrapper p-2 rounded-xl bg-gold-500 text-slate-950 shadow-[0_0_20px_rgba(232,179,23,0.6)] border border-white/50 transition-transform">
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"/>
+              <path d="M15 18H9"/>
+              <path d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.624l-3.48-4.35A1 1 0 0 0 17.52 8H14"/>
+              <circle cx="17" cy="18" r="2"/>
+              <circle cx="7" cy="18" r="2"/>
+            </svg>
+          </div>
+        </div>
+      `
+      truckIconElRef.current = el.querySelector('.truck-icon-wrapper')
+      fleetMarkerRef.current = new maplibregl.Marker({ element: el })
+        .setLngLat(activeCorridorCoords[0])
+        .addTo(map)
+    }
+
+    const { pos, bearing } = interpolatePositionAndBearing(
+      activeCorridorCoords,
+      fleetProgress
+    )
+
+    fleetMarkerRef.current.setLngLat(pos)
+    if (truckIconElRef.current) {
+      truckIconElRef.current.style.transform = `rotate(${bearing}deg)`
+    }
+  }, [showSimulatedFleet, activeCorridorCoords, fleetProgress])
+
+  /* ── 8. Playback Loop for Fleet Progress ─────────────────────────── */
+  useEffect(() => {
+    if (!isPlaying || !showSimulatedFleet || prefersReducedMotion) return
+
+    let lastTime = performance.now()
+    let frameId: number
+
+    const tick = (now: number) => {
+      const dt = (now - lastTime) / 1000
+      lastTime = now
+
+      // Real distance line speed simulation:
+      // total corridor distance / speed = hours to complete
+      const totalKm = Math.max(50, activeCorridor.distanceKm)
+      const hoursToComplete = totalKm / (simSpeedKmh * playbackSpeed)
+      const deltaProgress = (dt / (hoursToComplete * 3600)) * 150 // time-compressed simulation
+
+      setFleetProgress((prev) => (prev + deltaProgress) % 1)
+      frameId = requestAnimationFrame(tick)
+    }
+
+    frameId = requestAnimationFrame(tick)
+    return () => cancelAnimationFrame(frameId)
+  }, [isPlaying, showSimulatedFleet, prefersReducedMotion, activeCorridor.distanceKm, simSpeedKmh, playbackSpeed])
+
+  /* ── Camera Control Handlers ─────────────────────────────────────── */
+  const handleZoomIn = () => {
+    mapRef.current?.zoomIn({ duration: prefersReducedMotion ? 0 : 350 })
+  }
+
+  const handleZoomOut = () => {
+    mapRef.current?.zoomOut({ duration: prefersReducedMotion ? 0 : 350 })
+  }
+
+  const handleResetView = () => {
+    if (mapRef.current) {
+      mapRef.current.fitBounds(EGYPT_GULF_BOUNDS, {
+        padding: 50,
+        duration: prefersReducedMotion ? 0 : 800,
+      })
+    }
+  }
 
   return (
     <div
       className={`relative w-full rounded-3xl overflow-hidden backdrop-blur-3xl border transition-all duration-500 shadow-2xl flex flex-col ${
         isFullscreen
           ? 'fixed inset-0 z-[100] w-screen h-screen rounded-none p-4 sm:p-8 bg-slate-950/98 backdrop-blur-3xl'
-          : 'border-cyan-500/30 bg-slate-950/95 min-h-[580px]'
+          : 'border-gold-500/30 bg-slate-950/95 min-h-[580px]'
       }`}
     >
       {/* Top Professional Mission Control HUD Bar */}
       <div className="flex flex-wrap items-center justify-between gap-3 p-3.5 sm:p-4 bg-slate-900/90 border-b border-white/10 rounded-t-2xl z-20">
-        
         {/* Left: Map Mode Badges & Corridor Identifier */}
         <div className="flex items-center gap-2.5">
-          <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 font-mono text-[11px] font-semibold tracking-wider shadow-[0_0_15px_rgba(6,182,212,0.15)]">
+          <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-gold-500/10 border border-gold-500/30 text-gold-300 font-mono text-[11px] font-semibold tracking-wider shadow-[0_0_15px_rgba(232,179,23,0.15)]">
             <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75" />
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-cyan-400 shadow-[0_0_8px_#06b6d4]" />
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-gold-400 opacity-75" />
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-gold-400 shadow-[0_0_8px_#E8B317]" />
             </span>
             <span>LAND DIGITAL TWIN // {activeCorridor.code}</span>
           </div>
@@ -412,7 +766,7 @@ export function HighQualityRealMap({
             onClick={() => setMapLayerMode('vector-dark')}
             className={`px-3 py-1 rounded-lg text-xs font-mono font-bold transition-all flex items-center gap-1.5 ${
               mapLayerMode === 'vector-dark'
-                ? 'bg-cyan-500 text-slate-950 shadow-md'
+                ? 'bg-gold-500 text-slate-950 shadow-md'
                 : 'text-slate-400 hover:text-slate-200'
             }`}
           >
@@ -441,6 +795,7 @@ export function HighQualityRealMap({
           <button
             onClick={() => setShowHighways(!showHighways)}
             title="Toggle Arterial Highway Corridors"
+            aria-label="Toggle Arterial Highway Corridors"
             className={`p-2 rounded-xl text-xs font-mono border transition-all flex items-center gap-1 ${
               showHighways
                 ? 'bg-amber-500/20 text-amber-300 border-amber-500/40'
@@ -454,6 +809,7 @@ export function HighQualityRealMap({
           <button
             onClick={() => setShowSatellites(!showSatellites)}
             title="Toggle LEO Satellites"
+            aria-label="Toggle LEO Satellites"
             className={`p-2 rounded-xl text-xs font-mono border transition-all flex items-center gap-1 ${
               showSatellites
                 ? 'bg-purple-500/20 text-purple-300 border-purple-500/40'
@@ -467,9 +823,10 @@ export function HighQualityRealMap({
           <button
             onClick={() => setShowHubs(!showHubs)}
             title="Toggle Inland Logistics Hubs & Dry Ports"
+            aria-label="Toggle Inland Logistics Hubs & Dry Ports"
             className={`p-2 rounded-xl text-xs font-mono border transition-all flex items-center gap-1 ${
               showHubs
-                ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
+                ? 'bg-gold-500/20 text-gold-300 border-gold-500/40'
                 : 'bg-white/5 text-slate-400 border-white/10 hover:text-white'
             }`}
           >
@@ -480,6 +837,7 @@ export function HighQualityRealMap({
           <button
             onClick={() => setShowHeatmap(!showHeatmap)}
             title="Toggle Density Heatmap"
+            aria-label="Toggle Density Heatmap"
             className={`p-2 rounded-xl text-xs font-mono border transition-all flex items-center gap-1 ${
               showHeatmap
                 ? 'bg-rose-500/20 text-rose-300 border-rose-500/40'
@@ -493,6 +851,7 @@ export function HighQualityRealMap({
           <button
             onClick={() => setShowWeighStations(!showWeighStations)}
             title="Toggle Declared Weigh Stations"
+            aria-label="Toggle Declared Weigh Stations"
             className={`p-2 rounded-xl text-xs font-mono border transition-all flex items-center gap-1 ${
               showWeighStations
                 ? 'bg-amber-500/20 text-amber-300 border-amber-500/40'
@@ -506,6 +865,7 @@ export function HighQualityRealMap({
           <button
             onClick={() => setShowRestStops(!showRestStops)}
             title="Toggle Rest & Driver-Hours Stops"
+            aria-label="Toggle Rest & Driver-Hours Stops"
             className={`p-2 rounded-xl text-xs font-mono border transition-all flex items-center gap-1 ${
               showRestStops
                 ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
@@ -519,6 +879,7 @@ export function HighQualityRealMap({
           <button
             onClick={() => setShowBorderGates(!showBorderGates)}
             title="Toggle Border Crossings & Clearance Windows"
+            aria-label="Toggle Border Crossings & Clearance Windows"
             className={`p-2 rounded-xl text-xs font-mono border transition-all flex items-center gap-1 ${
               showBorderGates
                 ? 'bg-rose-500/20 text-rose-300 border-rose-500/40'
@@ -532,9 +893,10 @@ export function HighQualityRealMap({
           <button
             onClick={() => setShowSimulatedFleet(!showSimulatedFleet)}
             title="Toggle Simulated Fleet (not a live feed)"
+            aria-label="Toggle Simulated Fleet (not a live feed)"
             className={`p-2 rounded-xl text-xs font-mono border transition-all flex items-center gap-1 ${
               showSimulatedFleet
-                ? 'bg-sky-500/20 text-sky-300 border-sky-500/40'
+                ? 'bg-gold-500/20 text-gold-300 border-gold-500/40'
                 : 'bg-white/5 text-slate-400 border-white/10 hover:text-white'
             }`}
           >
@@ -545,558 +907,17 @@ export function HighQualityRealMap({
           <button
             onClick={() => setIsFullscreen(!isFullscreen)}
             title={isFullscreen ? 'Exit Fullscreen' : 'Fullscreen'}
+            aria-label={isFullscreen ? 'Exit Fullscreen' : 'Fullscreen'}
             className="p-2 rounded-xl text-xs font-mono border bg-white/5 text-slate-300 border-white/10 hover:text-white hover:bg-white/10 transition-all"
           >
             {isFullscreen ? <Minimize2 className="w-3.5 h-3.5" /> : <Maximize2 className="w-3.5 h-3.5" />}
           </button>
         </div>
-
       </div>
 
-      {/* Main Interactive Geographic Canvas Wrapper */}
-      <div
-        className={`relative flex-1 w-full h-full min-h-[480px] bg-slate-950 overflow-hidden select-none ${
-          isDragging ? 'cursor-grabbing' : 'cursor-grab'
-        }`}
-        onMouseDown={handleMouseDown}
-        onMouseMove={handleMouseMove}
-        onMouseUp={handleMouseUp}
-        onTouchStart={handleTouchStart}
-        onTouchMove={handleTouchMove}
-        onTouchEnd={handleTouchEnd}
-        onWheel={handleWheel}
-      >
-        {/* Real Dynamic SVG Cartographic & Satellite Map Engine */}
-        <svg
-          viewBox="0 0 1000 500"
-          className="w-full h-full object-contain pointer-events-auto"
-          preserveAspectRatio="xMidYMid slice"
-        >
-          <defs>
-            {/* Real Photorealistic Satellite Ocean Gradient */}
-            <radialGradient id="satellite-ocean-grad" cx="50%" cy="40%" r="70%">
-              <stop offset="0%" stopColor="#0c2238" />
-              <stop offset="45%" stopColor="#071728" />
-              <stop offset="85%" stopColor="#030b14" />
-              <stop offset="100%" stopColor="#01050a" />
-            </radialGradient>
-
-            {/* Glowing Effects */}
-            <filter id="hq-glow-cyan" x="-30%" y="-30%" width="160%" height="160%">
-              <feGaussianBlur stdDeviation="3.5" result="blur" />
-              <feMerge>
-                <feMergeNode in="blur" />
-                <feMergeNode in="SourceGraphic" />
-              </feMerge>
-            </filter>
-
-            <filter id="hq-glow-emerald" x="-30%" y="-30%" width="160%" height="160%">
-              <feGaussianBlur stdDeviation="3" result="blur" />
-              <feMerge>
-                <feMergeNode in="blur" />
-                <feMergeNode in="SourceGraphic" />
-              </feMerge>
-            </filter>
-
-            <filter id="hq-glow-gold" x="-30%" y="-30%" width="160%" height="160%">
-              <feGaussianBlur stdDeviation="3.5" result="blur" />
-              <feMerge>
-                <feMergeNode in="blur" />
-                <feMergeNode in="SourceGraphic" />
-              </feMerge>
-            </filter>
-
-            {/* Dynamic Active Corridor Gradient */}
-            <linearGradient id="active-pulse-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" stopColor="#06b6d4" />
-              <stop offset="50%" stopColor="#38bdf8" />
-              <stop offset="100%" stopColor="#10b981" />
-            </linearGradient>
-
-            {/* Tactical Grid Pattern */}
-            <pattern id="tactical-grid-pattern" width="40" height="40" patternUnits="userSpaceOnUse">
-              <path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(6,182,212,0.07)" strokeWidth="0.8" />
-              <circle cx="20" cy="20" r="0.8" fill="rgba(6,182,212,0.2)" />
-            </pattern>
-
-            {/* Satellite Terrain Shading Texture Gradient */}
-            <radialGradient id="sat-land-relief" cx="55%" cy="30%" r="65%">
-              <stop offset="0%" stopColor="#1a3628" />
-              <stop offset="40%" stopColor="#12271e" />
-              <stop offset="85%" stopColor="#091813" />
-              <stop offset="100%" stopColor="#040e0b" />
-            </radialGradient>
-
-            {/* Night-Lights Illuminations Filter */}
-            <radialGradient id="city-night-light" cx="50%" cy="50%" r="50%">
-              <stop offset="0%" stopColor="rgba(253, 224, 71, 0.9)" />
-              <stop offset="40%" stopColor="rgba(251, 191, 36, 0.4)" />
-              <stop offset="100%" stopColor="rgba(245, 158, 11, 0)" />
-            </radialGradient>
-
-            {/* Heatmap Gradients */}
-            <radialGradient id="hq-heatmap-hot" cx="50%" cy="50%" r="50%">
-              <stop offset="0%" stopColor="rgba(239,68,68,0.45)" />
-              <stop offset="70%" stopColor="rgba(245,158,11,0.18)" />
-              <stop offset="100%" stopColor="rgba(239,68,68,0)" />
-            </radialGradient>
-            <radialGradient id="hq-heatmap-cold" cx="50%" cy="50%" r="50%">
-              <stop offset="0%" stopColor="rgba(56,189,248,0.4)" />
-              <stop offset="70%" stopColor="rgba(59,130,246,0.15)" />
-              <stop offset="100%" stopColor="rgba(59,130,246,0)" />
-            </radialGradient>
-          </defs>
-
-          {/* Transform Matrix Group with Smooth Pan and Inertial Zoom */}
-          <g
-            transform={`translate(${transform.x}, ${transform.y}) scale(${transform.scale})`}
-            style={{ transformOrigin: '500px 250px', willChange: 'transform' }}
-          >
-            {/* 1. Base Ocean & Relief Layer */}
-            <rect width="1000" height="500" fill="url(#satellite-ocean-grad)" />
-
-            {/* Tactical Grid Overlay */}
-            {mapLayerMode === 'vector-arterial' && (
-              <rect width="1000" height="500" fill="url(#tactical-grid-pattern)" />
-            )}
-
-            {/* 2. Geographic Graticules */}
-            <g stroke={mapLayerMode === 'satellite' ? 'rgba(56,189,248,0.12)' : 'rgba(6,182,212,0.15)'} strokeWidth="0.75" strokeDasharray="4 6">
-              <line x1="0" y1="65.3" x2="1000" y2="65.3" />
-              <line x1="0" y1="184.7" x2="1000" y2="184.7" />
-              <line x1="0" y1="250.0" x2="1000" y2="250.0" stroke="rgba(56,189,248,0.3)" strokeWidth="1.2" strokeDasharray="none" />
-              <line x1="0" y1="315.3" x2="1000" y2="315.3" />
-              <line x1="166.7" y1="0" x2="166.7" y2="500" />
-              <line x1="333.3" y1="0" x2="333.3" y2="500" />
-              <line x1="500.0" y1="0" x2="500.0" y2="500" stroke="rgba(56,189,248,0.3)" strokeWidth="1.2" strokeDasharray="none" />
-              <line x1="666.7" y1="0" x2="666.7" y2="500" />
-              <line x1="833.3" y1="0" x2="833.3" y2="500" />
-            </g>
-
-            {/* 3. Real High-Resolution Continents & Topography Geometry */}
-            <path
-              d={WORLD_LAND_SVG_PATH}
-              fill={
-                mapLayerMode === 'satellite'
-                  ? 'url(#sat-land-relief)'
-                  : mapLayerMode === 'vector-arterial'
-                    ? '#071628'
-                    : 'rgba(6,182,212,0.07)'
-              }
-              stroke={
-                mapLayerMode === 'satellite'
-                  ? 'rgba(52,211,153,0.5)'
-                  : mapLayerMode === 'vector-arterial'
-                    ? 'rgba(245,158,11,0.6)'
-                    : 'rgba(6,182,212,0.5)'
-              }
-              strokeWidth="1.2"
-              className="transition-colors duration-500 pointer-events-none"
-            />
-
-            {/* World Country Borders */}
-            <path
-              d={WORLD_BORDERS_SVG_PATH}
-              fill="none"
-              stroke={mapLayerMode === 'satellite' ? 'rgba(255,255,255,0.15)' : 'rgba(6,182,212,0.22)'}
-              strokeWidth="0.7"
-              strokeDasharray="2 3"
-              className="pointer-events-none"
-            />
-
-            {/* 4. Satellite Night-Light Clusters (Industrial & Inland Logistics Belts) */}
-            {mapLayerMode === 'satellite' && (
-              <g className="pointer-events-none opacity-85">
-                <circle cx="653.6" cy="180.0" r="14" fill="url(#city-night-light)" />
-                <circle cx="512.4" cy="105.8" r="16" fill="url(#city-night-light)" />
-                <circle cx="527.5" cy="101.2" r="12" fill="url(#city-night-light)" />
-                <circle cx="837.4" cy="163.3" r="18" fill="url(#city-night-light)" />
-                <circle cx="788.4" cy="246.3" r="14" fill="url(#city-night-light)" />
-                <circle cx="295.0" cy="137.0" r="18" fill="url(#city-night-light)" />
-              </g>
-            )}
-
-            {/* 5. Arterial Highway Corridors & Heavy Road Freight Mesh */}
-            {showHighways && (
-              <g className="pointer-events-none opacity-50">
-                {/* Trans-Eurasian Highway Link */}
-                <path d="M 512 106 L 565 110 L 610 135 L 653 180 L 720 190 L 837 163" fill="none" stroke="#f59e0b" strokeWidth="1.5" strokeDasharray="4 4" />
-                {/* North American Interstates I-80/I-90 corridor */}
-                <path d="M 175 140 L 230 135 L 295 137" fill="none" stroke="#f59e0b" strokeWidth="1.5" strokeDasharray="4 4" />
-                {/* Middle East GCC Highway Grid */}
-                <path d="M 629 181 L 653 180 L 664 185" fill="none" stroke="#10b981" strokeWidth="1.8" strokeDasharray="3 3" />
-              </g>
-            )}
-
-            {/* 6. Quantitative Data Heatmap Overlay */}
-            {showHeatmap && (
-              <g className="pointer-events-none transition-opacity duration-500">
-                <circle cx="653.6" cy="180.0" r="65" fill="url(#hq-heatmap-hot)" />
-                <circle cx="512.4" cy="105.8" r="60" fill="url(#hq-heatmap-hot)" />
-                <circle cx="837.4" cy="163.3" r="70" fill="url(#hq-heatmap-cold)" />
-                <circle cx="788.4" cy="246.3" r="55" fill="url(#hq-heatmap-cold)" />
-                <circle cx="590.4" cy="166.9" r="50" fill="url(#hq-heatmap-hot)" />
-              </g>
-            )}
-
-            {/* 7. Active Terrestrial Highway Trajectory Vector Paths */}
-            {/* Secondary Alternative Highway */}
-            <path
-              d={activeCorridor.landOliveRuralPath || activeCorridor.predictivePath}
-              fill="none"
-              stroke="#06b6d4"
-              strokeWidth="2.2"
-              strokeDasharray="6 6"
-              className="opacity-60 pointer-events-none"
-            />
-
-            {/* Primary Main Active Highway Route Track with Reference for Live Vehicle Animation */}
-            <path
-              ref={pathRef}
-              d={activeTrajectoryPath}
-              fill="none"
-              stroke="url(#active-pulse-gradient)"
-              strokeWidth={selectedModeId === 'electric-platoon' ? '4.8' : '4.2'}
-              filter="url(#hq-glow-cyan)"
-              className="pointer-events-none"
-            />
-
-            {/* Animated Laser Pulse along trajectory */}
-            <motion.path
-              d={activeTrajectoryPath}
-              fill="none"
-              stroke="#ffffff"
-              strokeWidth="2.5"
-              strokeDasharray="14 120"
-              initial={{ strokeDashoffset: 0 }}
-              animate={{ strokeDashoffset: -260 }}
-              transition={{ duration: 2.2, repeat: Infinity, ease: 'linear' }}
-              className="pointer-events-none"
-            />
-
-            {/* Highway Crossing Chokepoints & Smart Customs Gateways */}
-            <g
-              onClick={(e) => {
-                e.stopPropagation()
-                centerOnPoint(chokepointPixels[0], chokepointPixels[1], 3.2)
-              }}
-              className="cursor-pointer"
-            >
-              <circle cx={chokepointPixels[0]} cy={chokepointPixels[1]} r="12" fill="rgba(245,158,11,0.3)" filter="url(#hq-glow-gold)" />
-              <circle cx={chokepointPixels[0]} cy={chokepointPixels[1]} r="5" fill="#f59e0b" />
-              <circle cx={chokepointPixels[0]} cy={chokepointPixels[1]} r="1.8" fill="#000000" />
-            </g>
-
-            {/* 8. Inland Logistics Hubs, Cross-Dock Centers, and Dry Ports */}
-            {showHubs &&
-              INLAND_LOGISTICS_HUBS.map((hub) => {
-                const [hx, hy] = projectGeo(hub.gps)
-                const isSelected = selectedHub?.id === hub.id
-                return (
-                  <g
-                    key={hub.id}
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      setSelectedHub(hub)
-                      centerOnPoint(hx, hy, 2.8)
-                    }}
-                    className="cursor-pointer group"
-                  >
-                    <circle
-                      cx={hx}
-                      cy={hy}
-                      r={isSelected ? '12' : '7'}
-                      fill={isSelected ? 'rgba(52,211,153,0.5)' : 'rgba(56,189,248,0.25)'}
-                      filter="url(#hq-glow-emerald)"
-                      className="transition-all duration-300"
-                    />
-                    <circle
-                      cx={hx}
-                      cy={hy}
-                      r={isSelected ? '5.5' : '3.8'}
-                      fill={isSelected ? '#34d399' : '#38bdf8'}
-                      className="transition-all duration-300"
-                    />
-                    <circle cx={hx} cy={hy} r="1.5" fill="#020617" />
-                    {/* Tooltip text on zoom */}
-                    {transform.scale > 1.8 && (
-                      <text
-                        x={hx + 8}
-                        y={hy + 3}
-                        fill="#e2e8f0"
-                        fontSize="7"
-                        fontFamily="monospace"
-                        fontWeight="bold"
-                        className="pointer-events-none drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]"
-                      >
-                        {hub.name[language]}
-                      </text>
-                    )}
-                  </g>
-                )
-              })}
-
-            {/* 8b. Declared Weigh Stations (corridor.weighbridgeGps) */}
-            {showWeighStations &&
-              weighStationMarkers.map((marker) => {
-                const [mx, my] = marker.coordinates
-                return (
-                  <g
-                    key={`weigh-${marker.gps[0]}-${marker.gps[1]}`}
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      openMarkerPopover(marker)
-                    }}
-                    className="cursor-pointer"
-                  >
-                    <circle cx={mx} cy={my} r="9" fill="rgba(245,158,11,0.2)" />
-                    <g transform={`translate(${mx} ${my}) rotate(45)`}>
-                      <rect x="-4.5" y="-4.5" width="9" height="9" rx="1.5" fill="#f59e0b" stroke="#020617" strokeWidth="0.8" />
-                    </g>
-                    <circle cx={mx} cy={my} r="1.6" fill="#020617" />
-                    {transform.scale > 1.8 && (
-                      <text
-                        x={mx + 8}
-                        y={my + 3}
-                        fill="#fbbf24"
-                        fontSize="6.5"
-                        fontFamily="monospace"
-                        fontWeight="bold"
-                        className="pointer-events-none drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]"
-                      >
-                        WEIGH · {marker.name}
-                      </text>
-                    )}
-                  </g>
-                )
-              })}
-
-            {/* 8c. Rest & Driver-Hours Stops */}
-            {showRestStops &&
-              restStopMarkers.map((marker) => {
-                const [mx, my] = marker.coordinates
-                return (
-                  <g
-                    key={`rest-${marker.gps[0]}-${marker.gps[1]}`}
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      openMarkerPopover(marker)
-                    }}
-                    className="cursor-pointer"
-                  >
-                    <circle cx={mx} cy={my} r="9" fill="rgba(45,212,191,0.18)" />
-                    <g transform={`translate(${mx} ${my})`}>
-                      <rect x="-4" y="-4" width="8" height="8" rx="2" fill="#2dd4bf" stroke="#020617" strokeWidth="0.8" />
-                      <rect x="-1.8" y="-1" width="2.2" height="3" rx="0.6" fill="#042f2e" />
-                      <rect x="1" y="-2.4" width="1.4" height="1.4" rx="0.4" fill="#042f2e" />
-                    </g>
-                    {transform.scale > 1.8 && (
-                      <text
-                        x={mx + 8}
-                        y={my + 3}
-                        fill="#5eead4"
-                        fontSize="6.5"
-                        fontFamily="monospace"
-                        fontWeight="bold"
-                        className="pointer-events-none drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]"
-                      >
-                        REST · {marker.name}
-                      </text>
-                    )}
-                  </g>
-                )
-              })}
-
-            {/* 8d. Border Crossings with declared clearance windows */}
-            {showBorderGates &&
-              borderGateMarkers.map((marker) => {
-                const [mx, my] = marker.coordinates
-                return (
-                  <g
-                    key={`border-${marker.gps[0]}-${marker.gps[1]}`}
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      openMarkerPopover(marker)
-                    }}
-                    className="cursor-pointer"
-                  >
-                    <circle cx={mx} cy={my} r="9" fill="rgba(251,113,133,0.18)" />
-                    <g transform={`translate(${mx} ${my}) rotate(45)`}>
-                      <rect x="-4" y="-4" width="8" height="8" fill="#fb7185" stroke="#020617" strokeWidth="0.8" />
-                    </g>
-                    <rect x={mx - 2} y={my - 2} width="4" height="4" fill="#881337" />
-                    {transform.scale > 1.8 && (
-                      <text
-                        x={mx + 8}
-                        y={my + 3}
-                        fill="#fda4af"
-                        fontSize="6.5"
-                        fontFamily="monospace"
-                        fontWeight="bold"
-                        className="pointer-events-none drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]"
-                      >
-                        BORDER · {marker.name}
-                      </text>
-                    )}
-                  </g>
-                )
-              })}
-
-            {/* 8e. Simulated Fleet — trucks interpolated along realLandPath
-                at the corridor's declared speed. Simulation only. */}
-            {showSimulatedFleet &&
-              fleetTrucks.map((truck, i) => (
-                <g
-                  key={`sim-fleet-${i}`}
-                  transform={`translate(${truck.x} ${truck.y}) rotate(${truck.angleDeg})`}
-                  className="pointer-events-none"
-                >
-                  <circle cx="0" cy="0" r="7" fill="rgba(125,211,252,0.12)" />
-                  <rect x="-6" y="-2.6" width="8.5" height="5.2" rx="1" fill="#7dd3fc" stroke="#0c4a6e" strokeWidth="0.6" />
-                  <polygon points="3,-2.4 6.4,0 3,2.4" fill="#bae6fd" stroke="#0c4a6e" strokeWidth="0.5" />
-                  <circle cx="0" cy="0" r="1" fill="#0c4a6e" />
-                </g>
-              ))}
-
-            {/* 9. LEO Satellite Constellation */}
-            {showSatellites &&
-              LEO_SATELLITES.map((sat) => {
-                const [sx, sy] = projectGeo([sat.lon, sat.lat])
-                return (
-                  <g key={sat.id} className="pointer-events-none">
-                    <line
-                      x1={sx}
-                      y1={sy}
-                      x2={sx}
-                      y2={sy + 35}
-                      stroke="rgba(168,85,247,0.35)"
-                      strokeWidth="1.2"
-                      strokeDasharray="2 3"
-                    />
-                    <circle cx={sx} cy={sy} r="9" fill="rgba(168,85,247,0.2)" />
-                    <circle cx={sx} cy={sy} r="3" fill="#c084fc" />
-                    <circle cx={sx} cy={sy} r="1" fill="#ffffff" />
-                    <line x1={sx - 7} y1={sy} x2={sx - 3} y2={sy} stroke="#c084fc" strokeWidth="1.5" />
-                    <line x1={sx + 3} y1={sy} x2={sx + 7} y2={sy} stroke="#c084fc" strokeWidth="1.5" />
-                    {transform.scale > 1.5 && (
-                      <text
-                        x={sx + 10}
-                        y={sy + 2}
-                        fill="#d8b4fe"
-                        fontSize="6.5"
-                        fontFamily="monospace"
-                        fontWeight="bold"
-                        className="drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]"
-                      >
-                        {sat.name}
-                      </text>
-                    )}
-                  </g>
-                )
-              })}
-
-            {/* 10. Origin & Destination Strategic Inland Logistics Gateways */}
-            {/* Origin Node */}
-            <g
-              onClick={(e) => {
-                e.stopPropagation()
-                if (activeCorridor.detailedWaypoints && activeCorridor.detailedWaypoints[0]) {
-                  setSelectedWaypointNode(activeCorridor.detailedWaypoints[0])
-                }
-                centerOnPoint(originPixels[0], originPixels[1], 3.0)
-              }}
-              className="cursor-pointer"
-            >
-              <circle cx={originPixels[0]} cy={originPixels[1]} r="16" fill="rgba(6,182,212,0.3)" filter="url(#hq-glow-cyan)" />
-              <circle cx={originPixels[0]} cy={originPixels[1]} r="6" fill="#06b6d4" />
-              <circle cx={originPixels[0]} cy={originPixels[1]} r="2.5" fill="#ffffff" />
-              <text
-                x={originPixels[0] + 10}
-                y={originPixels[1] - 8}
-                fill="#ffffff"
-                fontSize="9"
-                fontFamily="monospace"
-                fontWeight="800"
-                className="drop-shadow-[0_2px_6px_rgba(0,0,0,0.95)]"
-              >
-                ORIGIN // {activeCorridor.originHub}
-              </text>
-            </g>
-
-            {/* Destination Node */}
-            <g
-              onClick={(e) => {
-                e.stopPropagation()
-                if (activeCorridor.detailedWaypoints && activeCorridor.detailedWaypoints.length > 0) {
-                  const last = activeCorridor.detailedWaypoints[activeCorridor.detailedWaypoints.length - 1]
-                  setSelectedWaypointNode(last)
-                }
-                centerOnPoint(destPixels[0], destPixels[1], 3.0)
-              }}
-              className="cursor-pointer"
-            >
-              <circle cx={destPixels[0]} cy={destPixels[1]} r="16" fill="rgba(16,185,129,0.3)" filter="url(#hq-glow-emerald)" />
-              <circle cx={destPixels[0]} cy={destPixels[1]} r="6" fill="#10b981" />
-              <circle cx={destPixels[0]} cy={destPixels[1]} r="2.5" fill="#ffffff" />
-              <text
-                x={destPixels[0] + 10}
-                y={destPixels[1] - 8}
-                fill="#ffffff"
-                fontSize="9"
-                fontFamily="monospace"
-                fontWeight="800"
-                className="drop-shadow-[0_2px_6px_rgba(0,0,0,0.95)]"
-              >
-                DEST // {activeCorridor.destinationHub}
-              </text>
-            </g>
-
-            {/* 11. Real-Time Moving Fleet Asset (Autonomous Heavy Truck & Connected Platoon) */}
-            <g
-              transform={`translate(${vehiclePos.x}, ${vehiclePos.y}) rotate(${vehiclePos.angle})`}
-              className="pointer-events-none"
-            >
-              {/* Radar Detection Field Ring */}
-              <circle cx="0" cy="0" r="22" fill="rgba(6,182,212,0.15)" stroke="#06b6d4" strokeWidth="1" strokeDasharray="3 3" />
-              <circle cx="0" cy="0" r="10" fill="none" stroke="rgba(56,189,248,0.4)" strokeWidth="0.8" />
-              
-              {/* Heavy Electric Freight Truck Asset */}
-              <g filter="url(#hq-glow-cyan)">
-                {/* Forward LiDAR Sensor Beam Cone */}
-                <polygon points="14,0 32,-11 32,11" fill="rgba(6,182,212,0.18)" />
-                {/* Aerodynamic Trailer */}
-                <rect x="-18" y="-5" width="20" height="10" rx="1.5" fill="#0284c7" stroke="#ffffff" strokeWidth="1.2" />
-                {/* Cab */}
-                <polygon points="13,0 10,-4.5 2,-4.5 2,4.5 10,4.5" fill="#38bdf8" stroke="#ffffff" strokeWidth="1" />
-                {/* Windshield */}
-                <rect x="5" y="-2.5" width="3" height="5" fill="#082f49" />
-                {/* LED Headlight Beams */}
-                <circle cx="13" cy="-2.5" r="1.5" fill="#ffffff" />
-                <circle cx="13" cy="2.5" r="1.5" fill="#ffffff" />
-              </g>
-
-              {/* Core Center Pulse */}
-              <circle cx="0" cy="0" r="2" fill="#ffffff" />
-            </g>
-          </g>
-        </svg>
-
-        {/* Simulated fleet disclosure — prominent, not a tooltip */}
-        {showSimulatedFleet && (
-          <div
-            dir="auto"
-            className={`absolute top-4 ${isRTL ? 'right-4' : 'left-4'} z-30 max-w-[240px] px-3 py-2 rounded-xl border border-amber-400/40 bg-slate-950/90 backdrop-blur-xl font-mono text-[9px] leading-relaxed pointer-events-none shadow-2xl`}
-          >
-            <span className="flex items-center gap-1.5 font-bold text-amber-300 uppercase tracking-wider">
-              <span className="relative flex h-1.5 w-1.5">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75" />
-                <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-amber-400" />
-              </span>
-              SIMULATED FLEET — NOT A LIVE FEED
-            </span>
-            <span className="block text-amber-100/80 mt-0.5">أسطول مُحاكاة — ليست بيانات بث حي</span>
-          </div>
-        )}
+      {/* Main MapLibre WebGL Canvas Container */}
+      <div className="relative flex-1 w-full h-full min-h-[480px] bg-slate-950 overflow-hidden">
+        <div ref={mapContainerRef} className="w-full h-full min-h-[480px]" />
 
         {/* Live Simulation Floating Playback & Telemetry Controller */}
         <div
@@ -1104,7 +925,7 @@ export function HighQualityRealMap({
         >
           {/* Real-Time Vehicle Status Floating Card */}
           <div className="p-3 rounded-2xl bg-slate-900/90 border border-white/10 backdrop-blur-xl shadow-2xl flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-cyan-500/20 border border-cyan-500/40 flex items-center justify-center text-cyan-300 shrink-0">
+            <div className="w-9 h-9 rounded-xl bg-gold-500/20 border border-gold-500/40 flex items-center justify-center text-gold-300 shrink-0">
               <Navigation className="w-4 h-4 animate-spin" style={{ animationDuration: '6s' }} />
             </div>
             <div className="font-mono text-xs">
@@ -1118,7 +939,7 @@ export function HighQualityRealMap({
                 </span>
               </div>
               <div className="text-[10px] text-slate-400">
-                PROG: <span className="text-cyan-300 font-bold">{Math.round(fleetProgress * 100)}%</span> | SPEED:{' '}
+                PROG: <span className="text-gold-300 font-bold">{Math.round(fleetProgress * 100)}%</span> | SPEED:{' '}
                 <span className="text-white font-bold">{Math.round(simSpeedKmh)} KM/H (MODELLED)</span>
               </div>
             </div>
@@ -1128,7 +949,7 @@ export function HighQualityRealMap({
               <button
                 onClick={() => setIsPlaying(!isPlaying)}
                 aria-label={isPlaying ? 'Pause Simulation' : 'Play Simulation'}
-                className="p-1.5 rounded-lg bg-cyan-500 text-slate-950 hover:bg-cyan-400 transition-colors shadow-sm"
+                className="p-1.5 rounded-lg bg-gold-500 text-slate-950 hover:bg-gold-400 transition-colors shadow-sm"
               >
                 {isPlaying ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5" />}
               </button>
@@ -1138,7 +959,8 @@ export function HighQualityRealMap({
                   else if (playbackSpeed === 2) setPlaybackSpeed(5)
                   else setPlaybackSpeed(1)
                 }}
-                className="px-2 py-1 rounded-lg bg-white/5 border border-white/10 text-[10px] font-mono font-bold text-cyan-300 hover:bg-white/10 transition-colors flex items-center gap-1"
+                aria-label="Toggle Playback Speed"
+                className="px-2 py-1 rounded-lg bg-white/5 border border-white/10 text-[10px] font-mono font-bold text-gold-300 hover:bg-white/10 transition-colors flex items-center gap-1"
               >
                 <FastForward className="w-3 h-3" />
                 <span>{playbackSpeed}x</span>
@@ -1152,22 +974,25 @@ export function HighQualityRealMap({
           className={`absolute bottom-4 ${isRTL ? 'left-4' : 'right-4'} z-20 flex flex-col gap-1.5 p-1.5 rounded-2xl bg-slate-900/90 border border-white/10 backdrop-blur-xl shadow-2xl`}
         >
           <button
-            onClick={zoomIn}
+            onClick={handleZoomIn}
             title="Zoom In"
+            aria-label="Zoom In"
             className="p-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/10 transition-colors"
           >
             <Plus className="w-4 h-4" />
           </button>
           <button
-            onClick={zoomOut}
+            onClick={handleZoomOut}
             title="Zoom Out"
+            aria-label="Zoom Out"
             className="p-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/10 transition-colors"
           >
             <Minus className="w-4 h-4" />
           </button>
           <button
-            onClick={resetView}
+            onClick={handleResetView}
             title="Reset Map View"
+            aria-label="Reset Map View"
             className="p-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/10 transition-colors"
           >
             <RotateCcw className="w-4 h-4" />
@@ -1181,15 +1006,16 @@ export function HighQualityRealMap({
               initial={{ opacity: 0, y: 10, scale: 0.95 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 10, scale: 0.95 }}
-              className={`absolute top-4 ${isRTL ? 'left-4' : 'right-4'} z-30 max-w-xs w-full p-4 rounded-2xl bg-slate-900/95 border border-cyan-500/40 backdrop-blur-2xl shadow-2xl text-white font-mono text-xs`}
+              className={`absolute top-4 ${isRTL ? 'left-4' : 'right-4'} z-30 max-w-xs w-full p-4 rounded-2xl bg-slate-900/95 border border-gold-500/40 backdrop-blur-2xl shadow-2xl text-white font-mono text-xs`}
             >
               <div className="flex items-start justify-between gap-2 mb-2">
                 <div>
-                  <span className="text-[10px] text-cyan-400 font-bold uppercase">{selectedHub.country[language]}</span>
+                  <span className="text-[10px] text-gold-400 font-bold uppercase">{selectedHub.country[language]}</span>
                   <h4 className="font-bold text-sm text-white">{selectedHub.name[language]}</h4>
                 </div>
                 <button
                   onClick={() => setSelectedHub(null)}
+                  aria-label="Close Hub Details"
                   className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800"
                 >
                   <X className="w-3.5 h-3.5" />
@@ -1206,7 +1032,7 @@ export function HighQualityRealMap({
                 </div>
                 <div className="flex justify-between">
                   <span className="text-slate-400">CLEARANCE:</span>
-                  <span className="text-cyan-300 font-bold">{selectedHub.clearanceTime}</span>
+                  <span className="text-gold-300 font-bold">{selectedHub.clearanceTime}</span>
                 </div>
                 <div className="text-[10px] text-slate-400 pt-1">
                   {selectedHub.stats}
@@ -1232,6 +1058,7 @@ export function HighQualityRealMap({
                 </div>
                 <button
                   onClick={() => setSelectedWaypointNode(null)}
+                  aria-label="Close Waypoint Details"
                   className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800"
                 >
                   <X className="w-3.5 h-3.5" />
@@ -1240,7 +1067,7 @@ export function HighQualityRealMap({
               <div className="space-y-1.5 text-[11px] text-slate-300 border-t border-white/10 pt-2">
                 <div className="flex justify-between">
                   <span className="text-slate-400">WEATHER:</span>
-                  <span className="text-cyan-300 font-bold">{selectedWaypointNode.weather[language]}</span>
+                  <span className="text-gold-300 font-bold">{selectedWaypointNode.weather[language]}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-slate-400">THROUGHPUT:</span>
@@ -1254,19 +1081,18 @@ export function HighQualityRealMap({
             </motion.div>
           )}
         </AnimatePresence>
-
       </div>
 
       {/* Bottom Telemetry HUD Status Strip */}
       <div className="p-3.5 sm:p-4 bg-slate-900/90 border-t border-white/10 rounded-b-2xl z-20 flex flex-wrap items-center justify-between gap-3 text-xs font-mono">
         <div className="flex flex-wrap items-center gap-4 text-slate-300">
           <span className="flex items-center gap-1.5">
-            <Radio className="w-3.5 h-3.5 text-cyan-400" />
+            <Radio className="w-3.5 h-3.5 text-gold-400" />
             <span>AXLE LOAD: <strong className="text-white">{activeCorridor.axleLoadLimitT} TONS MAX</strong></span>
           </span>
           <span className="flex items-center gap-1.5">
             <ShieldCheck className="w-3.5 h-3.5 text-sky-400" />
-            <span>CLEARANCE: <strong className="text-cyan-300">{activeCorridor.clearanceHeightM}M HEIGHT</strong></span>
+            <span>CLEARANCE: <strong className="text-gold-300">{activeCorridor.clearanceHeightM}M HEIGHT</strong></span>
           </span>
           <span className="flex items-center gap-1.5">
             <Zap className="w-3.5 h-3.5 text-emerald-400" />

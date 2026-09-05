@@ -34,12 +34,12 @@ function ChartTooltip({ active, payload, label, language }: CustomTooltipProps) 
   const labelText = isRtl ? 'حجم التدفق' : 'Throughput'
 
   return (
-    <div className="rounded-xl border border-cyan-500/30 bg-slate-950/95 p-3.5 shadow-[0_10px_30px_rgba(0,0,0,0.8)] backdrop-blur-md">
+    <div className="rounded-xl border border-gold-500/30 bg-slate-950/95 p-3.5 shadow-[0_10px_30px_rgba(0,0,0,0.8)] backdrop-blur-md">
       <p className="font-mono text-xs text-slate-400 mb-1">{label}</p>
       <div className="flex items-center gap-2">
-        <span className="w-2.5 h-2.5 rounded-full bg-cyan-400 shadow-[0_0_8px_rgba(6,182,212,0.8)]" />
+        <span className="w-2.5 h-2.5 rounded-full bg-gold-400 shadow-[0_0_8px_rgba(232,179,23,0.8)]" />
         <span className="text-xs font-bold text-white">
-          {labelText}: <span className="font-mono text-cyan-300">{val.toLocaleString()} Tons/hr</span>
+          {labelText}: <span className="font-mono text-gold-300">{val.toLocaleString()} Tons/hr</span>
         </span>
       </div>
     </div>
@@ -146,7 +146,7 @@ export default function DashboardOverviewSection() {
     >
       {/* Background Ambience */}
       <div
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_60%_45%_at_50%_40%,rgba(6,182,212,0.05),transparent)]"
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_60%_45%_at_50%_40%,rgba(232,179,23,0.05),transparent)]"
         aria-hidden="true"
       />
 
@@ -154,8 +154,8 @@ export default function DashboardOverviewSection() {
         
         {/* Header Block */}
         <div className="text-center max-w-3xl mx-auto mb-16">
-          <p className="text-cyan-400 font-extrabold tracking-widest text-[11px] sm:text-xs uppercase mb-3 flex items-center justify-center gap-2">
-            <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
+          <p className="text-gold-400 font-extrabold tracking-widest text-[11px] sm:text-xs uppercase mb-3 flex items-center justify-center gap-2">
+            <span className="w-1.5 h-1.5 rounded-full bg-gold-400 animate-pulse" />
             {ui.kicker[language]}
           </p>
           <h2
@@ -213,7 +213,7 @@ export default function DashboardOverviewSection() {
                     onClick={() => setActiveMetric('throughput')}
                     className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all duration-200 ${
                       activeMetric === 'throughput'
-                        ? 'bg-gradient-to-r from-cyan-500 to-sky-500 text-slate-950 shadow-md'
+                        ? 'bg-gradient-to-r from-gold-500 to-amber-500 text-slate-950 shadow-md'
                         : 'text-slate-400 hover:text-white'
                     }`}
                   >
@@ -223,7 +223,7 @@ export default function DashboardOverviewSection() {
                     onClick={() => setActiveMetric('fleet')}
                     className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all duration-200 ${
                       activeMetric === 'fleet'
-                        ? 'bg-gradient-to-r from-cyan-500 to-sky-500 text-slate-950 shadow-md'
+                        ? 'bg-gradient-to-r from-gold-500 to-amber-500 text-slate-950 shadow-md'
                         : 'text-slate-400 hover:text-white'
                     }`}
                   >
@@ -241,8 +241,8 @@ export default function DashboardOverviewSection() {
                   >
                     <defs>
                       <linearGradient id="colorMetric" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#06b6d4" stopOpacity={0.3} />
-                        <stop offset="95%" stopColor="#06b6d4" stopOpacity={0.0} />
+                        <stop offset="5%" stopColor="#E8B317" stopOpacity={0.3} />
+                        <stop offset="95%" stopColor="#E8B317" stopOpacity={0.0} />
                       </linearGradient>
                     </defs>
                     <CartesianGrid
@@ -266,7 +266,7 @@ export default function DashboardOverviewSection() {
                     <Tooltip
                       content={<ChartTooltip language={language} />}
                       cursor={{
-                        stroke: '#06b6d4',
+                        stroke: '#E8B317',
                         strokeWidth: 1,
                         strokeDasharray: '3 3'
                       }}
@@ -274,21 +274,21 @@ export default function DashboardOverviewSection() {
                     <Area
                       type="monotone"
                       dataKey={activeMetric}
-                      stroke="#06b6d4"
+                      stroke="#E8B317"
                       strokeWidth={2.5}
                       fillOpacity={1}
                       fill="url(#colorMetric)"
                       dot={{
                         r: 3,
-                        stroke: '#06b6d4',
+                        stroke: '#E8B317',
                         strokeWidth: 2,
                         fill: '#020617'
                       }}
                       activeDot={{
                         r: 6,
-                        stroke: '#22d3ee',
+                        stroke: '#FBBF24',
                         strokeWidth: 2,
-                        fill: '#22d3ee'
+                        fill: '#FBBF24'
                       }}
                     />
                   </AreaChart>
@@ -299,14 +299,14 @@ export default function DashboardOverviewSection() {
             {/* Simulated Live Spark/Footer within the Card */}
             <div className="flex flex-wrap items-center justify-between gap-4 mt-6 pt-6 border-t border-slate-200/20 dark:border-white/[0.05]">
               <div className="flex items-center gap-3">
-                <div className="p-2 rounded-xl bg-cyan-500/10 text-cyan-400">
+                <div className="p-2 rounded-xl bg-gold-500/10 text-gold-400">
                   <Activity className="w-4 h-4 animate-pulse" />
                 </div>
                 <div>
                   <span className="text-[10px] text-slate-500 block uppercase tracking-wider">
                     {ui.metricThroughput[language]}
                   </span>
-                  <span className="text-sm font-black font-mono text-cyan-400">
+                  <span className="text-sm font-black font-mono text-gold-400">
                     {activeMetric === 'throughput'
                       ? `${Math.round(throughputData.reduce((acc, cur) => acc + cur.throughput, 0) / throughputData.length)} ${ui.tonsHr[language]}`
                       : `${Math.round(throughputData.reduce((acc, cur) => acc + cur.fleet, 0) / throughputData.length)} Units`}
@@ -369,14 +369,14 @@ export default function DashboardOverviewSection() {
                       stroke="none"
                     >
                       {/* Active glowing path */}
-                      <Cell fill="url(#gaugeCyanGradient)" />
+                      <Cell fill="url(#gaugeGoldGradient)" />
                       {/* Inactive background track */}
                       <Cell fill={mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.08)'} />
                     </Pie>
                     <defs>
-                      <linearGradient id="gaugeCyanGradient" x1="0" y1="0" x2="1" y2="1">
-                        <stop offset="0%" stopColor="#06b6d4" />
-                        <stop offset="100%" stopColor="#3b82f6" />
+                      <linearGradient id="gaugeGoldGradient" x1="0" y1="0" x2="1" y2="1">
+                        <stop offset="0%" stopColor="#E8B317" />
+                        <stop offset="100%" stopColor="#F59E0B" />
                       </linearGradient>
                     </defs>
                   </PieChart>
@@ -388,7 +388,7 @@ export default function DashboardOverviewSection() {
                     {gridLoad > 75 ? ui.highLoadText[language] : ui.optLoadText[language]}
                   </span>
                   <div className="flex items-baseline gap-0.5 justify-center mt-1">
-                    <span className="text-4xl sm:text-5xl font-black font-mono tracking-tighter bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">
+                    <span className="text-4xl sm:text-5xl font-black font-mono tracking-tighter bg-gradient-to-r from-gold-400 to-amber-300 bg-clip-text text-transparent">
                       {networkEfficiency}
                     </span>
                     <span className="text-lg font-bold text-slate-400">%</span>
@@ -403,10 +403,10 @@ export default function DashboardOverviewSection() {
               <div className="space-y-4 pt-4 border-t border-slate-200/20 dark:border-white/[0.05]">
                 <div className="flex items-center justify-between gap-2 text-xs">
                   <span className="font-bold flex items-center gap-1.5 text-slate-400">
-                    <Sliders className="w-3.5 h-3.5 text-cyan-400" />
+                    <Sliders className="w-3.5 h-3.5 text-gold-400" />
                     {ui.adjustedLoad[language]}
                   </span>
-                  <span className="font-mono text-cyan-400 font-bold">{gridLoad}%</span>
+                  <span className="font-mono text-gold-400 font-bold">{gridLoad}%</span>
                 </div>
                 <input
                   type="range"
@@ -414,7 +414,7 @@ export default function DashboardOverviewSection() {
                   max="95"
                   value={gridLoad}
                   onChange={(e) => setGridLoad(parseInt(e.target.value))}
-                  className="w-full h-1.5 bg-slate-200 dark:bg-slate-800 rounded-lg appearance-none cursor-pointer accent-cyan-400 focus:outline-none"
+                  className="w-full h-1.5 bg-slate-200 dark:bg-slate-800 rounded-lg appearance-none cursor-pointer accent-gold-400 focus:outline-none"
                   aria-label="Adjust Simulated Grid Load"
                 />
               </div>
@@ -425,9 +425,9 @@ export default function DashboardOverviewSection() {
               <button
                 onClick={handleCalibrate}
                 disabled={isCalibrating}
-                className="relative w-full group overflow-hidden py-3 px-4 rounded-xl font-bold text-xs transition-all duration-300 flex items-center justify-center gap-2 border border-cyan-400/35 bg-[#051336]/80 text-cyan-400 shadow-[inset_0_1px_2px_rgba(0,0,0,0.5),0_0_15px_rgba(6,182,212,0.1)] hover:shadow-[0_0_20px_rgba(6,182,212,0.35)] disabled:opacity-60"
+                className="relative w-full group overflow-hidden py-3 px-4 rounded-xl font-bold text-xs transition-all duration-300 flex items-center justify-center gap-2 border border-gold-400/35 bg-[#151206]/80 text-gold-400 shadow-[inset_0_1px_2px_rgba(0,0,0,0.5),0_0_15px_rgba(232,179,23,0.1)] hover:shadow-[0_0_20px_rgba(232,179,23,0.35)] disabled:opacity-60"
               >
-                <RefreshCw className={`w-3.5 h-3.5 text-cyan-400 ${isCalibrating ? 'animate-spin' : 'group-hover:rotate-180 transition-transform duration-500'}`} />
+                <RefreshCw className={`w-3.5 h-3.5 text-gold-400 ${isCalibrating ? 'animate-spin' : 'group-hover:rotate-180 transition-transform duration-500'}`} />
                 <span>
                   {isCalibrating ? ui.optimizingText[language] : ui.optimizeBtn[language]}
                 </span>

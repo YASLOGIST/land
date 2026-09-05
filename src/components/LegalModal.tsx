@@ -108,7 +108,7 @@ export default function LegalModal({
         className="max-w-2xl border-white/10 bg-slate-950/95 backdrop-blur-2xl text-slate-200 sm:max-w-2xl"
       >
         <DialogHeader className={direction === 'rtl' ? 'text-right' : 'text-left'}>
-          <p className="font-mono text-[10px] font-bold uppercase tracking-[0.28em] text-cyan-400">
+          <p className="font-mono text-[10px] font-bold uppercase tracking-[0.28em] text-gold-500">
             YASLOGIST · NEW CAIRO, CAIRO
           </p>
           <DialogTitle className="mt-2 text-xl font-extrabold text-white sm:text-2xl">

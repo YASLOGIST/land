@@ -751,7 +751,7 @@ export default function DisruptionCommandSection() {
 
                 <div className="flex items-center gap-2.5">
                   <div className="flex items-center gap-1.5 font-mono text-[9.5px] font-bold text-slate-400">
-                    <Terminal className="w-3.5 h-3.5 text-cyan-400" />
+                    <Terminal className="w-3.5 h-3.5 text-gold-400" />
                     <span>CONFIDENCE: {activeStrategy.confidenceScore}%</span>
                   </div>
 
@@ -1090,7 +1090,7 @@ export default function DisruptionCommandSection() {
               </div>
 
               {/* ETA strip — computeEta output for the active strategy */}
-              <div className="mb-2.5 p-3 rounded-2xl border border-cyan-500/15 bg-black/25 backdrop-blur-xl font-mono">
+              <div className="mb-2.5 p-3 rounded-2xl border border-gold-500/15 bg-black/25 backdrop-blur-xl font-mono">
                 <span className="text-[9px] font-bold text-amber-300/90 uppercase tracking-wider block mb-1.5">
                   {ui.etaCompareTitle[language]}
                 </span>
@@ -1125,7 +1125,7 @@ export default function DisruptionCommandSection() {
                   <div className="font-mono text-xl sm:text-2xl font-extrabold text-emerald-400">
                     -{simulation.hoursSaved} hrs
                   </div>
-                  <span className="text-[9px] font-mono text-cyan-400 font-semibold mt-0.5 block">
+                  <span className="text-[9px] font-mono text-gold-400 font-semibold mt-0.5 block">
                     AI OPTIMIZED
                   </span>
                 </div>
@@ -1139,7 +1139,7 @@ export default function DisruptionCommandSection() {
                   <span className="text-[9.5px] font-bold text-slate-400 block uppercase mb-0.5">
                     {ui.afterLabel[language]}
                   </span>
-                  <div className="font-mono text-xl sm:text-2xl font-extrabold text-cyan-300">
+                  <div className="font-mono text-xl sm:text-2xl font-extrabold text-gold-300">
                     {simulation.netDelayHours} hrs
                   </div>
                   <span className="text-[9px] font-mono text-slate-400 line-through mt-0.5 block">
@@ -1188,8 +1188,8 @@ export default function DisruptionCommandSection() {
               onClick={() => setAuthModalOpen(true)}
               className={`w-full group py-3.5 px-6 rounded-2xl font-bold text-sm tracking-wide transition-all duration-300 flex items-center justify-center gap-3 backdrop-blur-xl ${
                 mode === 'dark'
-                  ? 'bg-gradient-to-r from-emerald-500 via-cyan-500 to-blue-600 text-slate-950 hover:from-emerald-400 hover:to-blue-500 shadow-[0_0_25px_rgba(16,185,129,0.35)]'
-                  : 'bg-gradient-to-r from-emerald-600 via-cyan-600 to-blue-700 text-white hover:from-emerald-500 hover:to-blue-600 shadow-lg'
+                  ? 'bg-gradient-to-r from-emerald-500 via-gold-500 to-amber-600 text-slate-950 hover:from-emerald-400 hover:to-amber-500 shadow-[0_0_25px_rgba(16,185,129,0.35)]'
+                  : 'bg-gradient-to-r from-emerald-600 via-gold-600 to-amber-700 text-white hover:from-emerald-500 hover:to-amber-600 shadow-lg'
               }`}
             >
               <RotateCw className="w-4 h-4 text-slate-950 dark:text-slate-950 animate-spin" style={{ animationDuration: '6s' }} />

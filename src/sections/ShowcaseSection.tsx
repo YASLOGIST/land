@@ -81,8 +81,8 @@ export default function ShowcaseSection() {
       <div className="relative z-10 max-w-6xl mx-auto">
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto mb-16">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border mb-4 backdrop-blur-xl bg-cyan-500/10 border-cyan-500/30 text-cyan-400 shadow-[0_0_20px_rgba(6,182,212,0.15)]">
-            <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border mb-4 backdrop-blur-xl bg-gold-500/10 border-gold-500/30 text-gold-400 shadow-[0_0_20px_rgba(232,179,23,0.15)]">
+            <Sparkles className="w-3.5 h-3.5 text-gold-400" />
             <span className={`font-bold ${isRTL ? 'text-xs tracking-normal' : 'text-xs uppercase tracking-widest'}`}>
               {sectionHeader.kicker[language]}
             </span>
@@ -116,8 +116,8 @@ export default function ShowcaseSection() {
                 transition={{ duration: 0.5, delay: idx * 0.15 }}
                 className={`group relative flex flex-col rounded-3xl overflow-hidden backdrop-blur-2xl transition-all duration-300 ${
                   mode === 'dark'
-                    ? 'border border-white/10 bg-white/[0.025] hover:bg-white/[0.045] shadow-[0_8px_32px_0_rgba(0,0,0,0.37)] hover:shadow-[0_0_30px_rgba(6,182,212,0.2)] hover:border-cyan-400/40'
-                    : 'border border-slate-200/90 bg-white hover:shadow-2xl hover:border-cyan-500/40'
+                    ? 'border border-white/10 bg-white/[0.025] hover:bg-white/[0.045] shadow-[0_8px_32px_0_rgba(0,0,0,0.37)] hover:shadow-[0_0_30px_rgba(232,179,23,0.2)] hover:border-gold-400/40'
+                    : 'border border-slate-200/90 bg-white hover:shadow-2xl hover:border-gold-500/40'
                 }`}
               >
                 {/* Video Viewport Container with Dynamic Scale */}
@@ -129,7 +129,7 @@ export default function ShowcaseSection() {
                     loop
                     playsInline
                     webkit-playsinline="true"
-                    preload="auto"
+                    preload="none"
                     disablePictureInPicture
                     disableRemotePlayback
                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
@@ -144,10 +144,10 @@ export default function ShowcaseSection() {
                       isRTL ? 'right-3.5' : 'left-3.5'
                     }`}
                   >
-                    <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-bold backdrop-blur-xl bg-slate-950/80 text-cyan-300 border border-white/15 shadow-md ${
+                    <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-bold backdrop-blur-xl bg-slate-950/80 text-gold-300 border border-white/15 shadow-md ${
                       isRTL ? 'text-xs tracking-normal' : 'text-[11px] uppercase tracking-wider'
                     }`}>
-                      <ItemIcon className="w-3.5 h-3.5 text-cyan-400" />
+                      <ItemIcon className="w-3.5 h-3.5 text-gold-400" />
                       {item.badge[language]}
                     </span>
                   </div>
@@ -172,8 +172,8 @@ export default function ShowcaseSection() {
                       isRTL ? 'left-3.5' : 'right-3.5'
                     } ${
                       mode === 'dark'
-                        ? 'bg-slate-900/80 text-slate-200 hover:bg-cyan-500 hover:text-slate-950 border border-white/10'
-                        : 'bg-white/90 text-slate-800 hover:bg-cyan-600 hover:text-white border border-slate-200 shadow-sm'
+                        ? 'bg-slate-900/80 text-slate-200 hover:bg-gold-500 hover:text-slate-950 border border-white/10'
+                        : 'bg-white/90 text-slate-800 hover:bg-gold-600 hover:text-white border border-slate-200 shadow-sm'
                     }`}
                   >
                     <Maximize2 className="w-3.5 h-3.5" />
@@ -184,7 +184,7 @@ export default function ShowcaseSection() {
                 {/* Card Body */}
                 <div className="p-7 flex flex-col flex-grow justify-between">
                   <div>
-                    <span className={`font-mono font-bold text-cyan-400 mb-2 block ${isRTL ? 'text-xs tracking-normal' : 'text-[10px] uppercase tracking-widest'}`}>
+                    <span className={`font-mono font-bold text-gold-400 mb-2 block ${isRTL ? 'text-xs tracking-normal' : 'text-[10px] uppercase tracking-widest'}`}>
                       {item.tag[language]}
                     </span>
                     <h3
@@ -225,12 +225,12 @@ export default function ShowcaseSection() {
               exit={{ scale: 0.92, opacity: 0 }}
               transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
               onClick={(e) => e.stopPropagation()}
-              className="relative max-w-5xl w-full rounded-3xl overflow-hidden border border-white/15 bg-slate-900/90 shadow-[0_0_50px_rgba(6,182,212,0.3)]"
+              className="relative max-w-5xl w-full rounded-3xl overflow-hidden border border-white/15 bg-slate-900/90 shadow-[0_0_50px_rgba(232,179,23,0.3)]"
             >
               <button
                 onClick={() => setSelectedVideo(null)}
                 aria-label={sectionHeader.close[language]}
-                className={`absolute top-4 ${isRTL ? 'left-4' : 'right-4'} z-20 p-2.5 rounded-full bg-slate-950/80 text-white hover:bg-cyan-500 hover:text-slate-950 transition-colors border border-white/10 shadow-lg`}
+                className={`absolute top-4 ${isRTL ? 'left-4' : 'right-4'} z-20 p-2.5 rounded-full bg-slate-950/80 text-white hover:bg-gold-500 hover:text-slate-950 transition-colors border border-white/10 shadow-lg`}
               >
                 <X className="w-5 h-5" />
               </button>

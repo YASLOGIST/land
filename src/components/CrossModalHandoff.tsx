@@ -92,7 +92,7 @@ export default function CrossModalHandoff() {
           transition={{ duration: 0.6 }}
           className="max-w-3xl mb-12"
         >
-          <p className={`text-cyan-400 font-bold mb-3 ${
+          <p className={`text-gold-500 font-bold mb-3 ${
             isRtl ? 'text-xs tracking-normal' : 'text-xs uppercase tracking-widest'
           }`}>
             {COPY.tag[language]}
@@ -161,7 +161,7 @@ export default function CrossModalHandoff() {
                   {live ? (
                     <a
                       href={surface.href}
-                      className="inline-flex items-center gap-2 rounded-xl px-5 py-3 text-sm font-bold transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-cyan-400"
+                      className="inline-flex items-center gap-2 rounded-xl px-5 py-3 text-sm font-bold transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-gold-400"
                       style={{
                         background: surface.accent,
                         color: '#020617',
