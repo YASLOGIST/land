@@ -29,7 +29,12 @@ const BANNED = ["AASTMT", "Arab Academy", "CITL", "211010469"];
 /* Personal-document shapes. A CV is never a site asset — it carries a
    home address, a personal mobile and an education history that the
    commercial positioning deliberately removed. */
-const BANNED_FILES = [/\bcv\b/i, /curriculum[\s_-]*vitae/i, /\bresume\b/i, /\.docx\.pdf$/i];
+const BANNED_FILES = [
+  /(?:^|[\\/._-])cv\.(pdf|docx?|txt|rtf)$/i,
+  /curriculum[\s_-]*vitae/i,
+  /(?:^|[\\/._-])resume\.(pdf|docx?|txt|rtf)$/i,
+  /\.docx\.pdf$/i,
+];
 
 const escape = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
