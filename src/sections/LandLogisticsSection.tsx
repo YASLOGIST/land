@@ -138,10 +138,10 @@ export default function LandLogisticsSection({
 
   const sectionRef = useRef<HTMLElement | null>(null)
   const pinContainerRef = useRef<HTMLDivElement | null>(null)
-  const dayVideoRef = useRef<HTMLVideoElement | null>(null)
-  const nightVideoRef = useRef<HTMLVideoElement | null>(null)
+  const videoRef = useRef<HTMLVideoElement | null>(null)
   const scrollTriggerRef = useRef<ScrollTrigger | null>(null)
   const telemetryTimeSpanRef = useRef<HTMLSpanElement | null>(null)
+  const [videoLoaded, setVideoLoaded] = useState(false)
 
   const targetProgressRef = useRef<number>(0)
   const currentProgressRef = useRef<number>(0)
@@ -177,18 +177,35 @@ export default function LandLogisticsSection({
     setActivePhase((prev) => (prev === next ? prev : next))
   }, [])
 
-  const isDarkRef = useRef<boolean>(isDark)
+  // Dynamic theme switching with zero video stutter
   useEffect(() => {
-    isDarkRef.current = isDark
-    const active = isDark ? nightVideoRef.current : dayVideoRef.current
-    if (active && active.readyState >= 1) {
-      const dur = active.duration && !isNaN(active.duration) && active.duration > 0 ? active.duration : 10.0
-      const p = Math.max(0, Math.min(1, currentProgressRef.current))
+    const video = videoRef.current
+    if (!video) return
+    const nextSrc = isDark ? '/videos/FINALnight.mp4' : '/videos/FINAL.mp4'
+    const nextPoster = isDark ? '/assets/final-night-poster.jpg' : '/assets/final-day-poster.jpg'
+
+    if (!video.src.endsWith(nextSrc)) {
+      video.src = nextSrc
+      video.poster = nextPoster
+      video.muted = true
+      video.defaultMuted = true
+      video.playsInline = true
+      video.preload = 'auto'
       try {
-        active.currentTime = Math.max(0, Math.min(p * dur, dur - 0.03))
+        video.load()
       } catch {
-        // Guard seek
+        // Guard against load interrupt
       }
+      const onReady = () => {
+        const dur = video.duration && !isNaN(video.duration) && video.duration > 0 ? video.duration : 10.0
+        const p = Math.max(0, Math.min(1, currentProgressRef.current))
+        try {
+          video.currentTime = Math.max(0, Math.min(p * dur, dur - 0.03))
+        } catch {
+          // Guard seek on unmounted element
+        }
+      }
+      video.addEventListener('canplay', onReady, { once: true })
     }
   }, [isDark])
 
@@ -196,9 +213,8 @@ export default function LandLogisticsSection({
   useEffect(() => {
     const section = sectionRef.current
     const pinContainer = pinContainerRef.current
-    const dayVideo = dayVideoRef.current
-    const nightVideo = nightVideoRef.current
-    if (!section || !pinContainer) return
+    const video = videoRef.current
+    if (!section || !pinContainer || !video) return
 
     let disposed = false
     let innerCleanup: (() => void) | undefined
@@ -209,17 +225,20 @@ export default function LandLogisticsSection({
       if (disposed) return
       ScrollTrigger.config({ ignoreMobileResize: true })
 
-      if (dayVideo) {
-        dayVideo.muted = true
-        dayVideo.playsInline = true
-        dayVideo.preload = 'auto'
-        dayVideo.pause()
-      }
-      if (nightVideo) {
-        nightVideo.muted = true
-        nightVideo.playsInline = true
-        nightVideo.preload = 'auto'
-        nightVideo.pause()
+      video.muted = true
+      video.defaultMuted = true
+      video.playsInline = true
+      video.setAttribute('playsinline', '')
+      video.setAttribute('webkit-playsinline', '')
+      video.setAttribute('x5-playsinline', '')
+      video.preload = 'auto'
+      video.pause()
+      if (video.readyState < 1) {
+        try {
+          video.load()
+        } catch {
+          // Guard load
+        }
       }
 
       let isRunning = true
@@ -230,17 +249,16 @@ export default function LandLogisticsSection({
       let pendingTargetTime: number | null = null
 
       const seekActive = (targetTime: number) => {
-        const v = isDarkRef.current ? nightVideo : dayVideo
-        if (!v || v.readyState < 1) return
+        if (!video || video.readyState < 1) return
 
-        if (v.seeking || isSeeking) {
+        if (video.seeking || isSeeking) {
           pendingTargetTime = targetTime
           return
         }
 
         isSeeking = true
         try {
-          v.currentTime = targetTime
+          video.currentTime = targetTime
         } catch {
           isSeeking = false
         }
@@ -251,15 +269,13 @@ export default function LandLogisticsSection({
         if (pendingTargetTime !== null) {
           const next = pendingTargetTime
           pendingTargetTime = null
-          const v = isDarkRef.current ? nightVideo : dayVideo
-          if (v && Math.abs(v.currentTime - next) > 0.015) {
+          if (video && Math.abs(video.currentTime - next) > 0.015) {
             seekActive(next)
           }
         }
       }
 
-      dayVideo?.addEventListener('seeked', onSeeked)
-      nightVideo?.addEventListener('seeked', onSeeked)
+      video.addEventListener('seeked', onSeeked)
 
       const renderLoop = () => {
         if (!isRunning) return
@@ -280,15 +296,11 @@ export default function LandLogisticsSection({
 
         const p = Math.max(0, Math.min(1, currentProgressRef.current))
 
-        // Only scrub the visible active video to eliminate 50% GPU decoder overhead on mobile
-        const activeVideo = isDarkRef.current ? nightVideo : dayVideo
-        if (activeVideo) {
-          const dur = activeVideo.duration && !isNaN(activeVideo.duration) && activeVideo.duration > 0 ? activeVideo.duration : 10.0
-          const targetTime = Math.max(0, Math.min(p * dur, dur - 0.03))
+        const dur = video.duration && !isNaN(video.duration) && video.duration > 0 ? video.duration : 10.0
+        const targetTime = Math.max(0, Math.min(p * dur, dur - 0.03))
 
-          if (activeVideo.readyState >= 1 && Math.abs(activeVideo.currentTime - targetTime) > 0.015) {
-            seekActive(targetTime)
-          }
+        if (video.readyState >= 1 && Math.abs(video.currentTime - targetTime) > 0.015) {
+          seekActive(targetTime)
         }
 
         const totalSeconds = p * 60 + (activePhaseRef.current * 30)
@@ -345,25 +357,16 @@ export default function LandLogisticsSection({
       scrollTriggerRef.current = trigger
 
       const onVideoReady = () => {
+        setVideoLoaded(true)
+        if (video && !video.paused) video.pause()
         ScrollTrigger.refresh()
-        if (dayVideo && !dayVideo.paused) dayVideo.pause()
-        if (nightVideo && !nightVideo.paused) nightVideo.pause()
       }
 
-      if (dayVideo) {
-        if (dayVideo.readyState >= 2) onVideoReady()
-        else {
-          dayVideo.addEventListener('loadedmetadata', onVideoReady, { once: true })
-          dayVideo.addEventListener('canplay', onVideoReady, { once: true })
-        }
-      }
-
-      if (nightVideo) {
-        if (nightVideo.readyState >= 2) onVideoReady()
-        else {
-          nightVideo.addEventListener('loadedmetadata', onVideoReady, { once: true })
-          nightVideo.addEventListener('canplay', onVideoReady, { once: true })
-        }
+      if (video.readyState >= 2) {
+        onVideoReady()
+      } else {
+        video.addEventListener('loadedmetadata', onVideoReady, { once: true })
+        video.addEventListener('canplay', onVideoReady, { once: true })
       }
 
       const handleResize = () => ScrollTrigger.refresh()
@@ -375,16 +378,9 @@ export default function LandLogisticsSection({
           cancelAnimationFrame(animFrameIdRef.current)
         }
         window.removeEventListener('resize', handleResize)
-        dayVideo?.removeEventListener('seeked', onSeeked)
-        nightVideo?.removeEventListener('seeked', onSeeked)
-        if (dayVideo) {
-          dayVideo.removeEventListener('loadedmetadata', onVideoReady)
-          dayVideo.removeEventListener('canplay', onVideoReady)
-        }
-        if (nightVideo) {
-          nightVideo.removeEventListener('loadedmetadata', onVideoReady)
-          nightVideo.removeEventListener('canplay', onVideoReady)
-        }
+        video.removeEventListener('seeked', onSeeked)
+        video.removeEventListener('loadedmetadata', onVideoReady)
+        video.removeEventListener('canplay', onVideoReady)
         trigger.kill()
       }
     })() // end async scrub setup
@@ -394,6 +390,25 @@ export default function LandLogisticsSection({
       innerCleanup?.()
     }
   }, [updatePhase])
+
+  const handleLoadedMetadata = () => {
+    setVideoLoaded(true)
+    const video = videoRef.current
+    if (video) {
+      video.muted = true
+      video.defaultMuted = true
+      video.playsInline = true
+      video.preload = 'auto'
+      video.pause()
+      const dur = video.duration && !isNaN(video.duration) && video.duration > 0 ? video.duration : 10.0
+      const p = Math.max(0, Math.min(1, currentProgressRef.current))
+      try {
+        video.currentTime = Math.max(0, Math.min(p * dur, dur - 0.03))
+      } catch {
+        // Guard seek on initial load
+      }
+    }
+  }
 
   const phase = i18n.phases[activePhase]
   const PhaseIcon = phase.icon
@@ -432,44 +447,34 @@ export default function LandLogisticsSection({
         className="relative h-screen w-full overflow-hidden bg-slate-950"
       >
 
-        {/* ─── DAYTIME SIMULATION VIDEO (OPACITY SMOOTH CROSSFADE) ─── */}
+        {/* ─── SINGLE SOURCE OF TRUTH HARDWARE-ACCELERATED SIMULATION VIDEO (Z-0) ─── */}
         <video
-          ref={dayVideoRef}
-          src="/videos/FINAL.mp4"
+          ref={videoRef}
+          src={isDark ? '/videos/FINALnight.mp4' : '/videos/FINAL.mp4'}
+          poster={isDark ? '/assets/final-night-poster.jpg' : '/assets/final-day-poster.jpg'}
           muted
           playsInline
           webkit-playsinline="true"
           x5-playsinline="true"
-          preload="none"
+          preload="auto"
           controls={false}
           autoPlay={false}
           loop={false}
-          className={`absolute inset-0 w-full h-full object-cover z-0 pointer-events-none transition-opacity duration-700 ease-in-out ${
-            isDark ? 'opacity-0' : 'opacity-100'
-          }`}
+          onLoadedMetadata={handleLoadedMetadata}
+          onCanPlay={() => {
+            setVideoLoaded(true)
+            if (videoRef.current && !videoRef.current.paused) {
+              videoRef.current.pause()
+            }
+          }}
+          className="absolute inset-0 w-full h-full object-cover z-0 pointer-events-none"
+          style={{
+            opacity: videoLoaded ? 1 : 0.85,
+            transition: 'opacity 0.4s ease',
+          }}
           aria-hidden="true"
         >
-          <source src="/videos/FINAL.mp4" type="video/mp4" />
-        </video>
-
-        {/* ─── NOCTURNAL SIMULATION VIDEO (OPACITY SMOOTH CROSSFADE) ─── */}
-        <video
-          ref={nightVideoRef}
-          src="/videos/FINALnight.mp4"
-          muted
-          playsInline
-          webkit-playsinline="true"
-          x5-playsinline="true"
-          preload="none"
-          controls={false}
-          autoPlay={false}
-          loop={false}
-          className={`absolute inset-0 w-full h-full object-cover z-0 pointer-events-none transition-opacity duration-700 ease-in-out ${
-            isDark ? 'opacity-100' : 'opacity-0'
-          }`}
-          aria-hidden="true"
-        >
-          <source src="/videos/FINALnight.mp4" type="video/mp4" />
+          <source src={isDark ? '/videos/FINALnight.mp4' : '/videos/FINAL.mp4'} type="video/mp4" />
         </video>
 
         {/* ─── BACKDROP TINT OVERLAY (Z-10, POINTER-EVENTS-NONE) ─── */}
