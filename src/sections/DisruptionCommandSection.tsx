@@ -50,6 +50,11 @@ import type {
 import { WORLD_LAND_SVG_PATH, WORLD_BORDERS_SVG_PATH } from '@/data/world-land-110m'
 import { projectGeo } from '@/utils/gis-projection'
 import { useGisPanZoom } from '@/hooks/useGisPanZoom'
+import { computeEta, type EtaInput } from '@/lib/eta'
+import { LAND_TRADE_CORRIDORS } from '@/data/landCorridors'
+
+/** Declared line-haul speed for scenario ETA arithmetic (MODELLED). */
+const SCENARIO_LINEHAUL_KMH = 80
 
 const t = (en: string, ar: string): BilingualText => ({ en, ar })
 
@@ -481,10 +486,45 @@ export default function DisruptionCommandSection() {
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [])
 
-  // Pure Zero-Trust Immutable Simulation Engine
+  // Immutable Simulation Engine — every ETA is recomputed by computeEta
+  // from the affected corridor's declared segment figures, so selecting a
+  // strategy re-runs the arithmetic instead of reading its mitigation claim.
   const simulation: DisruptionSimulationResult = useMemo(() => {
-    const netDelay = Math.max(0.5, activeScenario.baseDelayHours - activeStrategy.delayMitigationHours)
-    const hoursSaved = activeStrategy.delayMitigationHours
+    const corridor =
+      LAND_TRADE_CORRIDORS.find(
+        (c) => c.code === activeScenario.affectedCorridor.split(' // ')[0].trim(),
+      ) || LAND_TRADE_CORRIDORS[0]
+
+    const etaBaseInput: EtaInput = {
+      distanceKm: corridor.distanceKm,
+      avgSpeedKmh: SCENARIO_LINEHAUL_KMH,
+      gateQueueMin: corridor.etaModel.gateQueueMin,
+      gateQueueBandMin: corridor.etaModel.gateQueueBandMin,
+      weighbridgeMin: corridor.etaModel.weighbridgeMin,
+      restBreakMin: corridor.etaModel.restBreakMin,
+      borderHrs: corridor.etaModel.borderHrs,
+      borderBandHrs: corridor.etaModel.borderBandHrs,
+    }
+
+    const formatMinutes = (totalMinutes: number) => {
+      const rounded = Math.round(totalMinutes)
+      const days = Math.floor(rounded / (24 * 60))
+      const h = Math.floor((rounded % (24 * 60)) / 60)
+      const m = rounded % 60
+      if (days > 0) return `${days}d ${h}h ${m}m`
+      if (h > 0) return `${h}h ${m}m`
+      return `${m}m`
+    }
+
+    const etaFor = (incidentHoldMin: number) =>
+      computeEta({ ...etaBaseInput, incidentHoldMin })
+
+    const planned = etaFor(0)
+    const disrupted = etaFor(activeScenario.baseDelayHours * 60)
+    const mitigated = etaFor(Math.max(0.5, activeScenario.baseDelayHours - activeStrategy.delayMitigationHours) * 60)
+
+    const hoursSaved = (disrupted.totalMinutes - mitigated.totalMinutes) / 60
+    const netDelay = (mitigated.totalMinutes - planned.totalMinutes) / 60
     const efficiencyGain = Number((22.4 + activeStrategy.confidenceScore * 0.05).toFixed(1))
 
     const rawSeed = `AUTH-REROUTE-${activeScenario.code}-${activeStrategy.id}-2026-GIS`
@@ -495,14 +535,29 @@ export default function DisruptionCommandSection() {
     }
     const token = `0x${Math.abs(hash).toString(16).padStart(8, '0').toUpperCase()}8B4E17C2`
 
+    const strategySavingsHours: Record<string, number> = {}
+    for (const strategy of activeScenario.strategies) {
+      const mitigatedFor = etaFor(
+        Math.max(0.5, activeScenario.baseDelayHours - strategy.delayMitigationHours) * 60,
+      )
+      strategySavingsHours[strategy.id] = Number(
+        ((disrupted.totalMinutes - mitigatedFor.totalMinutes) / 60).toFixed(1),
+      )
+    }
+
     return {
       activeScenario,
       selectedStrategy: activeStrategy,
       netDelayHours: Number(netDelay.toFixed(1)),
-      hoursSaved,
+      hoursSaved: Number(hoursSaved.toFixed(1)),
       fuelEfficiencyGain: efficiencyGain,
       lossPreventionRate: `${activeStrategy.confidenceScore.toFixed(1)}% MITIGATED (MODELLED)`,
       authChecksumToken: token,
+      etaPlannedFormatted: formatMinutes(planned.totalMinutes),
+      etaDisruptedFormatted: formatMinutes(disrupted.totalMinutes),
+      etaMitigatedFormatted: formatMinutes(mitigated.totalMinutes),
+      etaBandMin: Math.round(mitigated.confidenceBandMin),
+      strategySavingsHours,
     }
   }, [activeScenario, activeStrategy])
 
@@ -539,6 +594,10 @@ export default function DisruptionCommandSection() {
     copied: t('Token Copied', 'تم نسخ الرمز'),
     close: t('Close', 'إغلاق'),
     fullscreen: t('Crisis World View', 'عرض أزمات العالم الكامل للشاشة'),
+    etaCompareTitle: t(
+      'ETA — PLANNED VS MITIGATED, RECOMPUTED PER STRATEGY',
+      'زمن الوصول — المخطط مقابل ما بعد الخطة، يُعاد احتسابه لكل استراتيجية',
+    ),
     exitFullscreen: t('Exit Fullscreen', 'إنهاء وضع ملء الشاشة'),
     zoomIn: t('Zoom In', 'تكبير'),
     zoomOut: t('Zoom Out', 'تصغير'),
@@ -1019,7 +1078,7 @@ export default function DisruptionCommandSection() {
                         <div className="flex items-center justify-between mb-1.5">
                           <Icon className={`w-4 h-4 ${isSelected ? 'text-emerald-400' : 'text-slate-400'}`} />
                           <span className="font-mono text-[9px] font-bold text-emerald-400">
-                            -{strategy.delayMitigationHours}h
+                            -{simulation.strategySavingsHours[strategy.id] ?? 0}h
                           </span>
                         </div>
                         <div className="font-bold text-xs leading-snug mb-0.5">{strategy.name[language]}</div>
@@ -1027,6 +1086,28 @@ export default function DisruptionCommandSection() {
                       </button>
                     )
                   })}
+                </div>
+              </div>
+
+              {/* ETA strip — computeEta output for the active strategy */}
+              <div className="mb-2.5 p-3 rounded-2xl border border-cyan-500/15 bg-black/25 backdrop-blur-xl font-mono">
+                <span className="text-[9px] font-bold text-amber-300/90 uppercase tracking-wider block mb-1.5">
+                  {ui.etaCompareTitle[language]}
+                </span>
+                <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1 text-[10.5px] text-slate-300">
+                  <span>
+                    PLANNED (NO INCIDENT) <b className="text-white">{simulation.etaPlannedFormatted}</b>
+                  </span>
+                  <span>
+                    MITIGATED{' '}
+                    <b className="text-emerald-400">{simulation.etaMitigatedFormatted}</b>
+                  </span>
+                  <span className="text-slate-400">
+                    {simulation.etaBandMin > 0
+                      ? `±${simulation.etaBandMin} MIN BAND`
+                      : 'NO DECLARED SPREAD'}
+                  </span>
+                  <span className="text-amber-300/80 font-bold">(MODELLED)</span>
                 </div>
               </div>
 

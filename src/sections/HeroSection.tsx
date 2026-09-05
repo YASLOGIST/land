@@ -10,10 +10,10 @@ import {
   Warehouse,
 } from 'lucide-react'
 import { useLanguage } from '@/hooks/use-language'
-import { gsap } from 'gsap'
-import { ScrollTrigger } from 'gsap/ScrollTrigger'
-
-gsap.registerPlugin(ScrollTrigger)
+// GSAP + ScrollTrigger are loaded lazily inside the scrub effect (below) so
+// the scroll-scrubbed hero video never blocks first paint with the GSAP
+// bundle. The type-only import below keeps the ref type at zero runtime cost.
+import type { ScrollTrigger } from 'gsap/ScrollTrigger'
 
 const t = (en: string, ar: string) => ({ en, ar })
 
@@ -63,13 +63,25 @@ export default function HeroSection() {
     const pinContainer = pinContainerRef.current
     if (!video || !section || !pinContainer) return
 
-    video.muted = true
-    video.playsInline = true
-    video.preload = 'auto'
-    video.pause()
+    let disposed = false
+    let innerCleanup: (() => void) | undefined
 
-    let isMounted = true
-    const isLoopingRef = { current: false }
+    // Dynamic import: GSAP loads after first paint, before the first scroll.
+    void (async () => {
+      const [{ gsap }, { ScrollTrigger }] = await Promise.all([
+        import('gsap'),
+        import('gsap/ScrollTrigger'),
+      ])
+      if (disposed) return
+      gsap.registerPlugin(ScrollTrigger)
+
+      video.muted = true
+      video.playsInline = true
+      video.preload = 'auto'
+      video.pause()
+
+      let isMounted = true
+      const isLoopingRef = { current: false }
 
     // Smooth RAF loop: strictly interpolates progress and seeks video.currentTime
     const renderLoop = () => {
@@ -159,7 +171,7 @@ export default function HeroSection() {
     const handleResize = () => ScrollTrigger.refresh()
     window.addEventListener('resize', handleResize, { passive: true })
 
-    return () => {
+    innerCleanup = () => {
       isMounted = false
       if (animFrameIdRef.current) {
         cancelAnimationFrame(animFrameIdRef.current)
@@ -168,6 +180,12 @@ export default function HeroSection() {
       video.removeEventListener('loadedmetadata', onVideoReady)
       video.removeEventListener('canplay', onVideoReady)
       trigger.kill()
+    }
+    })() // end async scrub setup
+
+    return () => {
+      disposed = true
+      innerCleanup?.()
     }
   }, [])
 

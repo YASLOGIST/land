@@ -11,6 +11,27 @@ export interface WaypointDetail {
   avgClearanceTime: string
 }
 
+/** Declared segment figures the pure computeEta engine runs on. Every
+ *  number traces to a declared (MODELLED) string in landCorridors.ts —
+ *  a hub gate window, a waypoint clearance time, or the corridor route
+ *  itself. Expected values are the midpoints of declared windows; the
+ *  band fields are the one-sided half-widths of those windows. Corridors
+ *  without a declared border window carry borderHrs 0. */
+export interface DeclaredEtaSegments {
+  /** Expected origin gate / yard queue, minutes (declared window midpoint). */
+  gateQueueMin: number
+  /** One-sided half-width of the declared gate window, minutes. */
+  gateQueueBandMin: number
+  /** Expected weighbridge stop, minutes. */
+  weighbridgeMin: number
+  /** Scheduled driver rest / checkpoint-break minutes declared on the route. */
+  restBreakMin: number
+  /** Expected border (or ferry) clearance hours; 0 = domestic corridor. */
+  borderHrs: number
+  /** One-sided half-width of the declared border window, hours. */
+  borderBandHrs: number
+}
+
 export interface RealTradeCorridor {
   id: string
   code: string
@@ -50,6 +71,9 @@ export interface RealTradeCorridor {
   clearanceHeightM: number
   /** Booked departure slot out of the origin yard. */
   railSlotTime: string
+  /** Declared ETA segment figures (MODELLED) that feed the pure computeEta
+   *  engine — see DeclaredEtaSegments. */
+  etaModel: DeclaredEtaSegments
   chokepointName: BilingualText
   chokepointGps: [number, number]
   /** Weighbridge the corridor's overload risk concentrates on. */

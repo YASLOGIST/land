@@ -1,5 +1,6 @@
 import type { LucideIcon } from 'lucide-react'
 import type { BilingualText } from './land-logistics'
+import type { EtaResult } from '../lib/eta'
 
 export type TransportModeId =
   | 'electric-truck'
@@ -52,14 +53,18 @@ export interface TradeCorridorOption {
 }
 
 export interface DispatchSimulationOutput {
-  estimatedTimeHours: number
+  /** Total door-to-door time including every declared (MODELLED) hold,
+   *  formatted as e.g. "13h 55m" or "2d 3h". */
   estimatedTimeFormatted: string
+  /** Declared-spread confidence band, e.g. "±68 MIN (MODELLED)". */
   etaVarianceFormatted: string
+  /** Local arrival wall-clock from the engine's etaIso, "(MODELLED)". */
+  arrivalTimeFormatted: string
   co2SavedKg: number
   fuelReductionPercent: number
   costEstimateUsd: number
-  confidenceScore: number
   cryptographicManifestHash: string
   meshNodePingMs: number
-  zeroLossVerificationStatus: 'VERIFIED' | 'TAMPER_PROOF_SEALED'
+  /** Full deterministic ETA result — breakdown drives the segment list. */
+  eta: EtaResult
 }

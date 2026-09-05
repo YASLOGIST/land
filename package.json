@@ -13,7 +13,8 @@
     "check:bundle": "node scripts/check-bundle.mjs",
     "network-summary": "node scripts/network-summary.mjs --write",
     "check:network-summary": "node scripts/network-summary.mjs --check",
-    "gate": "npm run check:network-summary && npm run typecheck && npm run lint && npm run build && npm run check:bundle"
+    "gate": "npm run check:network-summary && npm run check:eta && npm run typecheck && npm run lint && npm run build && npm run check:bundle",
+    "check:eta": "node scripts/check-eta.mjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
